@@ -48,8 +48,9 @@ SUP { COLOR: #0000FF; FONT-SIZE: small; }
 <a name="top">JavaML: A Markup Language for Java Source Code</a>
 </h2>
 <h6><a href="http://www.cs.washington.edu/homes/gjb">Greg J. Badros</a><br>
-<a href="http://www.cs.washington.edu">Department of Computer Science and Engineering</a><br>
+<a href="http://www.cs.washington.edu">Dept. of Computer Science and Engineering</a><br>
 <a href="http://www.washington.edu">University of Washington</a><br>
+<a href="http://www.ci.seattle.wa.us/">Seattle, WA &nbsp; USA</a><br>
 <a href="http://www.cs.washington.edu/homes/gjb/JavaML/">JavaML Home Page</a></h6>
 
 <hr>
@@ -586,10 +587,10 @@ the resulting markup language.
 JavaML is defined by the document type definition (DTD) in
 <a href="#javaml-dtd">appendix A</a>, but is best illustrated by example.  For the
 <code>FirstApplet.java</code> source code listed above, we represent the
-program in JavaML as shown below.
+program in JavaML as shown in <a href="#fig-firstapplet-converted">figure 1</a>.
 </p>
 
-<a name="fig-firstapplet-converted"><p class="caption">FirstApplet.java converted to JavaML.</p></a>
+<a name="fig-firstapplet-converted">&nbsp;</a>
 <pre>
    1  &lt;?xml version="1.0" encoding="UTF-8"?&gt;
    2  &lt;!DOCTYPE java-source-program SYSTEM "java-ml.dtd"&gt;
@@ -629,7 +630,7 @@ structure of the programming language in the nesting of the elements.
 For example, the literal string <code>"FirstApplet"</code> is a part of the message
 send, thus the <code>literal-string</code> element is nested inside the
 <code>send</code> element.  This nesting is even more apparent when
-presented visually as in figures <a href="#fig2a">1a</a> and <a href="#fig2b">1b</a>.
+presented visually as in figures <a href="#fig2a">2a</a> and <a href="#fig2b">2b</a>.
 See the author's <a href="http://www.cs.washington.edu/homes/gjb/JavaML">JavaML web page </a><tt><a href="#ref-4">[4]</a></tt>
 for further examples.
 </p><p>
@@ -788,8 +789,8 @@ by processing a file to JavaML, back-converting it, and then
 re-converting to JavaML: no differences should exist between the result
 and the originally-converted JavaML file.
 </p><p>
-All of the source code is available from the JavaML home
-page <tt><a href="#ref-4">[4]</a></tt>.
+All of the source code is available from the <a href="http://www.cs.washington.edu/homes/gjb/JavaML/">JavaML home
+page</a> <tt><a href="#ref-4">[4]</a></tt>.
 </p>
 
 <p><span class="index"><a href="#top">[top]</a></span></p>
@@ -827,8 +828,10 @@ DOM level 1 <tt><a href="#ref-2">[2]</a></tt> interface to an XML tree.
 These are just a very small subset of the tools that prove useful when
 working with JavaML.  In the following examples, we will query
 <code>Hangman.java.xml</code>, the JavaML representation of the Hangman
-applet available at Sun Microsystems' applet page <tt><a href="#ref-50">[50]</a></tt> and
-also at the JavaML home page <tt><a href="#ref-4">[4]</a></tt>.  Although these examples
+applet available at <a href="http://java.sun.com/applets/">Sun Microsystems' applet page</a>
+<tt><a href="#ref-50">[50]</a></tt> and
+also at the <a href="http://www.cs.washington.edu/homes/gjb/JavaML/">JavaML home page</a>
+<tt><a href="#ref-4">[4]</a></tt>.  Although these examples
 are small by real-world standards, XML and SGML tools target documents
 ranging up through lengthy books so the implementations are designed to
 scale well.
