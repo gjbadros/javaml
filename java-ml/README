@@ -2,3 +2,14 @@ To get started, try:
 
 export CLASSPATH=/usr/lib/netscape/java/classes/java40.jar:$CLASSPATH
 ../jikes/src/jikes +ux FirstApplet.java
+
+Then use: 
+
+% nsgmls-xml xml-unparsed/FirstApplet.java.xml
+
+to check the output against java-ml.dtd
+
+nsgmls-xml is just:
+
+#!/bin/sh -
+nsgmls -c/usr/doc/jade-1.2.1/pubtext/xml.soc -wxml "$@"
