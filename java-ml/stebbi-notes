@@ -1,0 +1,102 @@
+From: Stefan Bjarni Sigurdsson <stebbi@cs.washington.edu>
+Subject: Can I contribute?
+To: gjb@cs.washington.edu
+Date: Sat, 13 Nov 1999 12:42:34 -0800
+Xref: clavicle.cs.washington.edu inbox:13456
+
+Hi Greg, I was rather excited about these XML ideas so I sat down last
+night and started working on a javaml-to-java converter. I am probably
+halfway through, time-wise. I also started working on a visualization
+tool, as an application for the idea - and a nice demo. If you think
+this might make the paper more compelling, I could put lots of hours
+into this until the paper deadline, in exchange for being least
+significant author. I already have a lot of the visualization stuff,
+anyway. I could contribute (a) javaml-to-java converter, (b) an example
+application and (c) I'm not going anywhere on Tuesday so it might
+relieve you of some of the time pressure.
+
+I'm going to make this stuff be my 505 project, so regardless of whether
+you'd like some help on the paper, could you send me the javaml doctype
+so I can make my converter fit yours? That would be great. And, if you'd
+rather not have any help with your paper, don't worry about it =8)
+I might just be guilty of some wistful thinking...
+
+I put some listings below just to show you what I've been doing. My
+quick-and-dirty javaml doctype (dtd, I guess it's called =8) isn't
+really all that interesting so I left it out.
+
+-- here is the example xml file
+
+<?xml version="1.0"?>
+<!DOCTYPE javaml SYSTEM "javaml.dtd">
+<package name="firstpackage">
+  <class name="FirstApplet" visibility="public">
+    <method name="paint" visibility="public" return-type="void">
+      <formal-arguments>
+        <formal-argument type="Graphics" name="g"></formal-argument>
+      </formal-arguments>
+    </method>
+  </class>
+  <class name="SecondClass">
+  </class>
+  <class name="ThirdClass" superclass="SecondClass">
+  </class>
+</package>
+
+-- here is the output from the converter
+
+package firstpackage;
+
+public class FirstClass {
+        public void paint(Graphics g) {
+        }
+}
+
+class SecondClass {
+}
+
+class ThirdClass extends SecondClass {
+}
+
+-- here is a proto doctype for UML class diagrams
+(indentation died in copy-paste)
+
+<?xml encoding="US-ASCII"?>
+
+<!ELEMENT classdiagram (file,dictionaries,packages,notes)>
+<!ATTLIST classdiagram
+ name ID #REQUIRED>
+<!ELEMENT file (#PCDATA)>
+<!ELEMENT dictionaries (dictionary)*>
+<!ELEMENT dictionary (file)>
+<!ATTLIST dictionary
+ name ID #REQUIRED>
+<!ELEMENT packages (package)*>
+<!ELEMENT package (coords,coords,class*)>
+<!ATTLIST package
+ name ID #REQUIRED,
+ show CDATA,
+ hilite CDATA>
+<!ELEMENT coords>
+<!ATTLIST coords
+ x CDATA #REQUIRED,
+ y CDATA #REQUIRED,
+ z CDATA>
+<!ELEMENT class (coords,coords,relations)>
+<!ATTLIST class
+ name ID #REQUIRED,
+ hilite CDATA>
+<!ELEMENT relations (relation*)>
+<!ELEMENT relation (coords*)>
+<!ATTLIST relation
+ remote IDREF #REQUIRED,
+ name CDATA,
+ type CDATA #IMPLIED,
+ srccard CDATA #IMPLIED,
+ srcrole CDATA,
+ destcard CDATA #IMPLIED,
+ destrole CDATA>
+<!ELEMENT notes (note)*>
+<!ELEMENT note (coords,coords,#PCDATA)>
+<!ATTLIST note
+ about IDREF #REQUIRED>
