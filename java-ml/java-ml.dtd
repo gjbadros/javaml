@@ -65,8 +65,8 @@
 <!ELEMENT formal-argument (type)>
 <!ATTLIST formal-argument
     name CDATA #REQUIRED
-    %mod-final;
-    id ID #REQUIRED>
+    id ID #REQUIRED
+    %mod-final;>
 <!ELEMENT send (target?,arguments)>
 <!ATTLIST send
     message CDATA #REQUIRED>
@@ -90,8 +90,8 @@
 <!ELEMENT local-variable (type,(static-initializer|%expr-elems;)?)>
 <!ATTLIST local-variable
     name CDATA #REQUIRED
-    %mod-final;
-    id ID #IMPLIED>
+    id ID #REQUIRED
+    %mod-final;>
 <!ELEMENT arguments (%expr-elems;)*>
 <!ELEMENT literal-string EMPTY>
 <!ATTLIST literal-string
