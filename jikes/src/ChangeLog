@@ -1,3 +1,11 @@
+Wed Nov 17 17:24:19 1999  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Added continuation="true" attr/value to
+	local-variables that use the syntactic shorthand of multiple
+	identifiers with a single type.  The preserves the (subtle)
+	possible intention that two (or more) variables should have the
+	same type.
+
 Tue Nov 16 16:34:01 1999  Greg J. Badros  <gjb@cs.washington.edu>
 
 	* xml-unparse.cpp (SzIdFromFormalArgument): Hack so idref/id of
