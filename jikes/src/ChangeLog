@@ -1,3 +1,14 @@
+Tue Nov 16 16:04:02 1999  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Use post="true", not post="yes" as attribute
+	for AstPostUnaryExpression (just for consistency).
+
+Tue Nov 16 08:25:57 1999  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp; Added OutputLiteralString(), and make
+	literal-string elements have content that is their string instead
+	of using the value attribute.
+
 Mon Nov 15 22:50:11 1999  Greg J. Badros  <gjb@cs.washington.edu>
 
 	* xml-unparse.cpp: Use symbol.h and semantic.h and get id and
