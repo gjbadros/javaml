@@ -1,25 +1,42 @@
 #!/usr/bin/perl -w
-
 use XML::DOM;
-
 my $filename = shift @ARGV;
 
 my $parser = new XML::DOM::Parser;
 my $doc = $parser->parsefile ($filename);
 
-# print all NAME attributes of all method elements
 my $nodes = $doc->getElementsByTagName("method");
-my $n = $nodes->getLength();
-
-print "$n methods...\n";
-
-for (my $i = 0; $i < $n; $i++) {	
-  my $node = $nodes->item ($i);	
-  my $name = $node->getAttribute("name");
-#  $node->setAttribute("name","foo");
-  print $name, "\n";
+for (my $i = 0; $i < $nodes->getLength(); $i++) {
+  my $method = $nodes->item($i);
+  my $method_blocks = 
+    $method->getElementsByTagName("block");
+  my $method_block = $method_blocks->item(0);
+  my $start_instrumentation 
+    = SendMessageBlock($doc,"Tracer","StartMethod",
+		       $method->getAttribute("name"));
+  $method_block->insertBefore($start_instrumentation,
+			      $method_block->getFirstChild());
+  my $exit_instrumentation 
+    = SendMessageBlock($doc,"Tracer","ExitMethod",
+		       $method->getAttribute("name"));
+  $method_block->appendChild($exit_instrumentation);
 }
+print $doc->toString;
 
-$doc->printToFile ("out.xml");
-
-#print $doc->toString;
+sub SendMessageBlock {
+  # insert, e.g:  Tracer.StartMethod("paint");
+  my ($doc,$target,$func,$string_arg) = (@_);
+  my $s = $doc->createElement("send");
+  $s->setAttribute("message",$func);
+  my $t = $doc->createElement("target");
+  my $vr = $doc->createElement("var-ref");
+  $vr->setAttribute("name",$target);
+  $t->appendChild($vr);
+  my $a = $doc->createElement("arguments");
+  my $ls = $doc->createElement("literal-string");
+  $ls->setAttribute("value",$string_arg);
+  $s->appendChild($t);
+  $s->appendChild($a);
+  $a->appendChild($ls);
+  return $s;
+}
