@@ -81,8 +81,8 @@ SUP { COLOR: #0000FF; FONT-SIZE: small; }
       is more natural for tools and permits easy specification of
       numerous software-engineering analysis by leveraging the plethora
       of XML tools and techniques.  A robust converter built with the IBM
-      Jikes Java compiler framework translates from plain-text Java
-      source code to JavaML.
+      Jikes Java compiler framework translates from the classical Java
+      source code representation to JavaML.
 
 <h3><a name="keywords">Keywords</a></h3>
 
@@ -488,7 +488,8 @@ code in its JavaML representation.  JavaML tools can leverage the
 existing infrastructure and exploit the canonical representation to
 improve inter-operability among tool sets.
 
-<p>
+
+<h4><a name="approaches">3.1 - Possible approaches</a></h4>
 
 Though the basic approach of using an XML application to model source
 code is fairly straightforward, there is a large design space for
@@ -549,7 +550,7 @@ of the excessive number of nodes.
 <p>
 
 An alternate possibility is to literally mark-up the Java source program
-to add value to the basic sequence of characters.  This approach might
+without changing the text of the program (i.e., only adding tags).  This approach might
 convert the <code>FirstApplet.java</code> implementation to:
 
 <code>
@@ -593,7 +594,7 @@ retains artifacts from the classical source code that another representation mig
 us to abstract away from and free ourselves of those syntactic burdens
 altogether.
 
-<h4><a name="chosen-representation">3.1 - The chosen representation</a></h4>
+<h4><a name="chosen-representation">3.2 - The chosen representation</a></h4>
 
 The prototype JavaML representation I have chosen aims to model the
 programming language constructs of Java (and, indeed, similar
@@ -655,7 +656,7 @@ the complete document type definition of JavaML, and Appendices <a
 href="#set.java">2a</a> and <a href="#set.java.xml">2b</a> for an
 example of a more complex converted program.
 
-<h4><a name="design-decisions">3.2 - Design decisions</a></h4>
+<h4><a name="design-decisions">3.3 - Design decisions</a></h4>
 
 JavaML provides more than just the structure of the source program,
 though.  In the above, notice the use of the formal-argument
@@ -692,12 +693,12 @@ type of that two-dimensional array was the primitive type
 
 In JavaML, important characteristics of elements are stressed over less
 important features, but those less important distinctions are preserved.
-For example, <code>45</code> and <code>3.2</code> are represented as:
+For example, <code>45</code> and <code>1.9</code> are represented as:
 <code>&lt;literal-number kind="integer" value="45"&gt;</code> and
-<code>&lt;literal-number kind="float" value="3.2"&gt;</code>,
+<code>&lt;literal-number kind="float" value="1.9"&gt;</code>,
 respectively.  An alternate possible markup is:
 <code>&lt;literal-integer value="45"&gt;</code> and
-<code>&lt;literal-float value="3.2"&gt;</code> but using separate
+<code>&lt;literal-float value="1.9"&gt;</code> but using separate
 element classes eliminates the tight relationship that both values are
 numbers and can complicate using the representation.  By instead
 disambiguating these literals based on a kind attribute, we can still
@@ -772,7 +773,7 @@ certain tasks including classical development and program editing.
 JavaML is complementary to the classical source representation and is especially appropriate
 for tools, though still accessible and readable to developers.
 
-<h4><a name="implementation">3.3 - Implementation of converter</a></h4>
+<h4><a name="implementation">3.4 - Implementation of converter</a></h4>
 
 To experiment with the design of JavaML and gain experience in using the
 representation, it was essential to implement a converter from the Java
@@ -814,9 +815,12 @@ Java is convenient, the more important benefit is that JavaML enables
 the use of the rich infrastructure developed to support SGML and XML.
 Instead of building analysis and transformation tools from scratch to
 work on a proprietary binary structured format for a program, existing
-SGML and XML tools can be used, combined, and extended.  In this paper,
-I will (for space reasons) limit discussion to uses of
-only three tool groups:
+SGML and XML tools can be used, combined, and extended.  XML tools
+encompass a broad range of features that include querying and
+transformation, document differencing and merging
+<cite>[XMLDiffMerge]</cite>, and simple APIs for working with the
+document directly.  In this paper, I will (for space reasons) limit
+discussion to uses of only three tool groups:
 
 <ul>
 <li> the XML toolbox (ltxml) from Edinburgh University
@@ -831,10 +835,13 @@ contains <code>dtd2html</code>, <code>dtddiff</code>,
 DOM level 1 <cite>[<a href="#REF-DOM">DOM</a>]</cite> interface to an XML tree.
 </ul>
 
-These are just a very small subset of the tools that prove useful
-when working with JavaML.  In the following examples, we will query the
+These are just a very small subset of the tools that prove useful when
+working with JavaML.  In the following examples, we will query the
 <code>Set.java.xml</code> document that appears in <a
-href="#set.java.xml">Appendix 2b</a>.
+href="#set.java.xml">Appendix 2b</a>.  Though these examples are small
+by real-world standards, XML and SGML tools target documents ranging up
+through lengthy books so the implementations are designed to
+scale well.
 
 <p>
 
@@ -1091,9 +1098,9 @@ event-action framework is similar to that used by SAX
 
 <p>
 
-ASTLog <cite>[<a href="#REF-ASTLog">ASTLog</a>]</cite> extends the ProLog <cite>[<a href="#REF-Prolog">Prolog</a>]</cite>
+ASTLog <cite>[<a href="#REF-ASTLog">ASTLog</a>]</cite> extends the Prolog <cite>[<a href="#REF-Prolog">Prolog</a>]</cite>
 logic programming language with the ability to reason about an external
-database that models the AST.  Unlike ProLog, ASTLog statements are
+database that models the AST.  Unlike Prolog, ASTLog statements are
 evaluated with respect to a current object.  The approach that Crew uses
 may be interesting to apply to the XML world, but the numerous XML tools
 already provide comparable functionality through a more conventional (if
@@ -1261,8 +1268,9 @@ process.
 <h3><a name="acknowledgments">Acknowledgments</a></h3> 
 
 I enthusiastically thank Zack Ives and Stefan Bjarni Sigurdsson for
-their comments, discussion, and input on this work.  I also thank Miguel
-Figueroa, Craig Kaplan, and Todd Millstein, for their helpful
+their comments, discussion, and input on this work.  I thank Alan Borning
+and Corin Anderson for much-appreciated comments on a draft of this paper.
+I also thank Miguel Figueroa, Craig Kaplan, and Todd Millstein, for their helpful
 discussions. Thanks to IBM for constructing the Jikes compiler
 framework, and for making it publicly available, and thanks to Mike
 Ernst for helpful pointers on using it. This work was supported by the
@@ -1723,6 +1731,12 @@ Sinan Si Alhir.
 O'Reilly and Associates, 1998.
 
 <p>
+<a name="REF-XMLDiffMerge"><strong>[XMLDiffMerge]</strong></a> &nbsp;
+IBM AlphaWorks.
+XML Diff and Merge Tool.
+<code><a href="http://www.alphaworks.ibm.com/tech/xmldiffmerge">http://www.alphaworks.ibm.com/tech/xmldiffmerge</a></code>
+
+<p>
 <a name="REF-XMI"><strong>[XMI]</strong></a> &nbsp;
 IBM AlphaWorks.
 XML Metadata Interchange (XMI) Toolkit.
@@ -1795,6 +1809,12 @@ Paul V. Biron, Ashok Malhotra, eds.
 Adele Goldberg and David Robson.
 <em>Smalltalk-80: The Language</em>.
 Addison-Wesley, 1989.
+
+<p>
+<a name="REF-Prolog"><strong>[Prolog]</strong></a> &nbsp;
+W. F. Clocksin and C. S. Mellish.
+<em>Programming in Prolog</em>.
+Springer-Verlang, 1994.
 
 <p>
 <a name="REF-C++"><strong>[C++]</strong></a> &nbsp;
