@@ -125,7 +125,7 @@
 <!ELEMENT unary-expr (%expr-elems;)>
 <!ATTLIST unary-expr
     op CDATA #REQUIRED
-    post (yes|no) #IMPLIED>
+    post (true|false) #IMPLIED>
 <!ELEMENT cast-expr (type,(%expr-elems;))>
 <!ELEMENT literal-false EMPTY>
 <!ELEMENT literal-true EMPTY>
