@@ -1,4 +1,14 @@
 #!/bin/sh -
+# $Id$
+# Copyright (C) 2000 Greg J. Badros, <gjb@cs.washington.edu>
+# http://www.cs.washington.edu/homes/gjb/JavaML
+#
+# Pipeline utility to display query results after converting
+# them back into the classical Java source code representation.
+# 
+# This simply embeds the text in a <code-fragment> element
+# and then hands it off to javaml-to-plain-source.
+#
 tag="code-fragment"
 awk "NR == 2 { print; print \"<$tag>\"; next } { print } END { print \"</$tag>\" }" "$@" | \
   `dirname $0`/javaml-to-plain-source

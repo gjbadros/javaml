@@ -1,4 +1,11 @@
 #!/usr/bin/perl -w
+# $Id$
+# Copyright (C) 2000 Greg J. Badros, <gjb@cs.washington.edu>
+# http://www.cs.washington.edu/homes/gjb/JavaML
+#
+# Simple example of using the DOM on the JavaML representation
+# to list all the methods in a code database
+#
 
 use XML::DOM;
 
