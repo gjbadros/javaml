@@ -1,3 +1,21 @@
+Sat Feb  5 19:46:44 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	**** All changes to xml-unparse.cpp
+	
+	* Use &lt;=, not &le; for <=.  Duh.
+
+	* Added FXMLStatementTagNeeded() and use it to try to eliminate
+ 	redundant <statement> tags more rationally.  Added
+ 	g_fTopLevelBlock to help in this regard.
+
+	* Do not ignore all return statements that are at the end of a
+	block -- only ignore them if at the end of a top-level block, and
+	use g_fTopLevelBlock to track that state.
+
+	* Added op attribute to assignment-expr to handle +=, /=, etc.
+
+	* Eliminated some extraneous code.
+
 Sat Feb  5 14:05:54 2000  Greg J. Badros  <gjb@cs.washington.edu>
 
 	* xml-unparse.cpp: More changes -- avoid nested <statements> more
