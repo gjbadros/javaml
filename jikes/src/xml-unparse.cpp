@@ -17,6 +17,10 @@
 
 #define XML_CLOSE ((char *) 1)
 
+char *g_szMethodName = NULL;
+char *g_szClassName = NULL;
+
+
 /* Output any prefix header for the converted XML file */
 void xml_prefix(Ostream &xo)
 {
@@ -31,13 +35,13 @@ void xml_suffix(Ostream &xo)
   xo << "</java-source-program>\n";
 }
 
+#ifdef XML_MANGLE_FOR_IDS
 static char *szIdSeparator = ".";
-
-// GJB:FIXME:: convert _ to -
 
 char *
 SzNewConvertingUnderscores(const char *sz)
 {
+  if (!sz) return NULL;
   char *szNew = new char[strlen(sz)+1];
   char *pch = szNew;
   while (*sz) {
@@ -81,6 +85,33 @@ SzIdFromFormalArgument(long id, const char *szClassName,
   delete [] szConverted;
   return xo.str();
 }
+#else
+char *
+SzIdFromMethod(long id, const char *szClassName,const char *szMethodName)
+{
+  ostrstream xo;
+  xo << "meth-" << id << ends;
+  return xo.str();
+}
+
+char *
+SzIdFromConstructor(long id, const char *szClassName,const char *szConstructorName)
+{
+  ostrstream xo;
+  xo << "ctr-" << id << ends;
+  return xo.str();
+}
+
+char *
+SzIdFromFormalArgument(long id, const char *szClassName,
+                       const char *szMethodName, const char *szFormalArg)
+{
+  ostrstream xo;
+  xo << "formal-" << id << ends;
+  return xo.str();
+}
+#endif
+
 
 char *
 SzNewFromLong(long i)
@@ -111,8 +142,6 @@ SzFromUnparse(LexStream &lex_stream, Ast *pnode)
 template <class T>
 xml_unparse_throws(Ostream &xo, LexStream &lex_stream, T *pnode)
 {
-  /* GJB:FIXME:: should these be inside a "throws-list" grouping element?
-     I don't think it's necessary. --11/12/99 gjb */
   if (pnode->NumThrows() > 0) {
     for (int k = 0; k < pnode -> NumThrows(); k++) {
       char *szExceptionName = SzFromUnparse(lex_stream,pnode->Throw(k));
@@ -415,8 +444,10 @@ void AstClassDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
       szSuperclass = xnm.str();
     }
 
+    char *szClassName = xml_name_string(lex_stream,identifier_token);
+
     xml_output(os,"class",
-               "name", xml_name_string(lex_stream,identifier_token),
+               "name", szClassName,
                "visibility",szVisibility,
                "superclass",szSuperclass,
                "abstract",SzOrNullFromF(fAbstract),
@@ -443,7 +474,10 @@ void AstClassDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
 	  }
       }
 
+    g_szClassName = szClassName;
     class_body -> XMLUnparse(os, lex_stream);
+    g_szClassName = NULL;
+
     xml_close(os,"class",true);
     if (Ast::debug_unparse) os << "/*:AstClassDeclaration#" << this-> id << "*/";
 }
@@ -610,9 +644,9 @@ void AstFormalParameter::XMLUnparse(Ostream& os, LexStream& lex_stream)
 
     char *szType = SzFromUnparse(lex_stream, type);
     char *szName = SzFromUnparse(lex_stream,formal_declarator->variable_declarator_name);
-    // GJB:FIXME:: these need to be gotten from the AST somehow
-    char *szClassName = "FIXME";
-    char *szMethodName = "FIXME";
+    // GJB:FIXME:: it'd be better to get these from the AST somehow
+    char *szClassName = g_szClassName;
+    char *szMethodName = g_szMethodName;
 
     xml_output(os,"formal-argument",
                "type",szType,
@@ -710,8 +744,8 @@ void AstMethodDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
     }
 
     char *szMethodName = xml_name_string(lex_stream,method_declarator->identifier_token);
-    // GJB:FIXME:: get the class name that we're in for the id.
-    char *szClassName = "FIXME";
+    // GJB:FIXME:: it'd be better to get these from the AST somehow
+    char *szClassName = g_szClassName;
 
     xml_output(os,"method",
                "name", szMethodName,
@@ -729,13 +763,16 @@ void AstMethodDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
 
     delete szNumBrackets;
 
+    g_szMethodName = szMethodName;
     method_declarator -> XMLUnparse(os, lex_stream);
 
     xml_unparse_throws(os,lex_stream,this);
 
     method_body -> XMLUnparse(os, lex_stream);
-    if (Ast::debug_unparse) os << "/*:AstMethodDeclaration#" << this-> id << "*/";
+    g_szMethodName = NULL;
+
     xml_close(os,"method",true);
+    if (Ast::debug_unparse) os << "/*:AstMethodDeclaration#" << this-> id << "*/";
 }
 
 void AstStaticInitializer::XMLUnparse(Ostream& os, LexStream& lex_stream)
@@ -846,8 +883,8 @@ void AstConstructorDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
     }
 
     char *szConstructorName = xml_name_string(lex_stream,constructor_declarator->identifier_token);
-    // GJB:FIXME:: get the class name that we're in for the id.
-    char *szClassName = "FIXME";
+    // GJB:FIXME:: it'd be better to get these from the AST somehow
+    char *szClassName = g_szClassName;
 
     xml_output(os,"constructor",
                "name", szConstructorName,
@@ -861,11 +898,13 @@ void AstConstructorDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
                NULL);
     xml_nl(os);
 
+    g_szMethodName = szConstructorName;
     constructor_declarator -> XMLUnparse(os, lex_stream);
 
     xml_unparse_throws(os,lex_stream,this);
 
     constructor_body -> XMLUnparse(os, lex_stream);
+    g_szMethodName = NULL;
     xml_close(os,"constructor",true);
     if (Ast::debug_unparse) os << "/*:AstConstructorDeclaration#" << this-> id << "*/";
 }
@@ -957,7 +996,6 @@ void AstLocalVariableDeclarationStatement::XMLUnparse(Ostream& os, LexStream& le
     for (int k = 0; k < this -> NumVariableDeclarators(); k++)
       {
         char *szName = SzFromUnparse(lex_stream,VariableDeclarator(k)->variable_declarator_name);
-        /* GJB:FIXME:: use two elements, instance-field and class-field, instead? */
         xml_output(os,"local-variable",
                    "type",szType,
                    "name",szName,
