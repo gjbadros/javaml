@@ -19,14 +19,15 @@
 
 <!ELEMENT code-fragment ANY>
 <!ELEMENT result ANY>
-<!ELEMENT java-source-program (package-decl?,import*,(class|interface)+) >
-<!ATTLIST java-source-program
+<!ELEMENT java-source-program (java-class-file+)>
+<!ELEMENT java-class-file (package-decl?,import*,(class|interface)+) >
+<!ATTLIST java-class-file
     name CDATA #IMPLIED
     version CDATA #IMPLIED>
 <!ELEMENT import EMPTY>
 <!ATTLIST import
     module CDATA #REQUIRED>
-<!ELEMENT class (superclass?, implement*, (class|interface|constructor|method|field|static-initializer)*) >
+<!ELEMENT class (superclass?, implement*, (class|interface|constructor|method|field|static-initializer|instance-initializer)*) >
 <!ATTLIST class
     name CDATA #REQUIRED
     %visibility-attribute;
@@ -34,7 +35,7 @@
     %mod-abstract;
     %mod-final;
     %mod-synchronized;>
-<!ELEMENT anonymous-class (superclass?, implement*, (constructor|method|field)*) >
+<!ELEMENT anonymous-class (superclass?, implement*, (constructor|method|field|instance-initializer)*) >
 <!ATTLIST anonymous-class
     %mod-abstract;
     %mod-final;
@@ -179,6 +180,7 @@
 <!ELEMENT base (%expr-elems;)>
 <!ELEMENT offset (%expr-elems;)>
 <!ELEMENT static-initializer (%stmt-elems;)>
+<!ELEMENT instance-initializer (%stmt-elems;)>
 <!ELEMENT super-call (arguments)>
 <!ELEMENT this-call (arguments)>
 <!ELEMENT super EMPTY>
