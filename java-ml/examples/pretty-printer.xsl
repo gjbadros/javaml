@@ -368,6 +368,14 @@
   </xsl:if>
 </xsl:template>
 
+<xsl:template match="conditional-expr">
+  <xsl:apply-templates select="*[1]"/>
+  <xsl:text>? </xsl:text>
+  <xsl:apply-templates select="*[2]"/>
+  <xsl:text> : </xsl:text>
+  <xsl:apply-templates select="*[3]"/>
+</xsl:template>
+
 <xsl:template match="cast-expr">
   <xsl:text>(</xsl:text>
   <xsl:apply-templates select="type"/>
@@ -394,7 +402,8 @@
   <xsl:text>; </xsl:text>
   <xsl:apply-templates select="update"/>
   <xsl:text>) </xsl:text>
-  <xsl:apply-templates select="*[position() > 3]"/>
+  <xsl:variable name="numtoskip" select="count(init|test|update)"/>
+  <xsl:apply-templates select="*[position() > $numtoskip]"/>
   <xsl:if test="not(.//statements)">
     <xsl:text>;&#xA;</xsl:text>
   </xsl:if>
@@ -410,12 +419,13 @@
 
 <xsl:template match="do-loop">
   <xsl:text>do </xsl:text>
-  <xsl:apply-templates select="*[last() - position() > 1]"/>
+  <xsl:apply-templates select="*[1]"/>
   <xsl:if test="not(statements)">
     <xsl:text>{} </xsl:text>
   </xsl:if>
   <xsl:text>while </xsl:text>
   <xsl:apply-templates select="test"/>
+  <xsl:text>;&#xA;</xsl:text>
 </xsl:template>
 
 <xsl:template match="init|update">
