@@ -1,3 +1,6 @@
+<!--$Id$-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
 <head>
 <title>
 JavaML: A Markup Language for Java Source Code, by Greg J. Badros
@@ -42,12 +45,31 @@ SUP { COLOR: #0000FF; FONT-SIZE: small; }
 </head>
 <body>
 <h1>
-JavaML: A Markup Language for Java Source Code
+<a name="top">JavaML: A Markup Language for Java Source Code</a>
 </h1>
 <h6>Greg J. Badros<br>
 University of Washington</h6>
 
-<h3>Abstract</h3>
+<hr>
+<a href="#introduction">Introduction</a> &nbsp;
+<a href="#background">Background</a> &nbsp;
+<a href="#javaml">JavaML</a>  &nbsp;
+<a href="#leveraging-xml">Leveraging XML</a> <br>
+<a href="#related-work">Related work</a>  &nbsp;
+<a href="#future-work">Future work</a>  &nbsp;
+<a href="#conclusion">Conclusion</a>  &nbsp; 
+<a href="#acknowledgments">Acknowledgments</a>  <br>
+<a href="#javaml-dtd">Appendix 1 - JavaML DTD</a> &nbsp;
+<a href="#set.java">Appendix 2a - Extended Example,
+      <strong>Set.java</strong></a>  &nbsp;
+<a href="#set.java.xml">Appendix 2b - Extended Example,
+      <strong>Set.java.xml</strong></a>  <br>
+<a href="#references">References</a>  &nbsp;
+<a href="#vitae">Vitae</a> 
+
+<hr>
+
+<h3><a name="abstract">Abstract</a></h3>
 
       The typical plain-text representation of source code is convenient
       for programmers but requires parsing to uncover the deep structure
@@ -66,19 +88,132 @@ University of Washington</h6>
       program-editing process, and that JavaML is a better primary
       representation format for Java programs.
 
-<h3>Keywords</h3>
+<h3><a name="keywords">Keywords</a></h3>
 Java, source-code, XML, AST, parsing, analysis, software-engineering, AST, Jikes
 
-<h3>Introduction</h3>
+<h3><a name="introduction">Introduction</a></h3>
+<pre>
+* PLs have always used char-based parsing
+** lexical analysis and parsing are well-understood, solved problems,
+    relegated to undergraduate compilers class
+*** strong theoretical foundations in grammars
+*** well-automated by tools such as Lex (Flex), Yacc (bison), CUP
+** also nice for humans to work with
+*** similar to natural languages
+*** concise
+*** works well with common tools, e.g., text editor, universal format
 
-<h3>Background</h3>
+* but there are problems
+** modern languages push the limits of parsing capabilities
+*** witness the `typename' keyword in C++
+*** extending a language means changing the grammar -- often very tricky
+** parsing is not very robust
+*** small changes in the source representation can have dramatic effects 
+    on the semantics  (perl as notorious example; extra semi-colon on
+    loop as more classical difficulty)
+** deep structure of the program is made manifest only after parsing
+*** forces language-specific parsing functionality to be duplicated in every tool that
+    wants to reason about the program beyond its lexical nature
+    (compilers, of course, but also software-engineering tools)
+*** often results in programmer's using inferior tools involving
+    lexical approaches such as grep and text-editor search and replace
+  -> change a variable named `result' to `answer', literal strings
+     containing result must be carefully avoided;  precludes the
+    possibility of complete automation (i.e., requires human
+    intervention)
+*** no canonical deep representation of source program, so different
+    tools either have to rely on reusing the same grammar, or have
+    gratuitous differences in their view of the program
+  -> changes to deep representation must be swizzled back into the
+     universal character-based representation before being further
+    munged
+** IDEs can get around some of these issues by providing tools and
+    infrastructure to support querying and transforming the deep
+    structure, but it's only a partial solution
+*** fixed, often limited, capabilities
+*** often hard to automate, batch process, use externally
+*** tied to a specific IDE, reliant on proprietary technology
 
- <h4>Java</h4>
+* XML is a solution
+** XML's capability to represent arbitrary nested hierarchy can
+be used to encode deep structure of a program;  language-independent
+    idea, but Java is a nice language to work with, and an important
+    language to support.
+** JavaML -- the Java Markup Language -- an XML application for
+    describing a Java class.  As with all XML applications, the data is
+    self-describing, and the DTD describes what is a valid JavaML
+    representation.
+** Shares most strengths of plain-old-source-representation (posr): nice 
+    theory, even easier to parse, still human-readable (though not as
+    concise)
+** Overcomes many weaknesses
+*** easy to extend and change
+*** more robust to superficial changes (largely due to being less
+    concise)
+*** deep-structure is readily apparent in the representation
+** Provides a single canonical representation of the deep structure of
+    the program; nice for interacting compilers, editors, other tools
+** Permits leveraging incredible wealth of tools targeting SGML/XML
+    (e.g., query and transformation tools, style sheets for presenting
+    the program, XML structure-aware editors, etc.)
+*** examples include diffing source code, code metrics, searches,
+transformations such as renaming a local variable, etc. 
+</pre>
 
-Parsing technology, clean OO design, nice source-code properties (less
-    redundancy than, say, C++)
+<br><small><a href="#top">[top]</a></small>
 
- <h4>XML</h4>
+<h3><a name="background">Background</a></h3>
+
+The Java Markup Language describes Java programs using an XML
+application.  JavaML is influenced by and benefits from numerous of the
+features of these technologies.
+
+ <h4><a name="java">Java</a></h4>
+    
+    Java is a popular object-oriented programming language developed by
+    Sun Microsystems in the mid-1990s.  It features a
+    platform-independent execution model based on the Java Virtual
+    machine (JVM) and owes its early popularity to its use as a
+    programming language for World Wide Web applications.  Java combines
+    a simple object model reminiscent of Smalltalk with Algol block
+    structure, a C++-like syntax, a static type system, and a package
+    system inspired by Modula-2.
+
+<p>
+
+   As in other object-oriented (OO) languages, the primary unit of
+   decomposition in Java is a "class" which specifies the behaviour of a
+   set of objects.  Each class can define several "methods," or
+   behaviours, similar to functions or procedures. A class can also
+   define "fields," or state variables, that are associated with
+   "instances" of the class called "objects." Classes can inherit
+   behaviour and state from "superclasses," thus forming a hierarchy of
+   inter-related classes that permits factoring related code into
+   classes at the top of the hierarchy, and encourages re-use.
+   Behaviours are invoked by sending a "message" to a target receiver
+   object that is a request to execute a method defined for that class.
+   Choosing what method to execute in response to a message is called
+   "dynamic dispatch" and is based on the run-time class of the object
+   receiving the message.  For example, an instance of the "ColoredBall"
+   class may respond to the "draw" message differently than an instance
+   of a "Ball" class.  This ability to behave differently upon receipt
+   of the same message is called polymorphism and is largely responsible
+   for the extensibility benefits touted by the OO community.
+    
+<p>
+      
+   Java is being widely used both in industry and in education, and it
+   remains popular as a programming language on the web.  Unlike C++, a
+   Java class definition exists in a single, self-contained file.  There
+   are no separate header files and implementation files, and Java is
+   largely free from order-dependencies of definitions.  A method body
+   is defined with the declaration of the method signature Additionally,
+   Java lacks an integrated preprocessor.  These features combine to
+   make Java source programs syntactically very clean, and make Java an
+   ideal language for representing using XML.
+
+ <h4><a name="xml">XML -- Extensible Markup Language</a></h4>
+<pre>
 
 Properties of XML that influenced DTD design:
 
@@ -87,17 +222,20 @@ attributes are unordered, finite
 attributes are only text strings, so cannot have references
  -> e.g., types need to be encoded as elements
     not 
-     <method return-type="boolean" ...> ... 
+     [method return-type="boolean" ...] ... 
     but
-     <method ...><type name="boolean" primitive="true"/> ...
+    [method ...][type name="boolean" primitive="true"/] ...
 Didn't want stuff like boolean[][] since then end user
 would have to do string processing on the attribute value to
 get at the base type.
 
+</pre>
 
-<h3>JavaML</h3>
+<br><small><a href="#top">[top]</a></small>
 
-give the DTD
+<h3><a name="javaml">JavaML</a></h3>
+<pre>
+give the DTD -- see appendix 1
 
 issues include loop (for/while) vs. do-loop;  var-ref, var-set; 
 field/method element w/ "static" attribute, or two kinds of field/method elements:
@@ -106,11 +244,23 @@ High level question: language-independence good or bad?  I lose
 the single variable type + multiple variable declarations abstraction -- 
 but it's really more than a syntactic artifact. (Maybe I shouldn't -- 
 add a continued-decl="true" attribute?).
-	
 
-<h3>Example uses</h3>
+Above is related to language translation issue:
+  -> move away from language-specific syntax and constructs
+  -> leads to more abstract representation
+  -> tradeoff with preserving abstractions
 
-<h3>Related work</h3>
+</pre>	
+
+<br><small><a href="#top">[top]</a></small>
+
+<h3><a name="leveraging-xml">Leveraging XML</a></h3>
+<!-- example uses -->
+
+<br><small><a href="#top">[top]</a></small>
+
+<h3><a name="related-work">Related work</a></h3>
+<pre>
 
 SGML/XML tools discussed in prior section.
 
@@ -118,18 +268,30 @@ TAWK
 
 ASTLog
 
+CCEL
+
 Intentional Programming
 
 Structured Editors
+</pre>
 
-<h3>Future work</h3>
+<br><small><a href="#top">[top]</a></small>
+
+<h3><a name="future-work">Future work</a></h3>
+<pre>
 
 Comments need to be preserved;  attaching them may be a bit tricky, but
     is helped by JavaDoc conventions.
 
 Robust converter back to plain Java source.  Ideally do this with Jikes
     and a XML DOM -> Jikes AST function, then let Jikes unparse and then 
-    indent.
+    indent.   Added benefit:  throw out posr from compiler altogether,
+Semantic analysis phase of compiler is simplified
+ -> some analysis handled by validity check
+   -> it'd be interesting to see which semantic errors jikes
+      reports are handled by the XML validity check on my DTD
+ -> well-formedness doesn't give us much, though
+
 
 Another possibility: a DSSSL pretty printer from the JavaML source to
 	plain java source.  No need for a parser in the pretty printer!
@@ -147,21 +309,574 @@ New abstractions?  Define a JavaML++ DTD w/ that abstraction, and
 XML editors that display and let edit on the
 	plain-old-source-representation.
 
-<h3>Conclusion</h3>
+Other languages: C++ has difficulties because of cpp
+
+Issue:
+  -> mangling for id/idrefs
+
+Issue:
+  -> should field-access be separate from var-ref?
+     this is a little weird:
+[field-access field="println"]
+  [field-access field="err"]
+    [var-ref name="System"]
+  [/field-access]
+[/field-access]
+
+</pre>
+<br><small><a href="#top">[top]</a></small>
+
+<h3><a name="conclusion">Conclusion</a></h3>
 
 The best is yet to come.  XML tools are improving all the time.
 
-<h3>Acknowledgments</h3> 
+<br><small><a href="#top">[top]</a></small>
+
+
+<h3><a name="acknowledgments">Acknowledgments</a></h3> 
 
 I thank Stefan Bjarni Sigurdsson, Zack Ives, and Craig Kaplan for their
 helpful discussion. Thanks to IBM for constructing the
 Jikes compiler framework, and for making it publically available, and
 thanks to Mike Ernst for helpful pointers on its use.
 
-<h3>Appendix 1 - JavaML DTD</h3>
+<br><small><a href="#top">[top]</a></small>
 
-<h3>References</h3>
 
-<h3>Vitae</h3>
+<h3><a name="javaml-dtd">Appendix 1 - JavaML DTD</a></h3>
+<pre>
+&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+&lt;!ENTITY % visibility-attribute "visibility (public|private|protected) #IMPLIED"&gt;
+&lt;!ENTITY % kind-attribute "kind (integer|long|real|double) #IMPLIED"&gt;
+&lt;!ENTITY % mod-final "final CDATA #IMPLIED"&gt;
+&lt;!ENTITY % mod-static "static CDATA #IMPLIED"&gt;
+&lt;!ENTITY % mod-volatile "volatile CDATA #IMPLIED"&gt;
+&lt;!ENTITY % mod-transient "transient CDATA #IMPLIED"&gt;
+&lt;!ENTITY % mod-native "native CDATA #IMPLIED"&gt;
+&lt;!ENTITY % mod-abstract "abstract CDATA #IMPLIED"&gt;
+&lt;!ENTITY % mod-synchronized "synchronized CDATA #IMPLIED"&gt;
 
+&lt;!ENTITY % expr-elems "send|new|new-array|var-ref|field-access|array-ref|paren|assignment-expr|conditional-expr|binary-expr|unary-expr|cast-expr|literal-number|literal-string|literal-true|literal-false|literal-null|this|super"&gt;
+
+&lt;!ELEMENT java-source-program (package-decl?,import*,(class|interface)+) &gt;
+&lt;!ATTLIST java-source-program
+    name CDATA #IMPLIED
+    version CDATA #IMPLIED&gt;
+&lt;!ELEMENT import EMPTY&gt;
+&lt;!ATTLIST import
+    module CDATA #REQUIRED&gt;
+&lt;!ELEMENT class ((implement)*, (constructor|method|field)*) &gt;
+&lt;!ATTLIST class
+    name CDATA #REQUIRED
+    %visibility-attribute;
+    %mod-abstract;
+    %mod-final;
+    %mod-synchronized;
+    superclass CDATA "Object"&gt;
+&lt;!ELEMENT interface ((extend)*, method*) &gt;
+&lt;!ATTLIST interface
+    name CDATA #REQUIRED
+    %visibility-attribute;&gt;
+&lt;!ELEMENT implement EMPTY&gt;
+&lt;!ATTLIST implement
+    class CDATA #REQUIRED&gt;
+&lt;!ELEMENT extend EMPTY&gt;
+&lt;!ATTLIST extend
+    interface CDATA #REQUIRED&gt;
+&lt;!ELEMENT field (type,(%expr-elems;)?)&gt;
+&lt;!ATTLIST field
+    name CDATA #REQUIRED
+    %visibility-attribute;
+    %mod-final;
+    %mod-static;
+    %mod-volatile;
+    %mod-transient;&gt;
+&lt;!ELEMENT constructor (formal-arguments,throws*,(super-call|this-call)?,statements)&gt;
+&lt;!ATTLIST constructor
+    name CDATA #REQUIRED
+    id ID #REQUIRED
+    %visibility-attribute;
+    %mod-final;
+    %mod-static;
+    %mod-synchronized;
+    %mod-volatile;
+    %mod-transient;
+    %mod-native;&gt;
+&lt;!ELEMENT method (type,formal-arguments,throws*,statements?)&gt;
+&lt;!ATTLIST method 
+    name CDATA #REQUIRED
+    id ID #REQUIRED
+    %visibility-attribute;
+    %mod-abstract;
+    %mod-final;
+    %mod-static;
+    %mod-synchronized;
+    %mod-volatile;
+    %mod-transient;
+    %mod-native;&gt;
+&lt;!ELEMENT formal-arguments (formal-argument)*&gt;
+&lt;!ELEMENT formal-argument (type)&gt;
+&lt;!ATTLIST formal-argument
+    name CDATA #REQUIRED
+    id ID #REQUIRED
+    %mod-final;&gt;
+&lt;!ELEMENT send (target?,arguments)&gt;
+&lt;!ATTLIST send
+    message CDATA #REQUIRED&gt;
+&lt;!ELEMENT target (%expr-elems;)&gt;
+&lt;!ELEMENT return (%expr-elems;)&gt;
+&lt;!ELEMENT statements (statements|local-variable|try|throw|if|loop|do-loop|return|continue|break|%expr-elems;)*&gt;
+&lt;!ELEMENT throw (%expr-elems;)&gt;
+&lt;!ELEMENT throws EMPTY&gt;
+&lt;!ATTLIST throws
+    exception CDATA #REQUIRED&gt;
+&lt;!ELEMENT new (type,arguments)&gt;
+&lt;!ELEMENT type EMPTY&gt;
+&lt;!ATTLIST type
+    primitive CDATA #IMPLIED
+    name CDATA #REQUIRED
+    dimensions CDATA #IMPLIED&gt;
+&lt;!ELEMENT new-array (type,dim-expr*,(%expr-elems;)?)&gt;
+&lt;!ATTLIST new-array
+    dimensions CDATA #REQUIRED&gt;
+&lt;!ELEMENT dim-expr (%expr-elems;)&gt;
+&lt;!ELEMENT local-variable (type,(static-initializer|%expr-elems;)?)&gt;
+&lt;!ATTLIST local-variable
+    name CDATA #REQUIRED
+    id ID #REQUIRED
+    %mod-final;&gt;
+&lt;!ELEMENT arguments (%expr-elems;)*&gt;
+&lt;!ELEMENT literal-string (#PCDATA)&gt;
+&lt;!ATTLIST literal-string
+    length CDATA #REQUIRED&gt;
+&lt;!ELEMENT literal-number EMPTY&gt;
+&lt;!ATTLIST literal-number
+    value CDATA #REQUIRED
+    %kind-attribute;
+    base CDATA "10"&gt;
+&lt;!ELEMENT var-ref EMPTY&gt;
+&lt;!ATTLIST var-ref
+    name CDATA #REQUIRED
+    idref IDREF #IMPLIED&gt;
+&lt;!ELEMENT field-access (%expr-elems;)&gt;
+&lt;!ATTLIST field-access
+    field CDATA #REQUIRED&gt;
+&lt;!ELEMENT var-set EMPTY&gt;
+&lt;!ATTLIST var-set
+    name CDATA #REQUIRED&gt;
+&lt;!ELEMENT field-set (%expr-elems;)&gt;
+&lt;!ATTLIST field-set
+    field CDATA #REQUIRED&gt;
+&lt;!ELEMENT package-decl EMPTY&gt;
+&lt;!ATTLIST package-decl
+    name CDATA #REQUIRED&gt;
+&lt;!ELEMENT assignment-expr (lvalue,(%expr-elems;))&gt;
+&lt;!ELEMENT lvalue (var-set|field-set|%expr-elems;)&gt;
+&lt;!ELEMENT binary-expr ((%expr-elems;),(%expr-elems;))&gt;
+&lt;!ATTLIST binary-expr
+    op CDATA #REQUIRED&gt;
+&lt;!ELEMENT paren (%expr-elems;)&gt;
+&lt;!ELEMENT unary-expr (%expr-elems;)&gt;
+&lt;!ATTLIST unary-expr
+    op CDATA #REQUIRED
+    post (true|false) #IMPLIED&gt;
+&lt;!ELEMENT cast-expr (type,(%expr-elems;))&gt;
+&lt;!ELEMENT literal-false EMPTY&gt;
+&lt;!ELEMENT literal-true EMPTY&gt;
+&lt;!ELEMENT literal-null EMPTY&gt;
+&lt;!ELEMENT if (test,true-case,false-case?)&gt;
+&lt;!ELEMENT test (%expr-elems;)&gt;
+&lt;!ELEMENT true-case (statements)&gt;
+&lt;!ELEMENT false-case (statements)&gt;
+&lt;!ELEMENT array-ref (base,offset)&gt;
+&lt;!ELEMENT base (%expr-elems;)&gt;
+&lt;!ELEMENT offset (%expr-elems;)&gt;
+&lt;!ELEMENT static-initializer (statements)&gt;
+&lt;!ELEMENT super-call (arguments)&gt;
+&lt;!ELEMENT this-call (arguments)&gt;
+&lt;!ELEMENT super EMPTY&gt;
+&lt;!ELEMENT this EMPTY&gt;
+&lt;!ELEMENT loop (init*,test?,update*,statements?)&gt;
+&lt;!ATTLIST loop
+    kind (for|while) #IMPLIED&gt;
+&lt;!ELEMENT init (local-variable|%expr-elems;)&gt;
+&lt;!ELEMENT update (%expr-elems;)&gt;
+&lt;!ELEMENT do-loop (statements?,test?)&gt;
+&lt;!ELEMENT try (statements,catch*,finally?)&gt;
+&lt;!ELEMENT catch (formal-argument,statements?)&gt;
+&lt;!ELEMENT finally (statements)&gt;
+&lt;!ELEMENT continue EMPTY&gt;
+&lt;!ATTLIST continue
+    targetname CDATA #IMPLIED&gt;
+&lt;!ELEMENT break EMPTY&gt;
+&lt;!ATTLIST break
+    targetname CDATA #IMPLIED&gt;
+&lt;!ELEMENT conditional-expr ((%expr-elems;),(%expr-elems;),(%expr-elems;))&gt;
+</pre>
+
+<br><small><a href="#top">[top]</a></small>
+
+
+<h3><a name="set.java">Appendix 2a - Extended Example, <strong>Set.java</strong></a></h3>
+<pre>
+// $Id$
+//
+// Cassowary Incremental Constraint Solver
+// Original Smalltalk Implementation by Alan Borning
+// This Java Implementation by Greg J. Badros, &lt;gjb@cs.washington.edu&gt;
+// http://www.cs.washington.edu/homes/gjb
+// (C) 1998, 1999 Greg J. Badros and Alan Borning
+// See ../LICENSE for legal details regarding this software
+//
+// Set
+// Encapsulate a mathematical "Set" ADT using java's
+// hash table.  Just a convenience wrapper of the java.util.Hashtable class.
+
+package EDU.Washington.grad.gjb.cassowary;
+
+import java.util.*;
+
+class Set {
+  public Set()
+    { hash = new Hashtable(); }
+
+  public Set(int i)
+    { hash = new Hashtable(i); }
+
+  public Set(int i, float f)
+    { hash = new Hashtable(i,f); }
+
+  public Set(Hashtable h) 
+    { hash = h; }
+
+  public boolean containsKey(Object o)
+    { return hash.containsKey(o); }
+
+  public boolean insert(Object o)
+    { return hash.put(o,o) == null? true: false; }
+
+  public boolean remove(Object o)
+    { return hash.remove(o) == null? true: false; }
+
+  public void clear()
+    { hash.clear(); }
+
+  public int size()
+    { return hash.size(); }
+
+  public boolean isEmpty()
+    { return hash.isEmpty(); }
+
+  public Object clone()
+    { return new Set((Hashtable) hash.clone()); }
+
+  public Enumeration elements()
+    { return hash.elements(); }
+
+  public String toString()
+  { 
+    StringBuffer bstr = new StringBuffer("{ ");
+    Enumeration e = hash.keys();
+    if (e.hasMoreElements())
+      bstr.append(e.nextElement().toString());
+    while ( e.hasMoreElements() ) {
+      bstr.append(", " + e.nextElement());
+    }
+    bstr.append(" }\n");
+    return bstr.toString();
+  }
+  
+  private Hashtable hash;
+}
+</pre>
+
+<br><small><a href="#top">[top]</a></small>
+
+
+<h3><a name="set.java.xml">Appendix 2b - Extended Example, <strong>Set.java.xml</strong></a></h3>
+<pre>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!DOCTYPE java-source-program SYSTEM "java-ml.dtd"&gt;
+
+&lt;java-source-program name="Set.java"&gt;
+  &lt;package-decl name="EDU.Washington.grad.gjb.cassowary"/&gt;
+  &lt;import module="java.util.*"/&gt;
+  &lt;class name="Set" superclass="Object"&gt;
+    &lt;constructor name="Set" visibility="public" id="ctr-21"&gt;
+      &lt;formal-arguments/&gt;
+      &lt;statements&gt;
+	&lt;assignment-expr&gt;&lt;lvalue&gt;&lt;var-set name="hash"/&gt;&lt;/lvalue&gt;&lt;new&gt;&lt;type name="Hashtable"/&gt;&lt;arguments/&gt;&lt;/new&gt;
+	&lt;/assignment-expr&gt;
+      &lt;/statements&gt;
+    &lt;/constructor&gt;
+    &lt;constructor name="Set" visibility="public" id="ctr-30"&gt;
+      &lt;formal-arguments&gt;
+	&lt;formal-argument name="i" id="frmarg-26"&gt;&lt;type name="int" primitive="true"/&gt;&lt;/formal-argument&gt;
+      &lt;/formal-arguments&gt;
+      &lt;statements&gt;
+	&lt;assignment-expr&gt;&lt;lvalue&gt;&lt;var-set name="hash"/&gt;&lt;/lvalue&gt;&lt;new&gt;&lt;type name="Hashtable"/&gt;&lt;arguments&gt;&lt;var-ref name="i"/&gt;&lt;/arguments&gt;&lt;/new&gt;
+	&lt;/assignment-expr&gt;
+      &lt;/statements&gt;
+    &lt;/constructor&gt;
+    &lt;constructor name="Set" visibility="public" id="ctr-43"&gt;
+      &lt;formal-arguments&gt;
+	&lt;formal-argument name="i" id="frmarg-35"&gt;&lt;type name="int" primitive="true"/&gt;&lt;/formal-argument&gt;
+	&lt;formal-argument name="f" id="frmarg-39"&gt;&lt;type name="float" primitive="true"/&gt;&lt;/formal-argument&gt;
+      &lt;/formal-arguments&gt;
+      &lt;statements&gt;
+	&lt;assignment-expr&gt;&lt;lvalue&gt;&lt;var-set name="hash"/&gt;&lt;/lvalue&gt;&lt;new&gt;&lt;type name="Hashtable"/&gt;&lt;arguments&gt;&lt;var-ref name="i"/&gt;&lt;var-ref name="f"/&gt;&lt;/arguments&gt;&lt;/new&gt;
+	&lt;/assignment-expr&gt;
+      &lt;/statements&gt;
+    &lt;/constructor&gt;
+    &lt;constructor name="Set" visibility="public" id="ctr-52"&gt;
+      &lt;formal-arguments&gt;
+	&lt;formal-argument name="h" id="frmarg-48"&gt;&lt;type name="Hashtable"/&gt;&lt;/formal-argument&gt;
+      &lt;/formal-arguments&gt;
+      &lt;statements&gt;
+	&lt;assignment-expr&gt;&lt;lvalue&gt;&lt;var-set name="hash"/&gt;&lt;/lvalue&gt;&lt;var-ref name="h"/&gt;&lt;/assignment-expr&gt;
+      &lt;/statements&gt;
+    &lt;/constructor&gt;
+    &lt;method name="containsKey" visibility="public" id="meth-60"&gt;
+      &lt;type name="boolean" primitive="true"/&gt;
+      &lt;formal-arguments&gt;
+	&lt;formal-argument name="o" id="frmarg-58"&gt;&lt;type name="Object"/&gt;&lt;/formal-argument&gt;
+      &lt;/formal-arguments&gt;
+      &lt;statements&gt;
+	&lt;statements&gt;
+	  &lt;return&gt;&lt;send message="containsKey"&gt;
+	      &lt;target&gt;&lt;var-ref name="hash"/&gt;&lt;/target&gt;
+	      &lt;arguments&gt;&lt;var-ref name="o" idref="frmarg-58"/&gt;&lt;/arguments&gt;
+	    &lt;/send&gt;
+	  &lt;/return&gt;
+	&lt;/statements&gt;
+      &lt;/statements&gt;
+    &lt;/method&gt;
+    &lt;method name="insert" visibility="public" id="meth-69"&gt;
+      &lt;type name="boolean" primitive="true"/&gt;
+      &lt;formal-arguments&gt;
+	&lt;formal-argument name="o" id="frmarg-67"&gt;&lt;type name="Object"/&gt;&lt;/formal-argument&gt;
+      &lt;/formal-arguments&gt;
+      &lt;statements&gt;
+	&lt;statements&gt;
+	  &lt;return&gt;&lt;conditional-expr&gt;&lt;binary-expr op="=="&gt;&lt;send message="put"&gt;
+		  &lt;target&gt;&lt;var-ref name="hash"/&gt;&lt;/target&gt;
+		  &lt;arguments&gt;&lt;var-ref name="o" idref="frmarg-67"/&gt;&lt;var-ref name="o" idref="frmarg-67"/&gt;&lt;/arguments&gt;
+		&lt;/send&gt;
+		&lt;literal-null/&gt;&lt;/binary-expr&gt;&lt;literal-true/&gt;&lt;literal-false/&gt;&lt;/conditional-expr&gt;&lt;/return&gt;
+	&lt;/statements&gt;
+      &lt;/statements&gt;
+    &lt;/method&gt;
+    &lt;method name="remove" visibility="public" id="meth-78"&gt;
+      &lt;type name="boolean" primitive="true"/&gt;
+      &lt;formal-arguments&gt;
+	&lt;formal-argument name="o" id="frmarg-76"&gt;&lt;type name="Object"/&gt;&lt;/formal-argument&gt;
+      &lt;/formal-arguments&gt;
+      &lt;statements&gt;
+	&lt;statements&gt;
+	  &lt;return&gt;&lt;conditional-expr&gt;&lt;binary-expr op="=="&gt;&lt;send message="remove"&gt;
+		  &lt;target&gt;&lt;var-ref name="hash"/&gt;&lt;/target&gt;
+		  &lt;arguments&gt;&lt;var-ref name="o" idref="frmarg-76"/&gt;&lt;/arguments&gt;
+		&lt;/send&gt;
+		&lt;literal-null/&gt;&lt;/binary-expr&gt;&lt;literal-true/&gt;&lt;literal-false/&gt;&lt;/conditional-expr&gt;&lt;/return&gt;
+	&lt;/statements&gt;
+      &lt;/statements&gt;
+    &lt;/method&gt;
+    &lt;method name="clear" visibility="public" id="meth-82"&gt;
+      &lt;type name="void" primitive="true"/&gt;
+      &lt;formal-arguments/&gt;
+      &lt;statements&gt;
+	&lt;statements&gt;
+	  &lt;send message="clear"&gt;
+	    &lt;target&gt;&lt;var-ref name="hash"/&gt;&lt;/target&gt;
+	    &lt;arguments/&gt;
+	  &lt;/send&gt;
+	&lt;/statements&gt;
+      &lt;/statements&gt;
+    &lt;/method&gt;
+    &lt;method name="size" visibility="public" id="meth-88"&gt;
+      &lt;type name="int" primitive="true"/&gt;
+      &lt;formal-arguments/&gt;
+      &lt;statements&gt;
+	&lt;statements&gt;
+	  &lt;return&gt;&lt;send message="size"&gt;
+	      &lt;target&gt;&lt;var-ref name="hash"/&gt;&lt;/target&gt;
+	      &lt;arguments/&gt;
+	    &lt;/send&gt;
+	  &lt;/return&gt;
+	&lt;/statements&gt;
+      &lt;/statements&gt;
+    &lt;/method&gt;
+    &lt;method name="isEmpty" visibility="public" id="meth-93"&gt;
+      &lt;type name="boolean" primitive="true"/&gt;
+      &lt;formal-arguments/&gt;
+      &lt;statements&gt;
+	&lt;statements&gt;
+	  &lt;return&gt;&lt;send message="isEmpty"&gt;
+	      &lt;target&gt;&lt;var-ref name="hash"/&gt;&lt;/target&gt;
+	      &lt;arguments/&gt;
+	    &lt;/send&gt;
+	  &lt;/return&gt;
+	&lt;/statements&gt;
+      &lt;/statements&gt;
+    &lt;/method&gt;
+    &lt;method name="clone" visibility="public" id="meth-98"&gt;
+      &lt;type name="Object"/&gt;
+      &lt;formal-arguments/&gt;
+      &lt;statements&gt;
+	&lt;statements&gt;
+	  &lt;return&gt;&lt;new&gt;&lt;type name="Set"/&gt;&lt;arguments&gt;&lt;cast-expr&gt;&lt;type name="Hashtable"/&gt;&lt;send message="clone"&gt;
+		    &lt;target&gt;&lt;var-ref name="hash"/&gt;&lt;/target&gt;
+		    &lt;arguments/&gt;
+		  &lt;/send&gt;
+		&lt;/cast-expr&gt;&lt;/arguments&gt;&lt;/new&gt;
+	  &lt;/return&gt;
+	&lt;/statements&gt;
+      &lt;/statements&gt;
+    &lt;/method&gt;
+    &lt;method name="elements" visibility="public" id="meth-103"&gt;
+      &lt;type name="Enumeration"/&gt;
+      &lt;formal-arguments/&gt;
+      &lt;statements&gt;
+	&lt;statements&gt;
+	  &lt;return&gt;&lt;send message="elements"&gt;
+	      &lt;target&gt;&lt;var-ref name="hash"/&gt;&lt;/target&gt;
+	      &lt;arguments/&gt;
+	    &lt;/send&gt;
+	  &lt;/return&gt;
+	&lt;/statements&gt;
+      &lt;/statements&gt;
+    &lt;/method&gt;
+    &lt;method name="toString" visibility="public" id="meth-108"&gt;
+      &lt;type name="String"/&gt;
+      &lt;formal-arguments/&gt;
+      &lt;statements&gt;
+	&lt;statements&gt;
+	  &lt;local-variable name="bstr" id="locvar-216"&gt;&lt;type name="StringBuffer"/&gt;&lt;new&gt;&lt;type name="StringBuffer"/&gt;&lt;arguments&gt;&lt;literal-string length="4"&gt;{ &lt;/literal-string&gt;&lt;/arguments&gt;&lt;/new&gt;
+	  &lt;/local-variable&gt;
+	  &lt;local-variable name="e" id="locvar-223"&gt;&lt;type name="Enumeration"/&gt;&lt;send message="keys"&gt;
+	      &lt;target&gt;&lt;var-ref name="hash"/&gt;&lt;/target&gt;
+	      &lt;arguments/&gt;
+	    &lt;/send&gt;
+	  &lt;/local-variable&gt;
+	  &lt;if&gt;&lt;test&gt;&lt;send message="hasMoreElements"&gt;
+		&lt;target&gt;&lt;var-ref name="e" idref="locvar-223"/&gt;&lt;/target&gt;
+		&lt;arguments/&gt;
+	      &lt;/send&gt;
+	    &lt;/test&gt;
+	    &lt;true-case&gt;&lt;statements&gt;
+		&lt;send message="append"&gt;
+		  &lt;target&gt;&lt;var-ref name="bstr"/&gt;&lt;/target&gt;
+		  &lt;arguments&gt;&lt;send message="toString"&gt;
+		      &lt;target&gt;&lt;send message="nextElement"&gt;
+			  &lt;target&gt;&lt;var-ref name="e"/&gt;&lt;/target&gt;
+			  &lt;arguments/&gt;
+			&lt;/send&gt;
+		      &lt;/target&gt;
+		      &lt;arguments/&gt;
+		    &lt;/send&gt;
+		  &lt;/arguments&gt;
+		&lt;/send&gt;
+	      &lt;/statements&gt;
+	    &lt;/true-case&gt;
+	  &lt;/if&gt;
+	  &lt;statements&gt;
+	    &lt;loop kind="while"&gt;&lt;test&gt;&lt;send message="hasMoreElements"&gt;
+		  &lt;target&gt;&lt;var-ref name="e"/&gt;&lt;/target&gt;
+		  &lt;arguments/&gt;
+		&lt;/send&gt;
+	      &lt;/test&gt;&lt;statements&gt;
+		&lt;send message="append"&gt;
+		  &lt;target&gt;&lt;var-ref name="bstr"/&gt;&lt;/target&gt;
+		  &lt;arguments&gt;&lt;binary-expr op="+"&gt;&lt;literal-string length="4"&gt;, &lt;/literal-string&gt;&lt;send message="nextElement"&gt;
+			&lt;target&gt;&lt;var-ref name="e"/&gt;&lt;/target&gt;
+			&lt;arguments/&gt;
+		      &lt;/send&gt;
+		    &lt;/binary-expr&gt;&lt;/arguments&gt;
+		&lt;/send&gt;
+	      &lt;/statements&gt;
+	    &lt;/loop&gt;
+	  &lt;/statements&gt;
+	  &lt;send message="append"&gt;
+	    &lt;target&gt;&lt;var-ref name="bstr" idref="locvar-216"/&gt;&lt;/target&gt;
+	    &lt;arguments&gt;&lt;literal-string length="6"&gt; }\n&lt;/literal-string&gt;&lt;/arguments&gt;
+	  &lt;/send&gt;
+	  &lt;return&gt;&lt;send message="toString"&gt;
+	      &lt;target&gt;&lt;var-ref name="bstr" idref="locvar-216"/&gt;&lt;/target&gt;
+	      &lt;arguments/&gt;
+	    &lt;/send&gt;
+	  &lt;/return&gt;
+	&lt;/statements&gt;
+      &lt;/statements&gt;
+    &lt;/method&gt;
+    &lt;field name="hash" visibility="private"&gt;&lt;type name="Hashtable"/&gt;&lt;/field&gt;
+  &lt;/class&gt;
+&lt;/java-source-program&gt;
+</pre>
+
+
+<br><small><a href="#top">[top]</a></small>
+
+
+<h3><a name="references">References</a></h3>
+
+Java
+
+Smalltalk
+
+C++
+
+Modula-2
+
+XML
+
+EvilMacros
+
+Framework for Preprocessor-aware C Source Code Analyses
+
+<br><small><a href="#top">[top]</a></small>
+
+
+<h3><a name="vitae">Vitae</a></h3>
+
+<IMG ALT="Greg J. Badros" SRC="./gjb-face-transp.gif"><br>
+
+<strong><a href="http://www.cs.washington.edu/homes/gjb">Greg J. 
+Badros</a></strong> is a final-year Ph.D. candidate at the
+<a href="http://www.cs.washington.edu">University of Washington</a>
+in Seattle, Washington where he earned his
+M.Sc. degree in 1998.  He graduated <i>magna cum laude</i> with a
+B.S. degree in <a href="http://www.math.duke.edu">Mathematics</a> and 
+<a href="http://www.cs.duke.edu">Computer Science</a> from
+<a href="http://www.duke.edu">Duke University</a> in
+1995.  He is the primary author of the <a
+href="http://scwm.mit.edu">Scheme Constraints Window Manager</a> and the
+<a href="http://www.cs.washington.edu/research/constraints/cassowary/">Cassowary
+Constraint Solving Toolkit</a>.  His research interests include
+constraint technology, languages, software engineering, and the
+internet.
+
+<hr>
+<a href="#introduction">Introduction</a> &nbsp;
+<a href="#background">Background</a> &nbsp;
+<a href="#javaml">JavaML</a>  &nbsp;
+<a href="#leveraging-xml">Leveraging XML</a> <br>
+<a href="#related-work">Related work</a>  &nbsp;
+<a href="#future-work">Future work</a>  &nbsp;
+<a href="#conclusion">Conclusion</a>  &nbsp; 
+<a href="#acknowledgments">Acknowledgments</a>  <br>
+<a href="#javaml-dtd">Appendix 1 - JavaML DTD</a> 
+<a href="#set.java">Appendix 2a - Extended Example,
+      <strong>Set.java</strong></a>  &nbsp;
+<a href="#set.java.xml">Appendix 2b - Extended Example,
+      <strong>Set.java.xml</strong></a>  <br>
+<a href="#references">References</a>  &nbsp;
+<a href="#vitae">Vitae</a> 
+
+<br><small><a href="#top">[top]</a></small>
+
+<hr>
+<address>Greg J. Badros / 
+      U Washington Computer Science and Engineering /
+      <a href="mailto:gjb@cs.washington.edu">gjb@cs.washington.edu</a></address>
 </body>
+</html>
