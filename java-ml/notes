@@ -119,3 +119,13 @@ Issue:
 
 Issue:
   -> mangling for id/idrefs
+
+
+Issue:
+  -> should field-access be separate from var-ref?
+     this is a little weird:
+<field-access field="println">
+  <field-access field="err">
+    <var-ref name="System">
+  </field-access>
+</field-access>
