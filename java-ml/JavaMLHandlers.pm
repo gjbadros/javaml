@@ -25,6 +25,10 @@ my $formal_final = undef;
 my $formal_id = undef;
 my $formal_type = undef;
 
+my $send_target = undef;
+
+my $field_name = undef;
+
 open(DEBUG,">java-ml-handers.debug");
 
 # Basic PerlSAX
@@ -76,6 +80,7 @@ sub start_element {
     $formal_id = $href_attribs->{id};
   } elsif ($name eq "send") {
   } elsif ($name eq "target") {
+    $send_target = $href_attribs;
   } elsif ($name eq "return") {
   } elsif ($name eq "statements") {
     if (defined($meth_name)) {
@@ -104,10 +109,14 @@ sub start_element {
   } elsif ($name eq "dim-expr") {
   } elsif ($name eq "local-variable") {
   } elsif ($name eq "arguments") {
+    print "(";
   } elsif ($name eq "literal-string") {
+    print $href_attribs->{value};
   } elsif ($name eq "literal-number") {
+    print $href_attribs->{value};
   } elsif ($name eq "var-ref") {
   } elsif ($name eq "field-access") {
+    $field_name = $href_attribs->{field};
   } elsif ($name eq "var-set") {
   } elsif ($name eq "field-set") {
   } elsif ($name eq "package-decl") {
@@ -174,10 +183,12 @@ sub end_element {
   } elsif ($name eq "dim-expr") {
   } elsif ($name eq "local-variable") {
   } elsif ($name eq "arguments") {
+    print ")";
   } elsif ($name eq "literal-string") {
   } elsif ($name eq "literal-number") {
   } elsif ($name eq "var-ref") {
   } elsif ($name eq "field-access") {
+    $field_name = undef;
   } elsif ($name eq "var-set") {
   } elsif ($name eq "field-set") {
   } elsif ($name eq "package-decl") {
@@ -188,8 +199,11 @@ sub end_element {
   } elsif ($name eq "unary-expr") {
   } elsif ($name eq "cast-expr") {
   } elsif ($name eq "literal-false") {
+    print "false";
   } elsif ($name eq "literal-true") {
+    print "true";
   } elsif ($name eq "literal-null") {
+    print "null";
   } elsif ($name eq "if") {
   } elsif ($name eq "test") {
   } elsif ($name eq "true-case") {
