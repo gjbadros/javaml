@@ -31,6 +31,8 @@
 char *g_szMethodName = NULL;
 char *g_szClassName = NULL;
 
+bool g_fInsideCatch = false;
+
 AstClassDeclaration *g_pclassdecl = NULL;
 AstBlock *g_pblockdecl = NULL;
 AstMethodDeclaration *g_pmethoddecl = NULL;
@@ -150,7 +152,17 @@ SzIdFromFormalArgument(long id, const char *szClassName,
                        const char *szMethodName, const char *szFormalArg)
 {
   ostrstream xo;
-  xo << "frmarg-" << id << ends;
+  // GJB:FIXME:: this is a hack;
+  // catch block formal-arguments get found
+  // like local variables, so their uses' idref-s
+  // point back to locvar-#, not frmarg-# so we
+  // need to be sure that the formal-argument gets
+  // an id locvar-#, not frmarg-#
+  if (g_fInsideCatch) {
+    xo << "locvar-" << id << ends;
+  } else {
+    xo << "frmarg-" << id << ends;
+  }
   return xo.str();
 }
 
@@ -309,7 +321,9 @@ void xml_unparse_maybe_var_ref(Ostream &xo, LexStream &ls, Ast *pnode)
     if (pname) {
       NameSymbol *name_symbol = ls.NameSymbol(pname->identifier_token);
       //      VariableSymbol *var_symbol = ThisEnvironment()->symbol_table.FindVariableSymbol(name_symbol);
-      VariableSymbol *var_symbol = g_pblockdecl->block_symbol->FindVariableSymbol(name_symbol);
+      VariableSymbol *var_symbol = NULL;
+      if (g_pblockdecl && g_pblockdecl->block_symbol)
+        var_symbol = g_pblockdecl->block_symbol->FindVariableSymbol(name_symbol);
       if (var_symbol)
         szIdRef = SzIdFromLocalVariable(var_symbol->declarator->id,wstring2string(var_symbol->Name()));
       else if (g_pmethoddecl && g_pmethoddecl->method_symbol) {
@@ -354,8 +368,15 @@ void xml_unparse_maybe_type(Ostream &xo, LexStream &ls, Ast *pnode, int cBracket
     if (cBrackets > 0) {
       char *sz = SzNewFromLong(cBrackets);
     }
+    AstPrimitiveType *pnodePrimType = 
+      dynamic_cast<AstPrimitiveType *>(pnode);
+    char *szName = NULL;
+    if (pnodePrimType)
+      szName = xml_name_string(ls,pnodePrimType->primitive_kind_token);
+    else
+      szName = SzFromUnparse(ls,pnode);
     xml_output(xo,"type",
-               "name", SzFromUnparse(ls,pnode),
+               "name", szName,
                "dimensions",sz,
                XML_CLOSE);
     delete sz;
@@ -450,8 +471,15 @@ void AstArrayType::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstArrayType:#" << this-> id << "*/";
     char *szNumBrackets = SzNewFromLong(NumBrackets());
+    AstPrimitiveType *pnodePrimType = 
+      dynamic_cast<AstPrimitiveType *>(type);
+    char *szName = NULL;
+    if (pnodePrimType)
+      szName = xml_name_string(lex_stream,pnodePrimType->primitive_kind_token);
+    else
+      szName = SzFromUnparse(lex_stream,type);
     xml_output(os,"type",
-               "name",SzFromUnparse(lex_stream,type),
+               "name",szName,
                "dimensions",szNumBrackets,
                XML_CLOSE);
     delete szNumBrackets;
@@ -1338,7 +1366,7 @@ void AstThrowStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstThrowStatement:#" << this-> id << "*/";
     xml_open(os,"throw");
-    expression -> XMLUnparse(os, lex_stream);
+    xml_unparse_maybe_var_ref(os, lex_stream, expression);
     xml_close(os,"throw",true);
     if (Ast::debug_unparse) os << "/*:AstThrowStatement#" << this-> id << "*/";
 }
@@ -1363,8 +1391,11 @@ void AstCatchClause::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstCatchClause:#" << this-> id << "*/";
     xml_open(os,"catch");
+    bool fInsideCatchPrev = g_fInsideCatch;
+    g_fInsideCatch = true;
     formal_parameter -> XMLUnparse(os, lex_stream);
     block -> XMLUnparse(os, lex_stream);
+    g_fInsideCatch = fInsideCatchPrev;
     xml_close(os,"catch");
     if (Ast::debug_unparse) os << "/*:AstCatchClause#" << this-> id << "*/";
 }
