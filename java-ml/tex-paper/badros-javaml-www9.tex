@@ -13,6 +13,7 @@
 \usepackage{graphicx}
 \usepackage{fullpage}
 \usepackage{times}
+\usepackage{url}
 \usepackage[english]{babel}
 
 \setlength\topmargin{-0.25in} \setlength\oddsidemargin{-0.25in}
@@ -167,7 +168,7 @@ sacrifices flexibility.  IDEs generally provide only a limited set of
 capabilities and extending those is hard.  Additionally, analyses and
 transformation on source code are often hard to automate or perform in
 batch using existing interactive environments.  Some more advanced IDEs,
-such as IBM VisualAge for C++~\cite{Montana}, expose an application
+such as IBM VisualAge for C++~\cite{Soroker97}, expose an application
 programming interface to the representation of the program.  Although an
 improvement, this technique still suffers from an inability to separate
 simple tools from a complex environment and additionally creates a
@@ -226,12 +227,12 @@ languages, Java is an excellent candidate for experimenting with these
 ideas and techniques.
 
 Java is a popular object-oriented programming language developed by Sun
-Microsystems in the mid-1990s~\cite{Java,JavaNutShell}.  It features a
+Microsystems in the mid-1990s~\cite{Arnold98,Flanagan97}.  It features a
 platform-independent execution model based on the Java Virtual Machine
 (JVM) and owes its quick acceptance to its use as a programming language
 for World Wide Web applications.  Java combines a simple object model
-reminiscent of Smalltalk~\cite{Smalltalk} with Algol block structure, a
-C++-like~\cite{C++} syntax, a static type system, and a package system
+reminiscent of Smalltalk~\cite{Goldberg89} with Algol block structure, a
+C++-like~\cite{Stroustrup97} syntax, a static type system, and a package system
 inspired by Modula-2~\cite{Modula2}.
 
 As in most other object-oriented (OO) languages, the primary unit of
@@ -277,7 +278,7 @@ language, the W3C is positioning XML to be its replacement.  While HTML
 permits authors to use only a pre-determined fixed set of tags in
 marking up their document, XML allows easy specification of user-defined
 markup tags adapted to the document and data at
-hand~\cite{LaTeXWeb,XML-Handbook}.
+hand~\cite{Goosens99,Goldfarb98}.
 
 An XML document consists simply of text marked up with tags enclosed in
 angle braces.  A simple example is:
@@ -701,7 +702,7 @@ paper).
 
 The converter has been tested by converting several sample programs, as
 well as the whole of the 4300 line Cassowary Constraint Solving
-Toolkit~\cite{Cassowary}.  The processing of all those files takes only
+Toolkit~\cite{CassoInI}.  The processing of all those files takes only
 about six seconds on the author's RedHat6-based dual Pentium III-450
 machine.  Each of the files converted was then validated with respect to
 the JavaML DTD using James Clark's Jade package's \smtexttt{nsgmls}
@@ -973,12 +974,12 @@ in the previous section.  Various researchers have similarly approached
 the problem of improving software engineering and development tools with
 varying degrees of success.
 
-TAWK~\cite{TAWK} extends the AWK~\cite{AwkSed} paradigm by matching
+TAWK~\cite{Griswold96} extends the AWK~\cite{Dougherty90} paradigm by matching
 patterns in the AST of a C program.  Numerous XML querying tools provide
 this same functionality for JavaML, and the event-action framework is
 similar to that used by SAX (Simple API for XML)~\cite{SAX}.
 
-ASTLog~\cite{ASTLog} extends the Prolog~\cite{Prolog} logic programming
+ASTLog~\cite{Crew97} extends the Prolog~\cite{Clock94} logic programming
 language with the ability to reason about an external database that
 models the AST.  Unlike Prolog, ASTLog statements are evaluated with
 respect to a current object.  The approach that Crew uses may be
@@ -1053,7 +1054,7 @@ preprocessor.  The C preprocessor provides a first pass of textual
 processing to permit abstractions that cannot otherwise be expressed in
 the core C++ language.  These abstractions are often very important to
 the understandability and maintainability of the code, but do not
-interact well with parsing techniques~\cite{EmpAnCpp,PCP3}.
+interact well with parsing techniques~\cite{ErnstBadrosNotkin00,Badros00-spe}.
 
 The current converter that translates back from JavaML to the classical
 source representation needs to be far more robust.  It was written as
@@ -1545,7 +1546,7 @@ class Set {
 }
 
 \section*{Vitae}
-\begin{figure}[h]
+\begin{figure}[ht]
 \includegraphics[width=1.5in]{gjb-face.eps}
 \end{figure}
 %%<a href="http://www.cs.washington.edu/homes/gjb">
