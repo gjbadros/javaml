@@ -401,7 +401,7 @@
   <xsl:apply-templates select="test" mode="no-parens"/>
   <xsl:text>; </xsl:text>
   <xsl:apply-templates select="update"/>
-  <xsl:text>) </xsl:text>
+  <xsl:text>)&#xA;</xsl:text>
   <xsl:variable name="numtoskip" select="count(init|test|update)"/>
   <xsl:apply-templates select="*[position() > $numtoskip]"/>
   <xsl:if test="not(.//statements)">
@@ -450,6 +450,35 @@
 
 <xsl:template match="break">
   <xsl:text>break</xsl:text>
+</xsl:template>
+
+<xsl:template match="switch">
+  <xsl:text>switch (</xsl:text>
+  <xsl:apply-templates select="*[1]"/>
+  <xsl:text>) {&#xA;</xsl:text>
+  <xsl:apply-templates select="*[position() > 1]"/>
+  <xsl:text>}&#xA;</xsl:text>
+</xsl:template>
+
+<xsl:template match="case">
+  <xsl:text>case </xsl:text>
+  <xsl:apply-templates/>
+  <xsl:text>:&#xA;</xsl:text>
+</xsl:template>
+
+<xsl:template match="default-case">
+  <xsl:text>default:&#xA;</xsl:text>
+</xsl:template>
+
+<xsl:template match="array-initializer">
+  <xsl:text>{ </xsl:text>
+  <xsl:for-each select="*">
+    <xsl:apply-templates select="."/>
+       <xsl:if test="not(position()=last())">
+  	 <xsl:text>, </xsl:text>
+       </xsl:if>
+  </xsl:for-each>
+  <xsl:text>} </xsl:text>
 </xsl:template>
 
 </xsl:stylesheet>
