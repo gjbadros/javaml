@@ -15,9 +15,17 @@
 \usepackage{times}
 \usepackage[english]{babel}
 
+\setlength\topmargin{-0.25in} \setlength\oddsidemargin{-0.25in}
+\setlength\textheight{9.0in} \setlength\textwidth{7.0in}
+\setlength\columnsep{0.375in}  \newlength\titlebox \setlength\titlebox{2.25in}
+\setlength\headheight{0pt}   \setlength\headsep{0pt}
+\setlength{\parskip}{2pt}
+\flushbottom \twocolumn \sloppy
+
 \begin{document}
 \bibliographystyle{plain}
 \newcommand{\smtexttt}[1]{{\small\texttt{#1}}}
+\newenvironment{smverbatim}{\small \begin{verbatim}}{\end{verbatim}}
 \newenvironment{shellcommand}{\begin{verbatim}}{\end{verbatim}}
 \newenvironment{shelloutput}{\begin{verbatim}}{\end{verbatim}}
 
@@ -91,12 +99,14 @@ effect on the resulting AST and, thus, the semantics of the computation.
 For example, a single extraneous semicolon can change a looping block
 into an ordinary one and result in an infinite loop:
 
+{\small
 \begin{verbatim}
   int i = 10;
   while (i > 0); {
     /* ... */ --i;
   }
 \end{verbatim}
+}
 
 Other, more concise, languages may suffer from far more dangerous
 semantic changes stemming from small syntactic errors (the Perl language
@@ -281,7 +291,9 @@ angle braces.  A simple example is:
     <from>Greg</from>
     <subject>My trip</subject>
   </head>
-  <body encoding="ascii">The weather is terrific!</body>
+  <body encoding="ascii">
+   The weather is terrific!
+  </body>
 </email>
 \end{verbatim}
 
@@ -411,7 +423,8 @@ derived from parsing source code.  Consider the simple Java program:
 import java.applet.*;
 import java.awt.*;
 
-public class FirstApplet extends Applet {
+public class FirstApplet 
+                   extends Applet {
   public void paint(Graphics g) {
     g.drawString("Hello World", 25, 50);
   }
@@ -462,18 +475,24 @@ to:
 
 \begin{verbatim}
 <java-source-program>
-<import-declaration>import java.applet.*;</import-declaration>
-<import-declaration>import java.awt.*;</import-declaration>
+<import-declaration>import java.applet.*;
+   </import-declaration>
+<import-declaration>import java.awt.*;
+   </import-declaration>
 
 <class-declaration>
 <modifiers>public</modifiers> class 
    <class-name>FirstApplet</class-name> 
-     extends <superclass>Applet</superclass> {
+     extends 
+      <superclass>Applet</superclass> {
  <method-definition>
-  <modifiers>public</modifiers> <return-type>void</return-type> 
+  <modifiers>public</modifiers>
+        <return-type>void</return-type> 
     <method-name>paint</method-name>
-      (<formal-arguments><type>Graphics</type> 
-             <name>g</name></formal-arguments>) 
+      (<formal-arguments>
+          <type>Graphics</type> 
+          <name>g</name>
+        </formal-arguments>) 
     <statements>{
     g.drawString("Hello World", 25, 50);
   } </statements>
@@ -514,8 +533,9 @@ the resulting markup language.
 JavaML is defined by the document type definition (DTD) in
 appendix~\ref{app-javaml}, but is best illustrated by example.  For the
 \smtexttt{FirstApplet.java} source code listed above, we represent the
-program in JavaML as:
+program in JavaML as show in figure~\ref{fig-firstapplet-javaml}.
 
+\begin{figure*}[htb]
 \begin{verbatim}
    1  <?xml version="1.0" encoding="UTF-8"?>
    2  <!DOCTYPE java-source-program SYSTEM "java-ml.dtd">
@@ -546,6 +566,9 @@ program in JavaML as:
   27    </class>
   28  </java-source-program>
 \end{verbatim}
+\caption{FirstApplet.java converted to JavaML.
+\label{fig-firstapplet-javaml}}
+\end{figure*}
 
 In the above document, concepts such as methods, superclasses, message
 sends, and literal numbers are all directly represented in the elements
@@ -558,13 +581,15 @@ presented visually as in figure~\ref{fig-treeview}. See
 appendix~\ref{app-ext-eg} for an example of a more complex converted
 program.
 
-\begin{figure*}[tb]
-\includegraphics[width=3in]{treeview.eps}
+\begin{figure}[tb]
+\begin{centering}
+\includegraphics[width=\linewidth]{treeview.eps}
 \caption{A fully-expanded tree view of the JavaML representation 
 of the \smtexttt{FirstApplet} example as viewed by IBM's
 \smtexttt{xmldiff} utility~\cite{XMLDiffMerge}.
 \label{fig-treeview}}
-\end{figure*}
+\end{centering}
+\end{figure}
 
 \subsection{Design decisions}
 \label{ssec-design}
@@ -730,10 +755,12 @@ utility \smtexttt{sgcount} does an excellent job of summarizing the
 constructs in a Java program:
 
 %% ShellCommand
+{\bfseries
 \begin{verbatim}
 % sgcount Set.java.xml
 \end{verbatim}
-
+}
+{\small
 \begin{verbatim}
 new                    5  
 method                 9  
@@ -769,6 +796,7 @@ binary-expr            3
 field                  1  
 *Total*                219 
 \end{verbatim}
+}
 
 In the above output, each row lists an element class and the number of
 times that that element appeared in the document.  Thus, we can easily
@@ -783,10 +811,12 @@ Suppose we wish to see all the string literals that a program contains.
 We can do this trivially using \smtexttt{sggrep} on the JavaML
 representation of the program:
 
+{\bfseries
 \begin{verbatim}
 % sggrep '.*/literal-string' < Set.java.xml
 \end{verbatim}
-
+}
+{\small
 \begin{verbatim}
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE java-source-program SYSTEM "java-ml.dtd" >
@@ -794,13 +824,15 @@ representation of the program:
 <literal-string length='2'>, </literal-string>
 <literal-string length='4'> }\n</literal-string>
 \end{verbatim}
+}
 
-Notice that the output of \smtexttt{sggrep} is also a (not necessarily
+\noindent Notice that the output of \smtexttt{sggrep} is also a (not necessarily
 valid nor even well-formed) XML document.  Thus we can string together
 SGML and XML tools in a Unix pipeline to combine tools in novel and
 useful ways.  For example, if we want to just see the strings, we can
 run \smtexttt{stripsgml} on the output of the above query:
 
+{\small
 \begin{verbatim}
 % sggrep '.*/literal-string' < Set.java.xml | stripsgml
 \end{verbatim}
@@ -809,14 +841,19 @@ run \smtexttt{stripsgml} on the output of the above query:
 , 
  }\n
 \end{verbatim}
-
+}
 We can also query the JavaML source for elements based on values of
 their attributes.  For example, if we wish to find all sends of the
 message \smtexttt{clone} we can do so easily and reliably:
 
+{\bfseries
 \begin{verbatim}
-% sggrep '.*/send[message=clone]' < Set.java.xml 
+% sggrep '.*/send[message=clone]' \
+                      < Set.java.xml 
 \end{verbatim}
+}
+
+{\small
 \begin{verbatim}
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE java-source-program SYSTEM "java-ml.dtd" >
@@ -827,6 +864,7 @@ message \smtexttt{clone} we can do so easily and reliably:
 <arguments/>
 </send>
 \end{verbatim}
+}
 
 Another class of common analyses is the semantic checks done by the
 compiler prior to translation.  For example, in Java code, only abstract
@@ -834,11 +872,15 @@ classes may have abstract methods.  When compiling, a semantic error
 will be flagged if this rule is violated.  We can query a JavaML document
 for concrete (i.e., not abstract) classes that contain an abstract method:
 
+{\small
 \begin{verbatim}
-% sggrep -q '.*/class[abstract!=true]/method[abstract=true]' < Set.java.xml
+% sggrep -q '.*/class[abstract!=true]/\
+                method[abstract=true]' \
+                          < Set.java.xml
 \end{verbatim}
+}
 
-and the output will be empty because this semantic restriction is not
+\noindent and the output will be empty because this semantic restriction is not
 violated in our target document (i.e., the analyzed program).
 
 A common error for novice Java programmers is to accidentally use the
@@ -849,22 +891,30 @@ the assigned-to variable is a \smtexttt{boolean}. If we wish to find these
 questionable constructs, \smtexttt{sggrep} makes this analysis
 trivial thanks to the JavaML representation:
 
+{\small
 \begin{verbatim}
-% sggrep -q '.*/if/test/assignment-expr' < Set.java.xml
+% sggrep -q '.*/if/test/assignment-expr' \
+                            < Set.java.xml
 \end{verbatim}
+}
 
-The \smtexttt{sgrpg} (SGML RePort Generator) program permits combining a
+\noindent The \smtexttt{sgrpg} (SGML RePort Generator) program permits combining a
 top-level query with a restriction on the children and an output format
 for the results (a common paradigm for querying tools~\cite{XMLQL-EnE}.
 For example:
 
+{\small
 \begin{verbatim}
-% sgrpg '.*/method' '.*/send[message=hasMoreElements]' '' '%s %s 
+% sgrpg '.*/method' \
+        '.*/send[message=hasMoreElements]' \
+        '' '%s %s 
 ' visibility name < Set.java.xml
 \end{verbatim}
+
 \begin{verbatim}
 public toString
 \end{verbatim}
+}
 
 \noindent searches for method definitions that contain message sends of the
 message \smtexttt{hasMoreElements}.  It then outputs the
@@ -890,7 +940,8 @@ following in the \smtexttt{start\_tag} subroutine:
 \begin{verbatim}
 sub start_tag { 
   my ($this,$tag,$attr_spec) = @_;
-  my %attrs = SGMLparse_attr_spec($attr_spec);
+  my %attrs = 
+     SGMLparse_attr_spec($attr_spec);
   # ...
   if ($tag eq "method") {
     if ($attrs{name} eq "bar") {
@@ -1070,6 +1121,7 @@ Engineering Wilma Bradley fellowship and by NSF Grant No. IIS-9975990.
 \section{JavaML DTD}
 \label{app-javaml-dtd}
 
+{\small
 \begin{verbatim}
 <?xml version="1.0" encoding="UTF-8" ?>
 <!ENTITY % visibility-attribute "visibility (public|private|protected)
@@ -1187,12 +1239,14 @@ literal-true|literal-false|literal-null|this|super">
 <!ATTLIST break targetname CDATA #IMPLIED>
 <!ELEMENT conditional-expr ((%expr-elems;),(%expr-elems;),(%expr-elems;))>
 \end{verbatim}
+}
 
 \section{Extended Example}
 \label{app-exteg}
 
 \subsection{Set.java}
 
+{\small
 \begin{verbatim}
 // Cassowary Incremental Constraint Solver
 // (C) 1998, 1999 Greg J. Badros and Alan Borning
@@ -1256,9 +1310,11 @@ class Set {
   private Hashtable hash;
 }
 \end{verbatim}
+}
 
 \subsection{Set.java.xml}
 
+{\small
 \begin{verbatim}
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE java-source-program SYSTEM "java-ml.dtd">
@@ -1480,15 +1536,16 @@ class Set {
   </class>
 </java-source-program>
 \end{verbatim}
+}
 
 {\small
 \bibliography{library,articles,applications} %style plain, from above.
 }
 
 \section*{Vitae}
-\begin{figure*}[h]
+\begin{figure}[h]
 \includegraphics[width=1.5in]{gjb-face.eps}
-\end{figure*}
+\end{figure}
 %%<a href="http://www.cs.washington.edu/homes/gjb">
 \textbf{Greg J. Badros} is a final-year Ph.D. candidate at the
 %% <a href="http://www.cs.washington.edu">
