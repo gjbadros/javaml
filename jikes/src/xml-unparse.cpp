@@ -15,6 +15,10 @@
 #include <fstream.h>
 #include <stdarg.h>
 
+#include "symbol.h"
+#include "semantic.h"
+
+
 /* make <arguments></arguments>
    and <formal-argments></formal-arguments>
    into <arguments/>
@@ -27,6 +31,17 @@
 char *g_szMethodName = NULL;
 char *g_szClassName = NULL;
 
+AstClassDeclaration *g_pclassdecl = NULL;
+AstBlock *g_pblockdecl = NULL;
+AstMethodDeclaration *g_pmethoddecl = NULL;
+
+PackageSymbol *ThisPackage() {
+  return g_pclassdecl->semantic_environment->sem->Package();
+}
+
+SemanticEnvironment *ThisEnvironment() {
+  return g_pclassdecl->semantic_environment;
+}
 
 /* Output any prefix header for the converted XML file */
 void xml_prefix(Ostream &xo,char *szInfilename)
@@ -114,7 +129,15 @@ SzIdFromFormalArgument(long id, const char *szClassName,
                        const char *szMethodName, const char *szFormalArg)
 {
   ostrstream xo;
-  xo << "formal-" << id << ends;
+  xo << "frmarg-" << id << ends;
+  return xo.str();
+}
+
+char *
+SzIdFromLocalVariable(long id, const char *szVarName)
+{
+  ostrstream xo;
+  xo << "locvar-" << id << ends;
   return xo.str();
 }
 #endif
@@ -260,8 +283,24 @@ void xml_unparse_maybe_var_ref(Ostream &xo, LexStream &ls, Ast *pnode)
     xml_unparse_maybe_var_ref(xo,ls,pfaNode->base);
     xml_close(xo,"field-access");
   } else if (pnode->IsName()) {
+    AstSimpleName *pname = pnode->SimpleNameCast();
+    char *szIdRef = NULL;
+    if (pname) {
+      NameSymbol *name_symbol = ls.NameSymbol(pname->identifier_token);
+      //      VariableSymbol *var_symbol = ThisEnvironment()->symbol_table.FindVariableSymbol(name_symbol);
+      VariableSymbol *var_symbol = g_pblockdecl->block_symbol->FindVariableSymbol(name_symbol);
+      if (var_symbol)
+        szIdRef = SzIdFromLocalVariable(var_symbol->declarator->id,wstring2string(var_symbol->Name()));
+      else if (g_pmethoddecl && g_pmethoddecl->method_symbol) {
+        var_symbol = g_pmethoddecl->method_symbol->block_symbol->FindVariableSymbol(name_symbol);
+        /* GJB:FIXME:: cheat here instead of figuring out classname, methodname, etc. */
+        if (var_symbol)
+          szIdRef = SzIdFromFormalArgument(var_symbol->declarator->id,"class","method","formal-name");
+      }
+    }
     xml_output(xo,"var-ref",
                "name",SzFromUnparse(ls,pnode),
+               "idref",szIdRef,
                XML_CLOSE);
   } else {
     pnode -> XMLUnparse(xo, ls);
@@ -350,6 +389,8 @@ void AstBlock::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstBlock:#" << this-> id << "*/";
     if (Ast::debug_unparse) os << "/*no_braces:" << no_braces << "*/";
+    AstBlock *pblockdeclPrior = g_pblockdecl;
+    g_pblockdecl = this;
     for (int i = 0; i < this -> NumLabels(); i++)
     {
       xml_output(os, "label",
@@ -370,6 +411,7 @@ void AstBlock::XMLUnparse(Ostream& os, LexStream& lex_stream)
     if ( this->NumStatements() > 0) {
       xml_close(os, "statements",true);
     }
+    g_pblockdecl = pblockdeclPrior;
     if (Ast::debug_unparse) os << "/*:AstBlock#" << this-> id << "*/";
 }
 
@@ -492,6 +534,8 @@ void AstClassDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
     bool fTransient = false;
     bool fNative = false;
     char *szVisibility = NULL;
+
+    g_pclassdecl = this;
 
     for (int i = 0; i < this -> NumClassModifiers(); i++)
     {
@@ -742,7 +786,8 @@ void AstFormalParameter::XMLUnparse(Ostream& os, LexStream& lex_stream)
     xml_output(os,"formal-argument",
                "name",szName,
                "final",SzOrNullFromF(fFinal),
-               "id",SzIdFromFormalArgument(this->id,szClassName,szMethodName,szName),
+               //               "id",SzIdFromFormalArgument(this->id,szClassName,szMethodName,szName),
+               "id",SzIdFromFormalArgument(formal_declarator->id,szClassName,szMethodName,szName),
                NULL);
     xml_unparse_maybe_type(os,lex_stream,type);
     xml_close(os,"formal-argument",true);
@@ -781,6 +826,8 @@ void AstMethodDeclarator::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstMethodDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstMethodDeclaration:#" << this-> id << "*/";
+    AstMethodDeclaration *pmethoddeclPrior = g_pmethoddecl;
+    g_pmethoddecl = this;
 
     bool fAbstract = false;
     bool fFinal = false;
@@ -859,6 +906,7 @@ void AstMethodDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
     g_szMethodName = NULL;
 
     xml_close(os,"method",true);
+    g_pmethoddecl = pmethoddeclPrior;
     if (Ast::debug_unparse) os << "/*:AstMethodDeclaration#" << this-> id << "*/";
 }
 
@@ -1077,6 +1125,7 @@ void AstLocalVariableDeclarationStatement::XMLUnparse(Ostream& os, LexStream& le
                    "static",SzOrNullFromF(fStatic),
                    "volatile",SzOrNullFromF(fVolatile),
                    "transient",SzOrNullFromF(fTransient),
+                   "id",SzIdFromLocalVariable(VariableDeclarator(k)->id,szName),
                    NULL);
         // Repeat the type for each variable
         // GJB:FIXME:: here we lose the fact that the variables
@@ -1446,6 +1495,12 @@ void AstParenthesizedExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstTypeExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstTypeExpression:#" << this-> id << "*/";
+    /* GJB:FIXME:: would like type expressions to have IDREFs pointing
+       back to the node that defines the class or the interface */
+#if 0
+    NameSymbol *name_symbol = lex_stream->NameSymbol(type->identifier_token);
+    TypeSymbol *type = 
+#endif
     xml_output(os,"type",
                "name",SzFromUnparse(lex_stream,type),
                XML_CLOSE);
