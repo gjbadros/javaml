@@ -120,6 +120,12 @@ xml_output(Ostream &xo, char *szTag, ...)
 }
 
 void
+xml_open(Ostream &xo, char *szTag)
+{
+  xml_output(xo,szTag,NULL);
+}
+
+void
 xml_nl(Ostream &xo)
 {
   xo << '\n';
@@ -211,7 +217,7 @@ void AstBlock::XMLUnparse(Ostream& os, LexStream& lex_stream)
     /* GJB:FIXME:: we get extra nestings of statements
        that'd be nice to remove */
     if ( this->NumStatements() > 0) {
-      xml_output(os, "statements", NULL);
+      xml_open(os, "statements");
       xml_nl(os);
     }
     for (int i = 0; i < this -> NumStatements(); i++)
@@ -314,7 +320,7 @@ void AstClassBody::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstClassBody:#" << this-> id << "*/";
 #ifdef XML_LONG_WINDED
-    xml_output(os,"class-body",NULL);
+    xml_open(os,"class-body");
 #endif
     for (int k = 0; k < this -> NumClassBodyDeclarations(); k++)
 	this -> ClassBodyDeclaration(k) -> XMLUnparse(os, lex_stream);
@@ -606,7 +612,7 @@ void AstMethodDeclarator::XMLUnparse(Ostream& os, LexStream& lex_stream)
       xml_nl(os);
     } else {
 #endif
-      xml_output(os,"formal-arguments",NULL);
+      xml_open(os,"formal-arguments");
       xml_nl(os);
       for (int k = 0; k < this -> NumFormalParameters(); k++)
         {
@@ -759,7 +765,7 @@ void AstConstructorBlock::XMLUnparse(Ostream& os, LexStream& lex_stream)
     if (explicit_constructor_invocation_opt)
     {
 #if 0 // I think this is redundant --11/12/99 gjb
-        xml_output(os,"statements",NULL);
+        xml_open(os,"statements");
 #endif
 	explicit_constructor_invocation_opt -> XMLUnparse(os, lex_stream);
 	// os << ";\n";
@@ -949,18 +955,18 @@ void AstLocalVariableDeclarationStatement::XMLUnparse(Ostream& os, LexStream& le
 void AstIfStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstIfStatement:#" << this-> id << "*/";
-    xml_output(os,"if",NULL);
-    xml_output(os,"test",NULL);
+    xml_open(os,"if");
+    xml_open(os,"test");
     xml_unparse_maybe_var_ref(os,lex_stream,expression);
     xml_close(os,"test",true);
 
-    xml_output(os,"true-case",NULL);
+    xml_open(os,"true-case");
     true_statement -> XMLUnparse(os, lex_stream);
     xml_close(os,"true-case",true);
 
     if (false_statement_opt)
       {
-        xml_output(os,"false-case",NULL);
+        xml_open(os,"false-case");
 	false_statement_opt -> XMLUnparse(os, lex_stream);
         xml_close(os,"false-case",true);
       }
@@ -1126,7 +1132,7 @@ void AstReturnStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 
     // just drop the return tag if there is nothing to return --11/12/99 gjb
     if (expression_opt) {
-      xml_output(os,"return",NULL);
+      xml_open(os,"return");
       expression_opt -> XMLUnparse(os, lex_stream);
       xml_close(os,"return",true);
     }
@@ -1136,7 +1142,7 @@ void AstReturnStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstThrowStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstThrowStatement:#" << this-> id << "*/";
-    xml_output(os,"throw",NULL);
+    xml_open(os,"throw");
     expression -> XMLUnparse(os, lex_stream);
     xml_close(os,"throw",true);
     if (Ast::debug_unparse) os << "/*:AstThrowStatement#" << this-> id << "*/";
@@ -1234,14 +1240,14 @@ void AstDoubleLiteral::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstTrueLiteral::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstTrueLiteral:#" << this-> id << "*/";
-    xml_output(os,"literal-true",NULL);
+    xml_open(os,"literal-true");
     if (Ast::debug_unparse) os << "/*:AstTrueLiteral#" << this-> id << "*/";
 }
 
 void AstFalseLiteral::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstFalseLiteral:#" << this-> id << "*/";
-    xml_output(os,"literal-false",NULL);
+    xml_open(os,"literal-false");
     if (Ast::debug_unparse) os << "/*:AstFalseLiteral#" << this-> id << "*/";
 }
 
@@ -1305,7 +1311,7 @@ void AstSuperExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstParenthesizedExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstParenthesizedExpression:#" << this-> id << "*/";
-    xml_output(os,"paren",NULL);
+    xml_open(os,"paren");
     expression -> XMLUnparse(os, lex_stream);
     xml_close(os,"paren",false);
     if (Ast::debug_unparse) os << "/*:AstParenthesizedExpression#" << this-> id << "*/";
@@ -1326,7 +1332,7 @@ void AstClassInstanceCreationExpression::XMLUnparse(Ostream& os, LexStream& lex_
                NULL);
     if (dot_token_opt /* base_opt - see ast.h for explanation */)
 	base_opt -> XMLUnparse(os, lex_stream);
-    xml_output(os,"arguments",NULL);
+    xml_open(os,"arguments");
     for (int j = 0; j < NumArguments(); j++)
       {
 	if (j>0) os << ", ";
@@ -1375,14 +1381,14 @@ void AstFieldAccess::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstMethodInvocation::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstMethodInvocation:#" << this-> id << "*/";
-    xml_output(os,"send",NULL);
-    xml_output(os,"target",NULL);
+    xml_open(os,"send");
+    xml_open(os,"target");
     method -> XMLUnparse(os, lex_stream);
     xml_close(os,"target",false);
 #ifdef SHORTCUT_XML_CLOSE
     if (NumArguments() > 0) {
 #endif
-      xml_output(os,"arguments",NULL);
+      xml_open(os,"arguments");
       for (int i = 0; i < this -> NumArguments(); i++)
         {
           this -> Argument(i) -> XMLUnparse(os, lex_stream);
@@ -1400,18 +1406,26 @@ void AstMethodInvocation::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstArrayAccess::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstArrayAccess:#" << this-> id << "*/";
+    xml_open(os,"array-ref");
+    xml_open(os,"base");
     base -> XMLUnparse(os, lex_stream);
-    os << "[";
+    xml_close(os,"base",false);
+    xml_open(os,"offset");
     expression -> XMLUnparse(os, lex_stream);
-    os << "]";
+    xml_close(os,"offset");
+    xml_close(os,"array-ref");
     if (Ast::debug_unparse) os << "/*:AstArrayAccess#" << this-> id << "*/";
 }
 
 void AstPostUnaryExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstPostUnaryExpression:#" << this-> id << "*/";
-    expression -> XMLUnparse(os, lex_stream);
-    os << lex_stream.NameString(post_operator_token);
+    xml_output(os,"unary-expr",
+               "op",xml_name_string(lex_stream,post_operator_token),
+               "post","yes",
+               NULL);
+    xml_unparse_maybe_var_ref(os,lex_stream,expression);
+    xml_close(os,"unary-expr");
     if (Ast::debug_unparse) os << "/*:AstPostUnaryExpression#" << this-> id << "*/";
 }
 
@@ -1431,8 +1445,8 @@ void AstCastExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
     if (Ast::debug_unparse) os << "/*AstCastExpression:#" << this-> id << "*/";
     if (left_parenthesis_token_opt && type_opt)
     {
-      xml_output(os,"cast-expr",NULL);
-      xml_output(os,"target-type",NULL);
+      xml_open(os,"cast-expr");
+      xml_open(os,"target-type");
       type_opt -> XMLUnparse(os, lex_stream);
       for (int i = 0; i < NumBrackets(); i++)
         os << "[]";
@@ -1460,7 +1474,7 @@ void AstBinaryExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstConditionalExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstConditionalExpression:#" << this-> id << "*/";
-    xml_output(os,"conditional-expr",NULL);
+    xml_open(os,"conditional-expr");
     test_expression -> XMLUnparse(os, lex_stream);
     //    os << " ? ";
     true_expression -> XMLUnparse(os, lex_stream);
@@ -1473,7 +1487,7 @@ void AstConditionalExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstAssignmentExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstAssignmentExpression:#" << this-> id << "*/";
-    xml_output(os,"assignment-expr",NULL);
+    xml_open(os,"assignment-expr");
     left_hand_side -> XMLUnparse(os, lex_stream);
     // os << " ";
     os << lex_stream.NameString(assignment_operator_token);
