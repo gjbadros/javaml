@@ -59,7 +59,7 @@ OBJECTS=jikes.@O@ scanner.@O@ code.@O@ zip.@O@ unzip.@O@ \
         stream.@O@ op.@O@ control.@O@ modifier.@O@ system.@O@ \
         bytecode.@O@ body.@O@ decl.@O@ definite.@O@ dump.@O@ expr.@O@ \
         getclass.@O@ init.@O@ double.@O@ config.@O@ option.@O@ \
-        incrmnt.@O@ case.@O@ tab.@O@ segment.@O@ unparse.@O@
+        incrmnt.@O@ case.@O@ tab.@O@ segment.@O@ unparse.@O@ xml-unparse.@O@
 
 $(EXECUTABLE):	$(OBJECTS)
 	$(LD) $(LDFLAGS)  $(OBJECTS) $(SYSOBJECTS) $(LIBS)
@@ -97,6 +97,14 @@ unparse.@O@:  $(srcdir)/unparse.cpp $(srcdir)/config.h \
           $(srcdir)/double.h $(srcdir)/symbol.h $(srcdir)/option.h \
           $(srcdir)/depend.h $(srcdir)/access.h 
 	$(CC) $(CCFLAGS) $(srcdir)/unparse.cpp 
+
+xml-unparse.@O@:  $(srcdir)/xml-unparse.cpp $(srcdir)/config.h \
+          $(srcdir)/code.h $(srcdir)/case.h $(srcdir)/ast.h \
+          $(srcdir)/stream.h $(srcdir)/javadef.h $(srcdir)/javasym.h \
+          $(srcdir)/tuple.h $(srcdir)/tab.h $(srcdir)/lookup.h $(srcdir)/long.h \
+          $(srcdir)/double.h $(srcdir)/symbol.h $(srcdir)/option.h \
+          $(srcdir)/depend.h $(srcdir)/access.h 
+	$(CC) $(CCFLAGS) $(srcdir)/xml-unparse.cpp 
 
 body.@O@: $(srcdir)/body.cpp $(srcdir)/config.h $(srcdir)/semantic.h \
           $(srcdir)/ast.h $(srcdir)/stream.h $(srcdir)/javadef.h \
