@@ -1,8 +1,0 @@
-#!/uns/bin/zsh -f
-setopt extendedglob
-
-for i in *.java~out.java; do
-   print -u2 $i
-   jikes +ux $i
-   nsgmls-xml -s xml-unparsed/$i.xml
-done
