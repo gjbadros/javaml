@@ -1,4 +1,4 @@
-#!/uns/bin/zsh -f
+#!/bin/sh -
 cat <<END
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE java-source-program SYSTEM "java-ml.dtd">
