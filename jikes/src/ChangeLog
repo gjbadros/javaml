@@ -1,3 +1,16 @@
+Sat Nov 13 15:13:40 1999  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Use xml_unparse_maybe_var_ref for Argument
+	lists.  Unparse "super", "this", "null" literals; super-calls,
+	this-calls.  Use szIdSeparator for building up ID parts, not "-".
+	Still need to convert _ to - in the IDs.
+
+Sat Nov 13 13:34:36 1999  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Indentation change to AstSuperCall.  Use
+	xml_unparse_maybe_var_ref for the base/offset expressions of
+	array-refs.
+
 Sat Nov 13 12:40:58 1999  Greg J. Badros  <gjb@cs.washington.edu>
 
 	* xml-unparse.cpp: Added xml_open, and use it pervasively as

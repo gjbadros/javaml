@@ -10,7 +10,7 @@ Possible Analyses:
 * renaming a method
 * search for unused variables
 * etags
-
+* list functions that do not call a function
 
 XML DTD Stuff:
 
@@ -34,3 +34,16 @@ http://www.oasis-open.org/cover/duplTokens.html
   <true-case><return>...</return></true-case>
   <false-case><return>...</return></false-case>
 </if>
+
+
+Thoughts for paper:
+
+C++ : cpp has problems
+
+Syntactic analysis phase of compiler is replaces with XML parser
+
+Semantic analysis phase of compiler is simplified
+ -> some analysis handled by validity check
+
+canonical external representation of AST for java source program
+ -> interacting compilers, tools, etc.
