@@ -1,0 +1,17 @@
+* Schema (instead of DTD)
+
+* Language extension
+** enums
+** type definitions --> must do type checking
+
+* Visualization
+** with Tauber's XSL:FO package
+* Comment handling
+
+* XML front end for Jikes
+** maybe do this w/ an XSLT conversion to a Jikes-handy XML AST, then a trivial front-end
+
+* Translation between languages
+** find out more about Karl T's CSF (for use w/ Jikes SDS IDE integration)
+
+* Query result fragment handling
