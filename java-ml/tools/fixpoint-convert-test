@@ -3,12 +3,12 @@ f=$1
 print -u2 "Making xml-unparsed/$f.xml"
 jikes +ux -nowrite +B $f
 print -u2 "Converting back to back-converted/$f"
-xt xml-unparsed/$f.xml $JAVAML_HOME/tools/pretty-printer.xsl > back-converted/$f || \
+saxon xml-unparsed/$f.xml $JAVAML_HOME/tools/javaml-to-plain-source.xsl > back-converted/$f || \
   exit -1
 cd back-converted
 print -u2 "Making back-converted/xml-unparsed/$f.xml"
 jikes +ux -nowrite +B $f
 print -u2 "Comparing the two (canonicalized) JavaML files..."
-diff -u =(perl -pe 's/(locvar|frmarg|meth)-\d+/$1/g' ../xml-unparsed/$f.xml) \
+diff -ub =(perl -pe 's/(locvar|frmarg|meth)-\d+/$1/g' ../xml-unparsed/$f.xml) \
         =(perl -pe 's/(locvar|frmarg|meth)-\d+/$1/g' xml-unparsed/$f.xml)  && \
    echo "Success! No differences found."
