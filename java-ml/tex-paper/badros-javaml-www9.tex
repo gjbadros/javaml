@@ -51,7 +51,7 @@ such as \smtexttt{grep} rely instead on only the lexical structure of
 source code.  I describe a new XML application that provides an
 alternative representation of Java source code. This XML-based
 representation, called JavaML, is more natural for tools and permits
-easy specification of numerous software-engineering analysis by
+easy specification of numerous software-engineering analyses by
 leveraging the abundance of XML tools and techniques.  A robust
 converter built with the IBM Jikes Java compiler framework translates
 from the classical Java source code representation to JavaML.
@@ -940,16 +940,18 @@ following in the \smtexttt{start\_tag} subroutine:
 \begin{verbatim}
 sub start_tag { 
   my ($this,$tag,$attr_spec) = @_;
+  my $from = "isBall";
+  my $to = "FIsBall";
   my %attrs = 
      SGMLparse_attr_spec($attr_spec);
   # ...
   if ($tag eq "method") {
-    if ($attrs{name} eq "bar") {
-      $attrs{name} = "Bar";
+    if ($attrs{name} eq $from) {
+      $attrs{name} = $to;
     }
   } elsif ($tag eq "send") {
-    if ($attrs{message} eq "bar") {
-      $attrs{message} = "Bar";
+    if ($attrs{message} eq $from) {
+      $attrs{message} = $to;
     }
   }
   # ...
