@@ -1,0 +1,3 @@
+#!/bin/sh -
+{ test -f javaml-industrial-affiliates-poster.ai && echo "Already have .ai file" } || \
+gunzip -c javaml-industrial-affiliates-poster.ai.gz > javaml-industrial-affiliates-poster.ai
