@@ -26,21 +26,20 @@
    respectively */
 #define SHORTCUT_XML_CLOSE
 
-#define XML_CLOSE ((char *) 1)
+/* #define JIKES_XML_STATEMENT_HAS_NUMBER_ATTRIBUTE */
 
 const char *g_szMethodName = NULL;
 const char *g_szClassName = NULL;
 
 bool g_fInsideCatch = false;
-
-// GJB:FIXME:: Ugly hack to avoid nested statements
-// at the start of method bodies.
-bool fLastWasMethodDeclarator = false;
-bool fLastWasSwitchBlock = false;
+bool g_fTopLevelBlock = false;
 
 AstClassDeclaration *g_pclassdecl = NULL;
 AstBlock *g_pblockdecl = NULL;
 AstMethodDeclaration *g_pmethoddecl = NULL;
+
+
+#define XML_CLOSE ((char *) 1)
 
 SemanticEnvironment *ThisEnvironment() {
   return g_pclassdecl->semantic_environment;
@@ -312,7 +311,7 @@ xml_name_string(LexStream &ls, LexStream::TokenIndex i)
     // does XML really disallow this? --11/13/99 gjb
     nm << "&lt;";
   } else if (strcmp(sz,"<=") == 0) {
-    nm << "&le;";
+    nm << "&lt;=";
   } else if (strcmp(sz,"&&") == 0) {
     nm << "&amp;&amp;";
   } else if (strcmp(sz,"&") == 0) {
@@ -447,6 +446,39 @@ void Ast::XMLUnparse(Ostream& os, LexStream& lex_stream)
     if (debug_unparse) os << "/*:Ast#" << this-> id << "*/";
 }
 
+bool FXMLStatementTagNeeded(AstBlock *pb)
+{
+  if (pb->NumStatements() == 0 || pb->no_braces)
+    return false;
+
+  if (dynamic_cast<AstSwitchBlockStatement *>(pb->Statement(0)))
+    return false;
+
+  if (pb->NumStatements() == 1 &&
+      (dynamic_cast<AstSwitchStatement *>(pb->Statement(0)) ||
+       dynamic_cast<AstIfStatement *>(pb->Statement(0)) ||
+       dynamic_cast<AstForStatement *>(pb->Statement(0)) ||
+       dynamic_cast<AstWhileStatement *>(pb->Statement(0)) ||
+       dynamic_cast<AstDoStatement *>(pb->Statement(0))))
+    return false;
+
+  AstBlock *pbChild = NULL;
+  if (pb->NumStatements() == 1 &&
+      (pbChild = dynamic_cast<AstBlock *>(pb->Statement(0))) != NULL &&
+      FXMLStatementTagNeeded(pbChild))
+    return false;
+
+  AstReturnStatement *pretChild = NULL;
+  if (pb->NumStatements() == 2 &&
+      (pbChild = dynamic_cast<AstBlock *>(pb->Statement(0))) != NULL &&
+      FXMLStatementTagNeeded(pbChild) &&
+      (pretChild = dynamic_cast<AstReturnStatement *>(pb->Statement(1))) != NULL &&
+      !pretChild->expression_opt)
+    return false;
+
+  return true;
+}
+
 void AstBlock::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     bool fDidOpenStatements = false;
@@ -461,36 +493,50 @@ void AstBlock::XMLUnparse(Ostream& os, LexStream& lex_stream)
                  XML_CLOSE);
     }
 
-    // GJB:FIXME:: Ugly hack to avoid nested statements
-    // at the start of method bodies.
-    if ( !no_braces && !fLastWasSwitchBlock) {
-      if (!((NumStatements() == 1 && dynamic_cast<AstBlock *>(Statement(0))) ||
-            (NumStatements() == 2 && dynamic_cast<AstBlock *>(Statement(0)) &&
-             dynamic_cast<AstReturnStatement *>(Statement(1))) ||
-            (NumStatements() == 2 && dynamic_cast<AstBlock *>(Statement(1)) &&
-             (dynamic_cast<AstThisCall*>(Statement(0)) || dynamic_cast<AstSuperCall*>(Statement(0)))))) {
-        char szNum[20];
-        sprintf(szNum,"%d",this->NumStatements());
-        xml_output(os, "statements",
-#if 0 // GJB:FIXME:: having num=5, e.g., makes harder to update and is of
-                   // marginal utility
-                   "num",szNum,
+    // avoid nested statements
+    // at the start of method, constructor bodies, loops, etc.
+    if ( FXMLStatementTagNeeded(this)) {
+#ifdef JIKES_XML_STATEMENT_HAS_NUMBER_ATTRIBUTE
+      char szNum[20];
+      sprintf(szNum,"%d",this->NumStatements());
 #endif
-                   NULL);
-        xml_nl(os);
-        fDidOpenStatements = true;
-      }
+      xml_output(os, "statements",
+#ifdef JIKES_XML_STATEMENT_HAS_NUMBER_ATTRIBUTE
+   // GJB:FIXME:: having num=5, e.g., makes harder to update and is of marginal utility
+                 // DTD needs updating if this code is used
+                 "num",szNum,
+#endif
+                 NULL);
+      xml_nl(os);
+      fDidOpenStatements = true;
     }
-    fLastWasMethodDeclarator = false;
-    fLastWasSwitchBlock = false;
 
-    for (int i = 0; i < this -> NumStatements(); i++)
-    {
-      this -> Statement(i) -> XMLUnparse(os, lex_stream);
+    int length = NumStatements();
+    int last = (g_fTopLevelBlock? length-1 : length);
+
+    int i = 0;
+    bool fTopLevelBlock = g_fTopLevelBlock;
+    g_fTopLevelBlock = false;
+    for (; i < last; i++) {
+        this -> Statement(i) -> XMLUnparse(os, lex_stream);
     }
+    g_fTopLevelBlock = fTopLevelBlock;
+
+    /* Only unparse AstReturnStatements from a top-level block
+       if they have an optional expression (i.e., if they return a value;
+       void functions get a return statement inserted after the main AstBlock */
+    if (i < length) {
+      AstReturnStatement *pretChild = NULL;
+      if (((pretChild = dynamic_cast<AstReturnStatement *>(Statement(i)))
+           == NULL) || pretChild->expression_opt) {
+        Statement(i) -> XMLUnparse(os, lex_stream);
+      } 
+    }
+
     if ( fDidOpenStatements ) {
       xml_close(os, "statements",true);
     }
+
     g_pblockdecl = pblockdeclPrior;
     if (Ast::debug_unparse) os << "/*:AstBlock#" << this-> id << "*/";
 }
@@ -891,10 +937,6 @@ void AstMethodDeclarator::XMLUnparse(Ostream& os, LexStream& lex_stream)
 #ifdef SHORTCUT_XML_CLOSE
     }
 #endif
-
-    // GJB:FIXME:: Ugly hack to avoid nested statements
-    // at the start of method bodies.
-    fLastWasMethodDeclarator = true;
     if (Ast::debug_unparse) os << "/*:AstMethodDeclarator#" << this-> id << "*/";
 }
 
@@ -977,7 +1019,12 @@ void AstMethodDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
     method_declarator -> XMLUnparse(os, lex_stream);
 
     xml_unparse_throws(os,lex_stream,this);
+
+    bool fTopLevelBlock = g_fTopLevelBlock;
+    g_fTopLevelBlock = true;
     method_body -> XMLUnparse(os, lex_stream);
+    g_fTopLevelBlock = fTopLevelBlock;
+
     g_szMethodName = NULL;
 
     xml_close(os,"method",true);
@@ -1023,16 +1070,9 @@ void AstConstructorBlock::XMLUnparse(Ostream& os, LexStream& lex_stream)
     if (Ast::debug_unparse) os << "/*AstConstructorBlock:#" << this-> id << "*/";
     if (explicit_constructor_invocation_opt)
       {
-#ifdef FORCE_CONSTRUCT_STATEMENTS_BLOCK
-        xml_open(os,"statements"); xml_nl(os);
-#endif
 	explicit_constructor_invocation_opt -> XMLUnparse(os, lex_stream);
       }
     block -> XMLUnparse(os, lex_stream);
-#ifdef FORCE_CONSTRUCT_STATEMENTS_BLOCK
-    if (explicit_constructor_invocation_opt)
-      xml_close(os,"statements",true);
-#endif
     if (Ast::debug_unparse) os << "/*:AstConstructorBlock#" << this-> id << "*/";
 }
 
@@ -1336,9 +1376,7 @@ void AstSwitchStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
     xml_open(os, "switch"); xml_nl(os);
     AstParenthesizedExpression *parenth = expression -> ParenthesizedExpressionCast();
     xml_unparse_maybe_var_ref(os,lex_stream,expression);
-    fLastWasSwitchBlock = true;
     switch_block -> XMLUnparse(os, lex_stream);
-    fLastWasSwitchBlock = false;
     // what about switch_labels_opt?
     xml_close(os, "switch", true);
     if (Ast::debug_unparse) os << "/*:AstSwitchStatement#" << this-> id << "*/";
@@ -1424,12 +1462,20 @@ void AstReturnStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
     // present in the source, the return_token points at the next "}".
     // os << lex_stream.NameString(return_token);
 
-    // just drop the return tag if there is nothing to return --11/12/99 gjb
-    if (expression_opt) {
+#ifdef SHORTCUT_XML_CLOSE
+    if (!expression_opt) {
+      xml_output(os,"return",XML_CLOSE);
+      xml_nl(os);
+    } else {
+#endif
       xml_open(os,"return");
-      xml_unparse_maybe_var_ref(os,lex_stream,expression_opt);
+      if (expression_opt) {
+        xml_unparse_maybe_var_ref(os,lex_stream,expression_opt);
+      }
       xml_close(os,"return",true);
+#ifdef SHORTCUT_XML_CLOSE
     }
+#endif
     if (Ast::debug_unparse) os << "/*:AstReturnStatement#" << this-> id << "*/";
 }
 
@@ -1802,13 +1848,12 @@ void AstConditionalExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstAssignmentExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstAssignmentExpression:#" << this-> id << "*/";
-    xml_open(os,"assignment-expr");
+    xml_output(os,"assignment-expr",
+               "op", xml_name_string(lex_stream,assignment_operator_token),
+               NULL);
     xml_open(os,"lvalue");
     xml_unparse_maybe_var_set(os,lex_stream,left_hand_side);
     xml_close(os,"lvalue");
-    // os << " ";
-    // os << lex_stream.NameString(assignment_operator_token);
-    // os << " ";
     xml_unparse_maybe_var_ref(os,lex_stream,expression);
     xml_close(os,"assignment-expr",true);
     if (Ast::debug_unparse) os << "/*:AstAssignmentExpression#" << this-> id << "*/";
