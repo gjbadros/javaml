@@ -1,0 +1,115 @@
+<pre>
+&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+&lt;!ENTITY % visibility-attribute "visibility (public|private|protected)
+    #IMPLIED"&gt;
+&lt;!ENTITY % kind-attribute "kind (integer|long|real|double) #IMPLIED"&gt;
+&lt;!ENTITY % mod-final "final CDATA #IMPLIED"&gt;
+&lt;!ENTITY % mod-static "static CDATA #IMPLIED"&gt;
+&lt;!ENTITY % mod-volatile "volatile CDATA #IMPLIED"&gt;
+&lt;!ENTITY % mod-transient "transient CDATA #IMPLIED"&gt;
+&lt;!ENTITY % mod-native "native CDATA #IMPLIED"&gt;
+&lt;!ENTITY % mod-abstract "abstract CDATA #IMPLIED"&gt;
+&lt;!ENTITY % mod-synchronized "synchronized CDATA #IMPLIED"&gt;
+&lt;!ENTITY % expr-elems
+    "send|new|new-array|var-ref|field-access|array-ref|paren|assignment-expr|conditional-expr|binary-expr|unary-expr|cast-expr|literal-number|literal-string|literal-true|literal-false|literal-null|this|super"&gt;
+&lt;!ELEMENT java-source-program (package-decl?,import*,(class|interface)+) &gt;
+&lt;!ATTLIST java-source-program name CDATA #IMPLIED version CDATA #IMPLIED&gt;
+&lt;!ELEMENT import EMPTY&gt;
+&lt;!ATTLIST import module CDATA #REQUIRED&gt;
+&lt;!ELEMENT class ((implement)*, (constructor|method|field)*) &gt;
+&lt;!ATTLIST class name CDATA #REQUIRED %visibility-attribute; %mod-abstract;
+    %mod-final; %mod-synchronized; superclass CDATA "Object"&gt;
+&lt;!ELEMENT interface ((extend)*, method*) &gt;
+&lt;!ATTLIST interface name CDATA #REQUIRED %visibility-attribute;&gt;
+&lt;!ELEMENT implement EMPTY&gt;
+&lt;!ATTLIST implement class CDATA #REQUIRED&gt;
+&lt;!ELEMENT extend EMPTY&gt;
+&lt;!ATTLIST extend interface CDATA #REQUIRED&gt;
+&lt;!ELEMENT field (type,(%expr-elems;)?)&gt;
+&lt;!ATTLIST field name CDATA #REQUIRED %visibility-attribute; %mod-final;
+    %mod-static; %mod-volatile; %mod-transient;&gt;
+&lt;!ELEMENT constructor
+    (formal-arguments,throws*,(super-call|this-call)?,statements)&gt;
+&lt;!ATTLIST constructor name CDATA #REQUIRED id ID #REQUIRED
+    %visibility-attribute; %mod-final; %mod-static; %mod-synchronized;
+    %mod-volatile; %mod-transient; %mod-native;&gt;
+&lt;!ELEMENT method (type,formal-arguments,throws*,statements?)&gt;
+&lt;!ATTLIST method name CDATA #REQUIRED id ID #REQUIRED
+    %visibility-attribute; %mod-abstract; %mod-final; %mod-static;
+    %mod-synchronized; %mod-volatile; %mod-transient; %mod-native;&gt;
+&lt;!ELEMENT formal-arguments (formal-argument)*&gt;
+&lt;!ELEMENT formal-argument (type)&gt;
+&lt;!ATTLIST formal-argument name CDATA #REQUIRED id ID #REQUIRED
+    %mod-final;&gt;
+&lt;!ELEMENT send (target?,arguments)&gt;
+&lt;!ATTLIST send message CDATA #REQUIRED&gt;
+&lt;!ELEMENT target (%expr-elems;)&gt;
+&lt;!ELEMENT return (%expr-elems;)&gt;
+&lt;!ELEMENT statements
+    (statements|local-variable|try|throw|if|loop|do-loop|return|continue|break|%expr-elems;)*&gt;
+&lt;!ELEMENT throw (%expr-elems;)&gt;
+&lt;!ELEMENT throws EMPTY&gt;
+&lt;!ATTLIST throws exception CDATA #REQUIRED&gt;
+&lt;!ELEMENT new (type,arguments)&gt;
+&lt;!ELEMENT type EMPTY&gt;
+&lt;!ATTLIST type primitive CDATA #IMPLIED name CDATA #REQUIRED dimensions
+    CDATA #IMPLIED&gt;
+&lt;!ELEMENT new-array (type,dim-expr*,(%expr-elems;)?)&gt;
+&lt;!ATTLIST new-array dimensions CDATA #REQUIRED&gt;
+&lt;!ELEMENT dim-expr (%expr-elems;)&gt;
+&lt;!ELEMENT local-variable (type,(static-initializer|%expr-elems;)?)&gt;
+&lt;!ATTLIST local-variable name CDATA #REQUIRED id ID #REQUIRED continuation
+    CDATA #IMPLIED %mod-final;&gt;
+&lt;!ELEMENT arguments (%expr-elems;)*&gt;
+&lt;!ELEMENT literal-string (#PCDATA)&gt;
+&lt;!ATTLIST literal-string length CDATA #REQUIRED&gt;
+&lt;!ELEMENT literal-number EMPTY&gt;
+&lt;!ATTLIST literal-number value CDATA #REQUIRED %kind-attribute; base CDATA
+    "10"&gt;
+&lt;!ELEMENT var-ref EMPTY&gt;
+&lt;!ATTLIST var-ref name CDATA #REQUIRED idref IDREF #IMPLIED&gt;
+&lt;!ELEMENT field-access (%expr-elems;)&gt;
+&lt;!ATTLIST field-access field CDATA #REQUIRED&gt;
+&lt;!ELEMENT var-set EMPTY&gt;
+&lt;!ATTLIST var-set name CDATA #REQUIRED&gt;
+&lt;!ELEMENT field-set (%expr-elems;)&gt;
+&lt;!ATTLIST field-set field CDATA #REQUIRED&gt;
+&lt;!ELEMENT package-decl EMPTY&gt;
+&lt;!ATTLIST package-decl name CDATA #REQUIRED&gt;
+&lt;!ELEMENT assignment-expr (lvalue,(%expr-elems;))&gt;
+&lt;!ELEMENT lvalue (var-set|field-set|%expr-elems;)&gt;
+&lt;!ELEMENT binary-expr ((%expr-elems;),(%expr-elems;))&gt;
+&lt;!ATTLIST binary-expr op CDATA #REQUIRED&gt;
+&lt;!ELEMENT paren (%expr-elems;)&gt;
+&lt;!ELEMENT unary-expr (%expr-elems;)&gt;
+&lt;!ATTLIST unary-expr op CDATA #REQUIRED post (true|false) #IMPLIED&gt;
+&lt;!ELEMENT cast-expr (type,(%expr-elems;))&gt;
+&lt;!ELEMENT literal-false EMPTY&gt;
+&lt;!ELEMENT literal-true EMPTY&gt;
+&lt;!ELEMENT literal-null EMPTY&gt;
+&lt;!ELEMENT if (test,true-case,false-case?)&gt;
+&lt;!ELEMENT test (%expr-elems;)&gt;
+&lt;!ELEMENT true-case (statements)&gt;
+&lt;!ELEMENT false-case (statements)&gt;
+&lt;!ELEMENT array-ref (base,offset)&gt;
+&lt;!ELEMENT base (%expr-elems;)&gt;
+&lt;!ELEMENT offset (%expr-elems;)&gt;
+&lt;!ELEMENT static-initializer (statements)&gt;
+&lt;!ELEMENT super-call (arguments)&gt;
+&lt;!ELEMENT this-call (arguments)&gt;
+&lt;!ELEMENT super EMPTY&gt;
+&lt;!ELEMENT this EMPTY&gt;
+&lt;!ELEMENT loop (init*,test?,update*,statements?)&gt;
+&lt;!ATTLIST loop kind (for|while) #IMPLIED&gt;
+&lt;!ELEMENT init (local-variable|%expr-elems;)&gt;
+&lt;!ELEMENT update (%expr-elems;)&gt;
+&lt;!ELEMENT do-loop (statements?,test?)&gt;
+&lt;!ELEMENT try (statements,catch*,finally?)&gt;
+&lt;!ELEMENT catch (formal-argument,statements?)&gt;
+&lt;!ELEMENT finally (statements)&gt;
+&lt;!ELEMENT continue EMPTY&gt;
+&lt;!ATTLIST continue targetname CDATA #IMPLIED&gt;
+&lt;!ELEMENT break EMPTY&gt;
+&lt;!ATTLIST break targetname CDATA #IMPLIED&gt;
+&lt;!ELEMENT conditional-expr ((%expr-elems;),(%expr-elems;),(%expr-elems;))&gt;
+</pre>
