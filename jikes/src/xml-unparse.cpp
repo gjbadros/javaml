@@ -223,6 +223,24 @@ void xml_unparse_maybe_var_ref(Ostream &xo, LexStream &ls, Ast *pnode)
   }
 }
 
+void xml_unparse_maybe_type(Ostream &xo, LexStream &ls, Ast *pnode, int cBrackets = 0)
+{
+  if (pnode->IsName()) {
+    if (cBrackets > 0) {
+      char *sz = SzNewFromLong(cBrackets);
+      xml_output(xo,"type",
+                 "dimensions",sz,
+                 NULL);
+      delete sz;
+    } else {
+      xml_open(xo,"type");
+    }
+  }
+  pnode->XMLUnparse(xo,ls);
+  if (pnode->IsName()) {
+    xml_close(xo,"type");
+  }
+}
 
 
 #ifdef TEST
@@ -296,16 +314,22 @@ void AstBlock::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstPrimitiveType::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstPrimitiveType:#" << this-> id << "*/";
+    xml_open(os,"type");
     os << lex_stream.NameString(primitive_kind_token);
+    xml_close(os,"type");
     if (Ast::debug_unparse) os << "/*:AstPrimitiveType#" << this-> id << "*/";
 }
 
 void AstArrayType::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstArrayType:#" << this-> id << "*/";
+    char *szNumBrackets = SzNewFromLong(NumBrackets());
+    xml_output(os,"type",
+               "dimensions",szNumBrackets,
+               NULL);
+    delete szNumBrackets;
     type -> XMLUnparse(os, lex_stream);
-    for (int i = 0; i < this -> NumBrackets(); i++)
-	 os << "[]";
+    xml_close(os,"type");
     if (Ast::debug_unparse) os << "/*:AstArrayType#" << this-> id << "*/";
 }
 
@@ -579,13 +603,11 @@ void AstFieldDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
       }
     }
 
-    char *szType = SzFromUnparse(lex_stream, type);
     for (int k = 0; k < this -> NumVariableDeclarators(); k++)
       {
         char *szName = SzFromUnparse(lex_stream,VariableDeclarator(k)->variable_declarator_name);
         /* GJB:FIXME:: use two elements, instance-field and class-field, instead? */
         xml_output(os,"field",
-                   "type",szType,
                    "name",szName,
                    "visibility",szVisibility,
                    "final",SzOrNullFromF(fFinal),
@@ -593,6 +615,7 @@ void AstFieldDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
                    "volatile",SzOrNullFromF(fVolatile),
                    "transient",SzOrNullFromF(fTransient),
                    NULL);
+        xml_unparse_maybe_type(os,lex_stream,type);
         xml_unparse_maybe_var_ref(os,lex_stream,VariableDeclarator(k));
         xml_close(os,"field",true);
       }
@@ -649,19 +672,18 @@ void AstFormalParameter::XMLUnparse(Ostream& os, LexStream& lex_stream)
       }
     }
 
-    char *szType = SzFromUnparse(lex_stream, type);
     char *szName = SzFromUnparse(lex_stream,formal_declarator->variable_declarator_name);
     // GJB:FIXME:: it'd be better to get these from the AST somehow
     char *szClassName = g_szClassName;
     char *szMethodName = g_szMethodName;
 
     xml_output(os,"formal-argument",
-               "type",szType,
                "name",szName,
                "final",SzOrNullFromF(fFinal),
                "id",SzIdFromFormalArgument(this->id,szClassName,szMethodName,szName),
                NULL);
-
+    xml_unparse_maybe_type(os,lex_stream,type);
+    xml_close(os,"formal-argument",true);
     if (Ast::debug_unparse) os << "/*:AstFormalParameter#" << this-> id << "*/";
 }
 
@@ -739,12 +761,6 @@ void AstMethodDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
       }
     }
 
-    ostrstream xnm;
-    Ostream nm(&xnm);
-    type -> XMLUnparse(nm, lex_stream);
-    xnm << ends;
-    char *szReturnType = xnm.str();
-
     char *szNumBrackets = NULL;
     if (method_declarator->NumBrackets() > 0) {
       szNumBrackets = SzNewFromLong(method_declarator->NumBrackets());
@@ -757,7 +773,6 @@ void AstMethodDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
     xml_output(os,"method",
                "name", szMethodName,
                "visibility", szVisibility,
-               "return-type", szReturnType,
                "abstract",SzOrNullFromF(fAbstract),
                "final",SzOrNullFromF(fFinal),
                "static",SzOrNullFromF(fStatic),
@@ -774,6 +789,8 @@ void AstMethodDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
     method_declarator -> XMLUnparse(os, lex_stream);
 
     xml_unparse_throws(os,lex_stream,this);
+
+    xml_unparse_maybe_type(os,lex_stream,type);
 
     method_body -> XMLUnparse(os, lex_stream);
     g_szMethodName = NULL;
@@ -997,12 +1014,10 @@ void AstLocalVariableDeclarationStatement::XMLUnparse(Ostream& os, LexStream& le
       }
     }
 
-    char *szType = SzFromUnparse(lex_stream, type);
     for (int k = 0; k < this -> NumVariableDeclarators(); k++)
       {
         char *szName = SzFromUnparse(lex_stream,VariableDeclarator(k)->variable_declarator_name);
         xml_output(os,"local-variable",
-                   "type",szType,
                    "name",szName,
                    "visibility",szVisibility,
                    "final",SzOrNullFromF(fFinal),
@@ -1010,6 +1025,10 @@ void AstLocalVariableDeclarationStatement::XMLUnparse(Ostream& os, LexStream& le
                    "volatile",SzOrNullFromF(fVolatile),
                    "transient",SzOrNullFromF(fTransient),
                    NULL);
+        // Repeat the type for each variable
+        // GJB:FIXME:: here we lose the fact that the variables
+        // were declared w/ a single type --11/13/99 gjb
+        xml_unparse_maybe_type(os,lex_stream,type);
         xml_unparse_maybe_var_ref(os,lex_stream,VariableDeclarator(k));
         xml_close(os,"local-variable",true);
       }
@@ -1374,7 +1393,9 @@ void AstParenthesizedExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstTypeExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstTypeExpression:#" << this-> id << "*/";
+    xml_open(os,"type");
     type -> XMLUnparse(os, lex_stream);
+    xml_close(os,"type");
     if (Ast::debug_unparse) os << "/*:AstTypeExpression#" << this-> id << "*/";
 }
 
@@ -1382,11 +1403,11 @@ void AstClassInstanceCreationExpression::XMLUnparse(Ostream& os, LexStream& lex_
 {
     if (Ast::debug_unparse) os << "/*AstClassInstanceCreationExpression:#" << this-> id << "*/";
     xml_open(os,"new");
-    xml_open(os,"class-type");
-    class_type -> XMLUnparse(os, lex_stream);
+    //    xml_open(os,"type");
+    xml_unparse_maybe_type(os,lex_stream,class_type);
     if (dot_token_opt /* base_opt - see ast.h for explanation */)
 	base_opt -> XMLUnparse(os, lex_stream);
-    xml_close(os,"class-type");
+    //    xml_close(os,"type");
     xml_open(os,"arguments");
     for (int j = 0; j < NumArguments(); j++)
       {
@@ -1416,9 +1437,9 @@ void AstArrayCreationExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
                "dimensions",szNumDimensions,
                NULL);
     delete szNumDimensions;
-    xml_open(os,"array-type");
-    array_type -> XMLUnparse(os, lex_stream);
-    xml_close(os,"array-type");
+    //    xml_open(os,"array-type");
+    xml_unparse_maybe_type(os,lex_stream, array_type);
+    //    xml_close(os,"array-type");
     for (int i = 0; i < NumDimExprs(); i++) {
       DimExpr(i) -> XMLUnparse(os, lex_stream);
     }
@@ -1505,11 +1526,7 @@ void AstCastExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
     if (left_parenthesis_token_opt && type_opt)
     {
       xml_open(os,"cast-expr");
-      xml_open(os,"target-type");
-      type_opt -> XMLUnparse(os, lex_stream);
-      for (int i = 0; i < NumBrackets(); i++)
-        os << "[]";
-      xml_close(os,"target-type",false);
+      xml_unparse_maybe_type(os,lex_stream,type_opt,NumBrackets());
     }
     xml_unparse_maybe_var_ref(os,lex_stream,expression);
     if (left_parenthesis_token_opt && type_opt)
