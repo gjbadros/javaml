@@ -364,13 +364,13 @@
 
 <xsl:template match="literal-string">
   <xsl:text>"</xsl:text>
-  <tt><xsl:value-of select="."/></tt>
+  <tt><xsl:value-of select="@value"/></tt>
   <xsl:text>"</xsl:text>
 </xsl:template>
 
 <xsl:template match="literal-char">
   <xsl:text>'</xsl:text>
-  <strong><tt><xsl:value-of select="."/></tt></strong>
+  <strong><tt><xsl:value-of select="@value"/></tt></strong>
   <xsl:text>'</xsl:text>
 </xsl:template>
 
@@ -378,11 +378,11 @@
   <xsl:value-of select="@value"/>
 </xsl:template>
 
-<xsl:template match="literal-true">
+<xsl:template match="literal-boolean[@value='true']">
   <em><font color="{$clr-true}"><xsl:text>true</xsl:text></font></em>
 </xsl:template>
 
-<xsl:template match="literal-false">
+<xsl:template match="literal-boolean[@value='false']">
   <em><font color="{$clr-false}"><xsl:text>false</xsl:text></font></em>
 </xsl:template>
 
