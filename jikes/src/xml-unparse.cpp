@@ -306,20 +306,17 @@ xml_name_string(LexStream &ls, LexStream::TokenIndex i)
   ostrstream xnm;
   Ostream nm(&xnm);
   char *sz = wstring2string(ls.NameString(i));
-  if (strcmp(sz,"<") == 0) {
-    // GJB:FIXME:: this is an ugly hack;
-    // does XML really disallow this? --11/13/99 gjb
-    nm << "&lt;";
-  } else if (strcmp(sz,"<=") == 0) {
-    nm << "&lt;=";
-  } else if (strcmp(sz,"&&") == 0) {
-    nm << "&amp;&amp;";
-  } else if (strcmp(sz,"&") == 0) {
-    nm << "&amp;";
-  } else if (strcmp(sz,"<<") == 0) { 
-    nm << "&lt;&lt;";
-  } else {
-    nm << ls.NameString(i);
+  char *pch = sz;
+  while (*pch) {
+    switch (*pch) {
+    case '<':
+      nm << "&lt;"; break;
+    case '&':
+      nm << "&amp;"; break;
+    default:
+      nm << *pch;
+    }
+    ++pch;
   }
   xnm << ends;
   return xnm.str();
@@ -743,7 +740,7 @@ void AstArrayInitializer::XMLUnparse(Ostream& os, LexStream& lex_stream)
     if (Ast::debug_unparse) os << "/*AstArrayInitializer:#" << this-> id << "*/";
     for (int k = 0; k < NumVariableInitializers(); k++)
       {
-	this -> VariableInitializer(k) -> XMLUnparse(os, lex_stream);
+        xml_unparse_maybe_var_ref(os,lex_stream,VariableInitializer(k));
       }
     if (Ast::debug_unparse) os << "/*:AstArrayInitializer#" << this-> id << "*/";
 }
@@ -830,7 +827,6 @@ void AstFieldDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
     for (int k = 0; k < this -> NumVariableDeclarators(); k++)
       {
         char *szName = SzFromUnparse(lex_stream,VariableDeclarator(k)->variable_declarator_name);
-        /* GJB:FIXME:: use two elements, instance-field and class-field, instead? */
         xml_output(os,"field",
                    "name",szName,
                    "visibility",szVisibility,
@@ -1618,9 +1614,13 @@ void AstCharacterLiteral::XMLUnparse(Ostream& os, LexStream& lex_stream)
     {
       xml_open(os,"literal-char");
       bool old_expand = os.ExpandWchar();
+#if 0 /* GJB:FIXME:: what is this all about? */
       os.SetExpandWchar(true);
       os << lex_stream.NameString(character_literal_token), lex_stream.NameStringLength(character_literal_token);
       os.SetExpandWchar(old_expand);
+#else
+      os << xml_name_string(lex_stream,character_literal_token);
+#endif
       xml_close(os, "literal-char", false);
     }
     if (Ast::debug_unparse) os << "/*:AstCharacterLiteral#" << this-> id << "*/";
@@ -1824,13 +1824,22 @@ void AstCastExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstBinaryExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstBinaryExpression:#" << this-> id << "*/";
-    xml_output(os,"binary-expr",
-               "op",xml_name_string(lex_stream,binary_operator_token),
-               NULL);
-    xml_unparse_maybe_var_ref(os,lex_stream,left_expression);
-    xml_unparse_maybe_var_ref(os,lex_stream,right_expression);
-    // right_expression -> XMLUnparse(os, lex_stream);
-    xml_close(os,"binary-expr",false);
+    if (strcmp(xml_name_string(lex_stream,binary_operator_token),"instanceof") == 0) {
+      // GJB:FIXME:: rather test the above token directly, 
+      // but I'm not not sure what constant to use
+      xml_open(os,"instanceof-test");
+      xml_unparse_maybe_var_ref(os,lex_stream,left_expression);
+      xml_unparse_maybe_var_ref(os,lex_stream,right_expression);
+      xml_close(os,"instanceof-test");
+    } else {
+      xml_output(os,"binary-expr",
+                 "op",xml_name_string(lex_stream,binary_operator_token),
+                 NULL);
+      xml_unparse_maybe_var_ref(os,lex_stream,left_expression);
+      xml_unparse_maybe_var_ref(os,lex_stream,right_expression);
+      // right_expression -> XMLUnparse(os, lex_stream);
+      xml_close(os,"binary-expr",false);
+    }
     if (Ast::debug_unparse) os << "/*:AstBinaryExpression#" << this-> id << "*/";
 }
 
