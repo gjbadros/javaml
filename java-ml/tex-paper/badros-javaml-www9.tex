@@ -9,6 +9,10 @@
 %% Final submission deadline 1-March-2000
 %%
 
+%% http://www9.org/w9-final-submission.html
+%% Your registration reference number is: WWW9-82602132000.
+
+
 \documentclass{article}
 \usepackage{graphicx}
 \usepackage{fullpage}
@@ -622,7 +626,7 @@ right).
 \label{ssec-design}
 
 JavaML provides more than just the structure of the source program,
-though.  In the preceding example, notice the use of the formal-argument
+though.  In figure~\ref{fig-firstapplet-javaml}, notice the use of the formal-argument
 \smtexttt{g} in line 17 as the target of the message send.  The
 \smtexttt{idref} attribute of that \smtexttt{var-ref} tag points back at
 the referenced \smtexttt{formal-argument} element (through its
@@ -1066,6 +1070,7 @@ exit to and from functions is also straightforward (see figure~\ref{fig:dom-inst
 \begin{minipage}[b]{0.55\linewidth}
 {\small
 \begin{verbatim}
+#!/usr/bin/perl -w
 use XML::DOM;
 use IO::Handle;
 
@@ -1075,20 +1080,23 @@ my $parser = new XML::DOM::Parser;
 my $doc = $parser->parsefile ($filename);
 
 my $nodes = $doc->getElementsByTagName("method");
+
 for (my $i = 0; $i < $nodes->getLength(); $i++) {
   my $method = $nodes->item($i);
-  my $method_blocks = 
-    $method->getElementsByTagName("block");
-  my $method_block = $method_blocks->item(0);
-  my $start_instrumentation 
+  my $block = $method->
+    getElementsByTagName("block")->item(0);
+  my $name = $method->getAttribute("name");
+
+  my $start_code
     = SendMessageBlock($doc,"Tracer","StartMethod",
-                       $method->getAttribute("name"));
-  $method_block->insertBefore($start_instrumentation,
-                              $method_block->getFirstChild());
-  my $exit_instrumentation 
+                       $name);
+  my $exit_code 
     = SendMessageBlock($doc,"Tracer","ExitMethod",
-                       $method->getAttribute("name"));
-  $method_block->appendChild($exit_instrumentation);
+                       $name);
+
+  $block->insertBefore($start_code,
+                       $block->getFirstChild());
+  $block->appendChild($exit_code);
 }
 print $doc->toString;
 
@@ -1098,7 +1106,9 @@ sub SendMessageBlock {
  return parseXMLFragment($doc,<<"__END_FRAGMENT__"
 <send message="$method_name">
   <target><var-ref name="$target_var"/></target>
-  <arguments><literal-string value="$data"/></arguments>
+  <arguments>
+    <literal-string value="$data"/>
+  </arguments>
 </send>  
 __END_FRAGMENT__
  );
@@ -1114,10 +1124,11 @@ sub parseXMLFragment {
 }
 \end{verbatim}
 }
-\caption{Perl program to instrument every method with invocations of
+\caption{Perl program to instrument every method of a Java class with invocations of
   \smtexttt{Tracer.StartMethod(}\textit{method\_name}\smtexttt{)} and
-  \smtexttt{Tracer.ExitMethod(}\textit{method\_name}\smtexttt{)}.  The program uses the Document Object
-  Model (DOM)~\cite{DOM} Perl module~\cite{perlDOM}.
+  \smtexttt{Tracer.ExitMethod(}\textit{method\_name}\smtexttt{)}.  The
+  program uses the Document Object Model (DOM)~\cite{DOM} Perl
+  module~\cite{perlDOM}.
 \label{fig:dom-instrument}}
 \end{minipage}
 \end{figure*}
