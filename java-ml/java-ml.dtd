@@ -13,6 +13,7 @@
 
 <!ELEMENT java-source-program (package-decl?,import*,class+) >
 <!ATTLIST java-source-program
+    name CDATA #IMPLIED
     version CDATA #IMPLIED>
 <!ELEMENT import EMPTY>
 <!ATTLIST import
@@ -47,7 +48,7 @@
     %mod-volatile;
     %mod-transient;
     %mod-native;>
-<!ELEMENT method (comment?,formal-arguments,throws*,type,statements?)>
+<!ELEMENT method (comment?,type,formal-arguments,throws*,statements?)>
 <!ATTLIST method 
     name CDATA #REQUIRED
     id ID #REQUIRED
@@ -75,9 +76,10 @@
 <!ATTLIST throws
     exception CDATA #REQUIRED>
 <!ELEMENT new (type,arguments)>
-<!ELEMENT type (#PCDATA)>
+<!ELEMENT type EMPTY>
 <!ATTLIST type
     primitive CDATA #IMPLIED
+    name CDATA #REQUIRED
     dimensions CDATA #IMPLIED>
 <!ELEMENT new-array (type,dim-expr*,(%expr-elems;)?)>
 <!ATTLIST new-array
