@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
 use XML::DOM;
+use IO::Handle;
+
 my $filename = shift @ARGV;
 
 my $parser = new XML::DOM::Parser;
@@ -25,18 +27,20 @@ print $doc->toString;
 
 sub SendMessageBlock {
   # insert, e.g:  Tracer.StartMethod("paint");
-  my ($doc,$target,$func,$string_arg) = (@_);
-  my $s = $doc->createElement("send");
-  $s->setAttribute("message",$func);
-  my $t = $doc->createElement("target");
-  my $vr = $doc->createElement("var-ref");
-  $vr->setAttribute("name",$target);
-  $t->appendChild($vr);
-  my $a = $doc->createElement("arguments");
-  my $ls = $doc->createElement("literal-string");
-  $ls->setAttribute("value",$string_arg);
-  $s->appendChild($t);
-  $s->appendChild($a);
-  $a->appendChild($ls);
-  return $s;
+ return parseXMLFragment($doc,<<"__END_FRAGMENT__"
+<send message="StartMethod">
+  <target><var-ref name="Tracer"/></target>
+  <arguments><literal-string value="paint"/></arguments>
+</send>  
+__END_FRAGMENT__
+ );
+}
+
+sub parseXMLFragment {
+  my ($doc,$code) = (@_);
+  my $newdoc = $parser->parse($code);
+  my $subtree = $newdoc->getDocumentElement();
+  $newdoc->removeChild($subtree);
+  $subtree->setOwnerDocument($doc);
+  return $subtree;
 }
