@@ -1,0 +1,14 @@
+#!/usr/bin/perl -w
+
+use XML::Parser::PerlSAX;
+use JavaMLHandlers;
+
+if ($#ARGV != 0) {
+    die "usage: javaml-to-java FILE\n";
+}
+$file = shift @ARGV;
+
+$my_handler = JavaMLHandlers->new;
+
+XML::Parser::PerlSAX->new->parse(Source => { SystemId => $file },
+				 Handler => $my_handler);
