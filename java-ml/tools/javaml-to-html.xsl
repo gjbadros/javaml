@@ -8,8 +8,8 @@
      Copyright (C) 2000 by Greg J. Badros <gjb@cs.washington.edu> -->
 
 <!-- Run this with: xt foo.java.xml javaml-to-html.xsl -->
-<!-- or: xt foo.java.xml javaml-to-plain-source.xsl -->
-<!-- or use saxon: saxon foo.java.xml javaml-to-plain-source.xsl -->
+<!-- or: xt foo.java.xml javaml-to-html.xsl -->
+<!-- or use saxon: saxon foo.java.xml javaml-to-html.xsl -->
 
 <xsl:param name="annotate-var-refs-with-type"/>
 <xsl:param name="want-method-index">true</xsl:param>
