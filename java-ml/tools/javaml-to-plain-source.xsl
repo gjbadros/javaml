@@ -23,6 +23,13 @@
   <xsl:apply-templates/>
 </xsl:template>
 
+<xsl:template match="code-fragment|result">
+  <xsl:for-each select="*">
+    <xsl:apply-templates select="."/>
+    <xsl:call-template name="newline"/>
+  </xsl:for-each>
+</xsl:template>
+
 <xsl:template match="import">
   <xsl:text>import </xsl:text>
   <xsl:value-of select="@module"/>
