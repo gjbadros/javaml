@@ -1,3 +1,11 @@
+Mon Nov 15 22:50:11 1999  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Use symbol.h and semantic.h and get id and
+	idrefs to match up for var-ref's to local-variables and
+	formal-arguments.  Added ThisPackage(), ThisEnvironment(),
+	SzIdFromLocalVariable(), track the current AstClassDeclaration,
+	AstMethodDeclaration, and AstBlock nodes.
+
 Mon Nov 15 17:48:41 1999  Greg J. Badros  <gjb@cs.washington.edu>
 
 	* xml-unparse.cpp: Added xml_unparse_arguments() function, and use 

@@ -144,6 +144,11 @@ Perhaps this will be (or is) revised for XML?
 
 Thoughts for paper:
 
+
+Future work:
+ * preserve and attach comments appropriately
+
+
 C++ : cpp has problems
 
 Syntactic analysis phase of compiler is replaces with XML parser
@@ -161,6 +166,11 @@ Issue:
   for-loop element vs. loop:
   -> do we care about preserving the looping format initially chosen in source
   -> or should we canonicalize to <loop> element
+
+Above is related to language translation issue:
+  -> move away from language-specific syntax and constructs
+  -> leads to more abstract representation
+  -> tradeoff with preserving abstractions
 
 Issue:
   -> field w/ attribute static, or instance-field and class-field?
