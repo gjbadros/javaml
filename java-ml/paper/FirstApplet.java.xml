@@ -8,7 +8,8 @@
     <method name="paint" visibility="public" id="meth-15">
       <type name="void" primitive="true"/>
       <formal-arguments>
-	<formal-argument name="g" id="frmarg-13"><type name="Graphics"/></formal-argument>
+	<formal-argument name="g" id="frmarg-13">
+             <type name="Graphics"/></formal-argument>
       </formal-arguments>
       <statements>
 	<statements>
