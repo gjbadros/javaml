@@ -9,7 +9,7 @@
 <!ENTITY % mod-abstract "abstract CDATA #IMPLIED">
 <!ENTITY % mod-synchronized "synchronized CDATA #IMPLIED">
 
-<!ENTITY % expression-types "send|assignment-expr|conditional-expr|binary-expr|literal-number|literal-string|literal-true|literal-false">
+<!ENTITY % expression-types "send|var-ref|paren|assignment-expr|conditional-expr|binary-expr|unary-expr|cast-expr|literal-number|literal-string|literal-true|literal-false">
 
 <!ELEMENT java-source-program (package-decl|import|class)* >
 <!ATTLIST java-source-program
@@ -69,7 +69,7 @@
 <!ELEMENT send (target,arguments)>
 <!ELEMENT target ANY>
 <!ELEMENT return ANY>
-<!ELEMENT statements (statements|local-variable|throw|condition|loop|return|%expression-types)*>
+<!ELEMENT statements (statements|local-variable|throw|if|loop|return|%expression-types)*>
 <!ELEMENT throw ANY>
 <!ELEMENT throws EMPTY>
 <!ATTLIST throws
@@ -101,3 +101,19 @@
 <!ELEMENT binary-expr ((%expression-types),(%expression-types))>
 <!ATTLIST binary-expr
     op CDATA #REQUIRED>
+<!ELEMENT paren (%expression-types)>
+<!ELEMENT unary-expr (%expression-types)>
+<!ATTLIST unary-expr
+    op CDATA #REQUIRED
+    post (yes|no) #IMPLIED>
+<!ELEMENT cast-expr (target-type,(%expression-types))>
+<!ELEMENT target-type (#PCDATA)>
+<!ELEMENT literal-false EMPTY>
+<!ELEMENT literal-true EMPTY>
+<!ELEMENT if (test,true-case,false-case?)>
+<!ELEMENT test (%expression-types)>
+<!ELEMENT true-case (statements)>
+<!ELEMENT false-case (statements)>
+<!ELEMENT array-ref (base,offset)>
+<!ELEMENT base (%expression-types)>
+<!ELEMENT offset (%expression-types)>
