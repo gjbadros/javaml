@@ -1,4 +1,4 @@
-<!-- java-ml.dtd 0.95 -->
+<!-- java-ml.dtd 0.96 -->
 
 <!ENTITY % visibility-attribute 
     "visibility (public|private|\
@@ -22,7 +22,11 @@
     "abstract CDATA #IMPLIED">
 <!ENTITY % mod-synchronized 
     "synchronized CDATA #IMPLIED">
-
+<!ENTITY % location-info 
+	"line CDATA #IMPLIED col CDATA #IMPLIED 
+         end-line CDATA #IMPLIED end-col CD
+     ATA #IMPLIED
+	 comment CDATA #IMPLIED">
 <!ENTITY % expr-elems 
     "send|new|new-array|var-ref|\
      field-access|array-ref|paren|\
@@ -40,9 +44,11 @@
 <!ELEMENT code-fragment ANY>
 <!ELEMENT result ANY>
 <!ELEMENT java-source-program 
+    (java-class-file+)>
+<!ELEMENT java-class-file 
     (package-decl?,import*,
      (class|interface)+)>
-<!ATTLIST java-source-program
+<!ATTLIST java-class-file
     name CDATA #IMPLIED
     version CDATA #IMPLIED>
 <!ELEMENT import EMPTY>
@@ -51,21 +57,25 @@
 <!ELEMENT class 
     (superclass?, implement*,
       (class|interface|constructor|method|\
-     field|static-initializer)*)>
+     field|static-initializer|\
+     instance-initializer)*)>
 <!ATTLIST class
     name CDATA #REQUIRED
     %visibility-attribute;
     %mod-static;
     %mod-abstract;
     %mod-final;
-    %mod-synchronized;>
+    %mod-synchronized;
+    %location-info;>
 <!ELEMENT anonymous-class 
     (superclass?, implement*,
-      (constructor|method|field)*)>
+      (constructor|method|field|\
+     instance-initializer)*)>
 <!ATTLIST anonymous-class
     %mod-abstract;
     %mod-final;
-    %mod-synchronized;>
+    %mod-synchronized;
+    %location-info;>
 <!ELEMENT superclass EMPTY>
 <!ATTLIST superclass
     name CDATA #REQUIRED>
@@ -73,7 +83,8 @@
     (extend*, (method|field)*)>
 <!ATTLIST interface
     name CDATA #REQUIRED
-    %interface-visibility-attribute;>
+    %interface-visibility-attribute;
+    %location-info;>
 <!ELEMENT implement EMPTY>
 <!ATTLIST implement
     interface CDATA #REQUIRED>
@@ -89,11 +100,12 @@
     %mod-final;
     %mod-static;
     %mod-volatile;
-    %mod-transient;>
+    %mod-transient;
+    %location-info;>
 <!ELEMENT constructor 
     (formal-arguments,throws*,
      (super-call|this-call)?,
-     (%stmt-elems;))>
+     (%stmt-elems;)?)>
 <!ATTLIST constructor
     name CDATA #REQUIRED
     id ID #REQUIRED
@@ -103,7 +115,8 @@
     %mod-synchronized;
     %mod-volatile;
     %mod-transient;
-    %mod-native;>
+    %mod-native;
+    %location-info;>
 <!ELEMENT method 
     (type,formal-arguments,throws*,
      (%stmt-elems;)?)>
@@ -117,7 +130,8 @@
     %mod-synchronized;
     %mod-volatile;
     %mod-transient;
-    %mod-native;>
+    %mod-native;
+    %location-info;>
 <!ELEMENT formal-arguments 
     (formal-argument)*>
 <!ELEMENT formal-argument (type)>
@@ -130,6 +144,8 @@
     message CDATA #REQUIRED
     idref IDREF #IMPLIED>
 <!ELEMENT block (label*,(%stmt-elems;)*)>
+<!ATTLIST block
+    %location-info;>
 <!ELEMENT label EMPTY>
 <!ATTLIST label
     name CDATA #REQUIRED>
@@ -225,7 +241,9 @@
 <!ELEMENT base (%expr-elems;)>
 <!ELEMENT offset (%expr-elems;)>
 <!ELEMENT static-initializer 
-    (%stmt-elems;)>
+    (%stmt-elems;)*>
+<!ELEMENT instance-initializer 
+    (%stmt-elems;)*>
 <!ELEMENT super-call (arguments)>
 <!ELEMENT this-call (arguments)>
 <!ELEMENT super EMPTY>
@@ -233,7 +251,8 @@
 <!ELEMENT loop 
     (init*,test?,update*,(%stmt-elems;)?)>
 <!ATTLIST loop
-    kind (for|while) #IMPLIED>
+    kind (for|while) #IMPLIED
+    %location-info;>
 <!ELEMENT init 
     (local-variable|%expr-elems;)*>
 <!ELEMENT update (%expr-elems;)>
@@ -253,7 +272,9 @@
     ((%expr-elems;),(%expr-elems;),
      (%expr-elems;))>
 <!ELEMENT switch 
-    ((%expr-elems;),((case|default-case)+,
-     (%stmt-elems;))+)>
+    ((%expr-elems;),switch-block+)>
+<!ELEMENT switch-block 
+    ((case|default-case)+,
+     (%stmt-elems;)*)>
 <!ELEMENT case (%expr-elems;)>
 <!ELEMENT default-case EMPTY>
