@@ -9,7 +9,7 @@
 <!ENTITY % mod-abstract "abstract CDATA #IMPLIED">
 <!ENTITY % mod-synchronized "synchronized CDATA #IMPLIED">
 
-<!ENTITY % expression-types "send|var-ref|paren|assignment-expr|conditional-expr|binary-expr|unary-expr|cast-expr|literal-number|literal-string|literal-true|literal-false">
+<!ENTITY % expression-types "send|var-ref|array-ref|paren|assignment-expr|conditional-expr|binary-expr|unary-expr|cast-expr|literal-number|literal-string|literal-true|literal-false">
 
 <!ELEMENT java-source-program (package-decl|import|class)* >
 <!ATTLIST java-source-program
