@@ -25,6 +25,9 @@
     %mod-final;
     %mod-synchronized;
     superclass CDATA "Object">
+<!ELEMENT implement EMPTY>
+<!ATTLIST implement
+    class CDATA #REQUIRED>
 <!ELEMENT field (type,(%expr-elems;)?)>
 <!ATTLIST field
     name CDATA #REQUIRED
@@ -67,7 +70,7 @@
 <!ELEMENT target (%expr-elems;)>
 <!ELEMENT return (%expr-elems;)>
 <!ELEMENT statements (statements|local-variable|try|throw|if|loop|return|continue|break|%expr-elems;)*>
-<!ELEMENT throw ANY>
+<!ELEMENT throw (%expr-elems;)>
 <!ELEMENT throws EMPTY>
 <!ATTLIST throws
     exception CDATA #REQUIRED>
@@ -79,7 +82,7 @@
 <!ELEMENT new-array (type,dim-expr*,(%expr-elems;)?)>
 <!ATTLIST new-array
     dimensions CDATA #REQUIRED>
-<!ELEMENT dim-expr ANY>
+<!ELEMENT dim-expr (%expr-elems;)>
 <!ELEMENT local-variable (type,(%expr-elems;)?)>
 <!ATTLIST local-variable
     name CDATA #REQUIRED
@@ -139,8 +142,8 @@
 <!ELEMENT loop (init*,test?,update*,statements?)>
 <!ATTLIST loop
     kind (for|while) #IMPLIED>
-<!ELEMENT init ANY>
-<!ELEMENT update ANY>
+<!ELEMENT init (local-variable|%expr-elems;)>
+<!ELEMENT update (%expr-elems;)>
 <!ELEMENT do-loop (statements?,test?)>
 <!ELEMENT try (statements,catch*,finally?)>
 <!ELEMENT catch (formal-argument,statements?)>
