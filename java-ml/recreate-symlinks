@@ -5,3 +5,5 @@ ln -s . ./Washington
 ln -s . ./gjb
 ln -s . ./cassowary
 ln -s . ./classes
+cd paper
+ln -s ../javaml-badros-www9.html
