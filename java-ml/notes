@@ -4,17 +4,36 @@ http://papers.www9.org:8027/x/dbn/edit/user/gjb
 gjb,mywww9pass
 
 Possible Analyses:
+--> some of these are handled by compilations semantic analysis, but part of the
+    point is that we can get the analyses w/o using such a heavyweight
+    approach!
+
+* metrics:
+-> sgcount xml-unparsed/ClSimplexSolver.java.xml
 * check that only abstract classes have abstract methods
+-> sggrep -q '.*/class[abstract!=true]/method[abstract=true]' ComplexApplet.java.xml
+* look for all sends of the message "drawString"
+-> sggrep -q '.*/send[message=drawString]' xml-unparsed/ComplexApplet.java.xml 
+* returns from inside loops
+-> sggrep -q '.*/method/.*/loop|do-loop/.*/return' ComplexApplet.java.xml 
+* assignments inside ifs:
+-> sggrep -q '.*/if/test/assignment-expr' xml-unparsed/ComplexApplet.java.xml 
 * check that all functions have only one return statement
+=> cannot do this with sggrep, it seems --11/15/99 gjb
+ALSO CANNOT DO ANYTHING THAT REQUIRES A TRANSFORMATION, OBVIOUSLY
 * changing sense of a default parameter (via overriding, since no defaults in Java)
 * renaming a method
 * search for unused variables
+* all definitions of variables of type int
+-> sggrep -q '.*/local-variable' -s './type[name=int]' xml-unparsed/ComplexApplet.java.xml
+* ensure that all variables of type String start with str (hungarian)
+-> sggrep -q '.*/local-variable[name!~"^str"]' -s './type[name=String]' xml-unparsed/ComplexApplet.java.xml 
 * etags
 * list functions that do not call a function
-* enforce hungarian naming convention
-* metrics:
-  -> sgcount xml-unparsed/ClSimplexSolver.java.xml
+* list functions that send message "drawString" (contrast w/ above)
+* add debug code at entry/exit to function
 * better diff utility; canonical ast differ for cheating check
+
 
 
 XML DTD Stuff:
@@ -139,3 +158,16 @@ Issue:
     <var-ref name="System">
   </field-access>
 </field-access>
+
+
+
+Properties of XML that influenced DTD design:
+
+attributes are unordered, finite
+ -> cannot use for arguments
+attributes are only text strings, so cannot have references
+ -> e.g., types need to be encoded as elements
+    not 
+     <method return-type="boolean" ...> ... 
+    but
+     <method ...><type name="boolean" primitive="true"/> ...
