@@ -1222,7 +1222,7 @@ void AstLocalVariableDeclarationStatement::XMLUnparse(Ostream& os, LexStream& le
                    "static",SzOrNullFromF(fStatic),
                    "volatile",SzOrNullFromF(fVolatile),
                    "transient",SzOrNullFromF(fTransient),
-                   "continuation",(k==0?NULL:"true"),
+                   "continued",(k==0?NULL:"true"),
                    "id",SzIdFromLocalVariable(VariableDeclarator(k)->id,szName),
                    NULL);
         // Repeat the type for each variable
