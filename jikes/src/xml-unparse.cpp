@@ -76,23 +76,36 @@ void xml_suffix(Ostream &xo)
   xo << "</java-source-program>\n";
 }
 
-void
-OutputLiteralString(Ostream &xo, const char *sz)
+
+// GJB:FIXME:: this is a dumb, slow implementation
+char *SzNewEscapedLiteralString(const char *sz) 
 {
-  ++sz; // skip leading quote
+  // reserve five times the space;  worst case
+  // is that sz is all double-quote characters
+  // that need conversion to &quot;
+  char *szAnswer = new char[strlen(sz)*5+1];
+  char *pch = szAnswer;
+  *pch = '\0';
+  ++sz; // skip leading quote (single/double)
   while (*(sz+1)) { // test one beyond so we skip last quote
     switch (*sz) {
     case '&':
-      xo << "&amp;"; break;
+      strcat(szAnswer,"&amp;"); break;
     case '<':
-      xo << "&lt;"; break;
+      strcat(szAnswer,"&lt;"); break;
     case '>':
-      xo << "&gt;"; break;
+      strcat(szAnswer,"&gt;"); break;
+    case '"':
+      strcat(szAnswer,"&quot;"); break;
     default:
-      xo << *sz; break;
+      int ich = strlen(szAnswer);
+      szAnswer[ich] = *sz;
+      szAnswer[ich+1] = '\0';
+      break;
     }
     ++sz;
   }
+  return szAnswer;
 }
 
 char *
@@ -1546,14 +1559,18 @@ void AstDoubleLiteral::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstTrueLiteral::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstTrueLiteral:#" << this-> id << "*/";
-    xml_output(os,"literal-true",XML_CLOSE);
+    xml_output(os,"literal-boolean",
+               "value","true",
+               XML_CLOSE);
     if (Ast::debug_unparse) os << "/*:AstTrueLiteral#" << this-> id << "*/";
 }
 
 void AstFalseLiteral::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstFalseLiteral:#" << this-> id << "*/";
-    xml_output(os,"literal-false",XML_CLOSE);
+    xml_output(os,"literal-boolean",
+               "value","false",
+               XML_CLOSE);
     if (Ast::debug_unparse) os << "/*:AstFalseLiteral#" << this-> id << "*/";
 }
 
@@ -1564,26 +1581,31 @@ void AstStringLiteral::XMLUnparse(Ostream& os, LexStream& lex_stream)
     nm.SetExpandWchar(true);
     nm << lex_stream.NameString(string_literal_token), lex_stream.NameStringLength(string_literal_token);
     xnm << ends;
-    char *szLen = SzNewFromLong(lex_stream.NameStringLength(string_literal_token)-2);
+    // GJB:FIXME:: If I really want a length attribute, I should at least do something
+    // smart about \", e.g., since that's really of length 1, not 2.
+/*    char *szLen = SzNewFromLong(lex_stream.NameStringLength(string_literal_token)-2); */
+    char *szValue = SzNewEscapedLiteralString(xnm.str());
     xml_output(os,"literal-string",
-               "length", szLen,
-               NULL);
-    delete szLen;
-    OutputLiteralString(os,xnm.str());
-    xml_close(os,"literal-string");
+               "value", szValue,
+/*               "length", szLen, */
+               XML_CLOSE);
+    delete szValue;
+/*    delete szLen; */
     if (Ast::debug_unparse) os << "/*:AstStringLiteral#" << this-> id << "*/";
 }
 
 void AstCharacterLiteral::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstCharacterLiteral:#" << this-> id << "*/";
-    xml_open(os,"literal-char");
     ostrstream xnm; Ostream nm(&xnm);
     nm.SetExpandWchar(true);
     nm << lex_stream.NameString(character_literal_token), lex_stream.NameStringLength(character_literal_token);
     xnm << ends;
-    OutputLiteralString(os,xnm.str());
-    xml_close(os, "literal-char", false);
+    char *szValue = SzNewEscapedLiteralString(xnm.str());
+    xml_output(os,"literal-char",
+               "value",szValue,
+               XML_CLOSE);
+    delete szValue;
     if (Ast::debug_unparse) os << "/*:AstCharacterLiteral#" << this-> id << "*/";
 }
 
