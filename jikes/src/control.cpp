@@ -392,6 +392,7 @@ Control::Control(ArgumentExpander &arguments, Option &option_) : return_code(0),
                 // Clean up all the files that have just been compiled in this new batch.
                 //
                 for (file_symbol = (FileSymbol *) input_java_file_set.FirstElement();
+                    // delete file_symbol
                      file_symbol;
                      file_symbol = (FileSymbol *) input_java_file_set.NextElement())
                 {
@@ -562,6 +563,7 @@ Control::~Control()
     delete scanner;
     delete parser;
     delete system_semantic;
+    delete system_table;
 #endif
 
 #ifdef TEST
@@ -1361,17 +1363,6 @@ void Control::CleanUp(FileSymbol *file_symbol)
         }
         if (option.debug_dump_ast)
             sem -> compilation_unit -> Print(*sem -> lex_stream);
-        if (option.debug_xml_unparse_ast)
-        {
-            if (option.debug_unparse_ast_debug)
-              {
-                // which of these is correct?
-                sem -> compilation_unit -> debug_unparse = true;
-                Ast::debug_unparse = true;
-              }
-            sem -> compilation_unit -> XMLUnparse(*sem -> lex_stream,
-                                                  "xml-unparsed/");
-        }
         if (option.debug_unparse_ast)
         {
             if (option.debug_unparse_ast_debug)

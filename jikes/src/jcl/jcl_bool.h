@@ -16,7 +16,9 @@
 // to become standard C++. When that happens, these declarations should 
 // be removed.                                                       
 //======================================================================
+#ifndef TYPE_bool
 typedef int bool;
 enum {false = 0, true = 1};
+#endif
 
 #endif /* bool_INCLUDED */

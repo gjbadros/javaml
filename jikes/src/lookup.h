@@ -11,7 +11,9 @@
 #define lookup_INCLUDED
 
 #include "config.h"
-#include <wchar.h>
+#ifdef HAVE_WCHAR_H
+# include <wchar.h>
+#endif
 #include <string.h>
 #include <sys/stat.h>
 #include <time.h>

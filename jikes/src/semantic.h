@@ -11,7 +11,9 @@
 #define semantic_INCLUDED
 
 #include "config.h"
-#include <wchar.h>
+#ifdef HAVE_WCHAR_H
+# include <wchar.h>
+#endif
 #include "ast.h"
 #include "diagnose.h"
 #include "error.h"

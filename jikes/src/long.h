@@ -28,7 +28,7 @@ protected:
         u4 word[2];
     } value;
 
-#ifdef BIGENDIAN
+#ifdef WORDS_BIGENDIAN
     u4 &High() { return value.word[0]; }
     u4 &Low()  { return value.word[1]; }
 #else

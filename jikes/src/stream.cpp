@@ -16,8 +16,11 @@
 #include "control.h"
 #include "semantic.h"
 
-#ifdef HAVE_LIB_ICU_UC
+#if defined(HAVE_LIB_ICU_UC)
 # include <ucnv.h>
+#elif defined(HAVE_ICONV_H)
+# include <iconv.h>
+# include <errno.h>
 #endif
 
 wchar_t *LexStream::KeywordName(int kind)
@@ -442,7 +445,7 @@ int LexStream::hexvalue(wchar_t ch)
 //
 void LexStream::ProcessInput(char *buffer, long filesize)
 {
-#ifdef HAVE_LIB_ICU_UC
+#if defined(HAVE_LIB_ICU_UC) || defined(HAVE_ICONV_H)
     LexStream::ProcessInputUnicode(buffer,filesize);
 #else
     LexStream::ProcessInputAscii(buffer, filesize);
@@ -453,7 +456,7 @@ void LexStream::ProcessInput(char *buffer, long filesize)
 // Read file_size Ascii characters from srcfile, convert them to unicode and
 // store them in input_buffer.
 //
-void LexStream::ProcessInputAscii(char *buffer, long filesize)
+void LexStream::ProcessInputAscii(const char *buffer, long filesize)
 {
 #ifdef TEST
     file_read++;
@@ -465,7 +468,7 @@ void LexStream::ProcessInputAscii(char *buffer, long filesize)
 
     if (buffer)
     {
-        char *source_ptr = buffer,
+        const char *source_ptr = buffer,
              *source_tail = &(buffer[filesize - 1]); // point to last character read from the file.
 
         while(source_ptr <= source_tail)
@@ -484,7 +487,7 @@ void LexStream::ProcessInputAscii(char *buffer, long filesize)
                     *(++input_ptr) = *source_ptr++;
                 else if (*source_ptr == U_u)
                 {
-                    char *u_ptr = source_ptr;
+                    const char *u_ptr = source_ptr;
 
                     for (source_ptr++; source_ptr <= source_tail && *source_ptr == U_u; source_ptr++)
                         ;
@@ -494,7 +497,7 @@ void LexStream::ProcessInputAscii(char *buffer, long filesize)
                     {
                         int multiplier[4] = {4096, 256, 16, 1};
 
-                        char ch = *source_ptr++;
+                        const char ch = *source_ptr++;
                         switch(ch)
                         {
                             case U_a: case U_A:
@@ -575,45 +578,40 @@ void LexStream::ProcessInputAscii(char *buffer, long filesize)
     return;
 }
 
-#ifdef HAVE_LIB_ICU_UC
+#if defined(HAVE_LIB_ICU_UC) || defined(HAVE_ICONV_H)
 //
 // Read file_size Ascii characters from srcfile, convert them to unicode, and
 // store them in input_buffer.
 //
-void LexStream::ProcessInputUnicode(char *buffer, long filesize)
+void LexStream::ProcessInputUnicode(const char *buffer, long filesize)
 {
+    //fprintf(stderr,"LexStream::ProcessInputUnicode called.\n");
 #ifdef TEST
     file_read++;
 #endif
 
-#ifdef HAVE_LIB_ICU_UC
-    input_buffer       = new wchar_t[filesize + 4 + 2];
+    input_buffer       = new wchar_t[filesize + 4];
     wchar_t *input_tail = input_buffer + filesize;
-#else
-    input_buffer = new wchar_t[filesize + 4];
-#endif
     
     wchar_t *input_ptr = input_buffer;
     *input_ptr = U_LINE_FEED; // add an initial '\n';
-    
+
     if(buffer)
     {
         int      escape_value;
         wchar_t *escape_ptr;
-        const char *source_ptr = buffer,
-            *source_tail = &(buffer[filesize - 1]); // point to last character read from the file.
-        
-        UnicodeLexerState saved_state;
-        UnicodeLexerState state=RAW;
-        bool oncemore=false;
+        const char *source_ptr  = buffer;
+        const char *source_tail = buffer + filesize - 1; // point to last character read from the file.
 
+        UnicodeLexerState saved_state;
+        UnicodeLexerState state = RAW;
 #ifdef HAVE_LIB_ICU_UC
-        UErrorCode err = ZERO_ERROR;
+        UErrorCode err = U_ZERO_ERROR;
 #endif
+        bool oncemore = false;
 
         while((source_ptr <= source_tail) || oncemore)
         {
-#ifdef HAVE_LIB_ICU_UC
             // On each iteration we advance input_ptr maximun 2 postions.
             // Here we check if we are close to the end of input_buffer
             if(input_ptr>=input_tail)
@@ -627,33 +625,73 @@ void LexStream::ProcessInputUnicode(char *buffer, long filesize)
                 // If such reallocation will be required, it will indeed
                 // slow down compilation a bit.
                 size_t cursize = input_ptr-input_buffer;
-                size_t newsize = cursize+cursize/10; // add 10%
+                size_t newsize = cursize+cursize/10+4; // add 10%
                 wchar_t *tmp   = new wchar_t[newsize]; 
-                memcpy(tmp, input_buffer, newsize*sizeof(wchar_t));
+                wmemcpy (tmp, input_buffer, cursize);
                 delete input_buffer;
                 input_buffer = tmp;
-                input_tail = input_buffer + newsize;
-                input_ptr  = input_buffer+cursize;
+                input_tail = input_buffer + newsize - 1;
+                input_ptr  = input_buffer + cursize;
             }
-#endif
             
             wchar_t ch;
             
             if(!oncemore)
             {
-#ifdef HAVE_LIB_ICU_UC
                 if(control.option.converter)
+                {
+                    const char *before = source_ptr;
+
+#ifdef HAVE_LIB_ICU_UC
                     ch=ucnv_getNextUChar (control.option.converter,
                                           &source_ptr,
-                                          source_tail,
+                                          source_tail+1,
                                           &err);
-                else
-                    ch=*source_ptr++;
-                if(err!=ZERO_ERROR)
-                    break;
+
+                    if(U_FAILURE(err))
+                    {
+                        fprintf(stderr,"Conversion error: %s at byte %d\n", 
+                                errorName(err),
+                                int(before-buffer)
+                        );
+                        break;
+                    }
 #else
-                ch=*source_ptr++;
+#   ifdef HAVE_ICONV_H
+                    unsigned char chd[2];
+                    unsigned char *chp  = chd;
+                    size_t   chl  = 2;
+                    size_t   srcl = (source_ptr-source_tail)+1;
+                    size_t n = iconv(control.option.converter,
+                                     &source_ptr, &srcl,
+                                     (char **)&chp, &chl
+                    );
+
+#        ifdef WORDS_BIGENDIAN
+                    ch=chd[0] + chd[1]*256;
+#        else
+                    ch=chd[1] + chd[0]*256;
+#        endif
+
+                    if(n==-1 && (errno != E2BIG))
+                    {
+                        fprintf(stderr,"Charset conversion error at offset : ", int(before-buffer));
+                        perror("");
+                        break;
+                    }
+                    
+#   endif
 #endif
+                    if(before==source_ptr)
+                    {
+                        //End of conversion
+                        break;
+                    }
+                }
+                else
+                {
+                    ch=*source_ptr++;
+                }
             } else oncemore = false;
       
             switch(state)
@@ -776,7 +814,7 @@ void LexStream::ProcessInputUnicode(char *buffer, long filesize)
 
     return;
 }
-#endif
+#endif // defined(HAVE_LIB_ICU_UC) || defined(HAVE_ICONV_H)
 
 //
 // This procedure uses a  quick sort algorithm to sort the stream ERRORS

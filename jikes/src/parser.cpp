@@ -78,7 +78,7 @@ AstPackageDeclaration *Parser::PackageHeaderParse(LexStream *lex_stream_, Storag
         ast_pool = ast_pool_;
 
         parse_package_header_only = true;
-        end_token = LexStream::INFINITY; // We are parsing the whole input and not just a segment.
+        end_token = LexStream::LEX_INFINITY; // We are parsing the whole input and not just a segment.
         lex_stream = lex_stream_;
         Ast *ast = HeaderParse();
         parse_package_header_only = false;
@@ -106,7 +106,7 @@ AstCompilationUnit *Parser::HeaderParse(LexStream *lex_stream_, StoragePool *ast
     AstCompilationUnit *compilation_unit = NULL;
 
     parse_header_only = true;
-    end_token = LexStream::INFINITY; // We are parsing the whole input and not just a segment.
+    end_token = LexStream::LEX_INFINITY; // We are parsing the whole input and not just a segment.
     lex_stream = lex_stream_;
     Ast *ast = HeaderParse();
     parse_header_only = false;

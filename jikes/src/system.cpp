@@ -477,7 +477,9 @@ void Control::ProcessPath()
         wchar_t *path_name = new wchar_t[max_path_name_length + 1]; // +1 for '\0'
 
         wchar_t *input_name = NULL;
+#ifdef WIN32_FILE_SYSTEM
         char * full_directory_name = NULL;
+#endif
 
         for (char *path = option.classpath, *path_tail = &path[strlen(path)]; path < path_tail; path++)
         {
@@ -715,6 +717,7 @@ DirectorySymbol *Control::GetOutputDirectory(FileSymbol *file_symbol)
 
         directory_symbol = control.ProcessSubdirectories(name, length);
 
+        delete [] name;
         delete [] directory_name;
     }
 

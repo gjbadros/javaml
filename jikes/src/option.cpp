@@ -15,6 +15,10 @@
 #include "error.h"
 #include "case.h"
 
+#ifdef CYGWIN
+#include <sys/cygwin.h>
+#endif
+
 //
 //
 //
@@ -150,14 +154,14 @@ void Option::SaveCurrentDirectoryOnDisk(char c)
 #endif
 
 
-Option::Option(ArgumentExpander &arguments) : default_path(NULL),
+Option::Option(ArgumentExpander &arguments) : 
                                               classpath(NULL),
-#ifdef HAVE_LIB_ICU_UC
+                                              directory(NULL),
+                                              dependence_report_name(NULL),
+                                              encoding(NULL),
+#if defined(HAVE_LIB_ICU_UC) || defined(HAVE_ICONV_H)
                                               converter(NULL),
 #endif
-                                              directory(NULL),
-                                              encoding(NULL),
-                                              dependence_report_name(NULL),
                                               nowrite(false),
                                               deprecation(false),
                                               O(false),
@@ -165,7 +169,7 @@ Option::Option(ArgumentExpander &arguments) : default_path(NULL),
                                               verbose(false),
                                               depend(false),
                                               nowarn(false),
-                                              one_one(true),
+                                              classpath_search_order(false),
                                               zero_defect(false),
                                               first_file_index(arguments.argc),
                                               debug_trap_op(0),
@@ -175,7 +179,6 @@ Option::Option(ArgumentExpander &arguments) : default_path(NULL),
                                               debug_unparse_ast_debug(false),
                                               debug_dump_class(false),
                                               nocleanup(false),
-                                              applet_author(false),
                                               incremental(false),
                                               makefile(false),
                                               dependence_report(false),
@@ -184,8 +187,6 @@ Option::Option(ArgumentExpander &arguments) : default_path(NULL),
                                               unzip(false),
                                               dump_errors(false),
                                               errors(true),
-                                              ascii(false),
-                                              classpath_search_order(false),
                                               comments(false),
                                               pedantic(false)
 {
@@ -235,15 +236,25 @@ Option::Option(ArgumentExpander &arguments) : default_path(NULL),
                  depend = true;
             else if (strcmp(arguments.argv[i], "-encoding") == 0 && ((i + 1) < arguments.argc))
             {
-#ifdef HAVE_LIB_ICU_UC
+#if defined(HAVE_LIB_ICU_UC)
                 encoding = new char[strlen(arguments.argv[++i]) + 1];
                 strcpy(encoding, arguments.argv[i]);
-                UErrorCode err=ZERO_ERROR;
+                UErrorCode err=U_ZERO_ERROR;
                 converter=ucnv_open(encoding, &err);
                 if(!converter)
                     bad_options.Next() = new OptionError(SemanticError::UNSUPPORTED_ENCODING, encoding); 
+#elif defined(HAVE_ICONV_H)
+                encoding = new char[strlen(arguments.argv[++i]) + 1];
+                strcpy(encoding, arguments.argv[i]);
+                converter=iconv_open("utf-16", encoding);
+                if(converter==(iconv_t)-1)
+                {
+                    converter = NULL;
+                    bad_options.Next() = new OptionError(SemanticError::UNSUPPORTED_ENCODING, encoding); 
+                }
 #else
-// if compiling without ICU support, will only support one encoding (ascii).
+                bad_options.Next() = new OptionError(SemanticError::UNSUPPORTED_OPTION, "-encoding"); 
+                i++;
 #endif
                 continue;
             }
@@ -311,9 +322,7 @@ Option::Option(ArgumentExpander &arguments) : default_path(NULL),
         }
         else if (arguments.argv[i][0] == '+')
         {
-            if (strcmp(arguments.argv[i], "+AA") == 0)
-                 applet_author = true;
-            else if (strcmp(arguments.argv[i], "+A") == 0)
+            if (strcmp(arguments.argv[i], "+A") == 0)
                  debug_dump_ast = true;
             else if (strcmp(arguments.argv[i], "+u") == 0)
                  debug_unparse_ast = true;
@@ -322,16 +331,6 @@ Option::Option(ArgumentExpander &arguments) : default_path(NULL),
                 debug_unparse_ast = true;
                 debug_unparse_ast_debug = true;
             }
-            else if (strcmp(arguments.argv[i], "+ux") == 0)
-            {
-                debug_xml_unparse_ast = true;
-            }
-            else if (strcmp(arguments.argv[i], "+udx") == 0)
-            {
-                debug_unparse_ast_debug = true;
-                debug_xml_unparse_ast = true;
-            }
-
 #ifdef EBCDIC
             else if (strcmp(arguments.argv[i], "+ASCII") == 0)
                      ascii = true;
@@ -394,8 +393,6 @@ Option::Option(ArgumentExpander &arguments) : default_path(NULL),
                     }
                 }
             }
-            else if (strcmp(arguments.argv[i],"+1.0") == 0)
-                 one_one = false;
             else if (strcmp(arguments.argv[i],"+F") == 0)
                  full_check = true;
             else if (strcmp(arguments.argv[i],"+M") == 0)
@@ -459,6 +456,13 @@ Option::Option(ArgumentExpander &arguments) : default_path(NULL),
 
         if (classpath)
         {
+            /* Create a copy of the classpath string we can modify
+               this copy without worry that it will effect the env array */
+            char * buf;
+            buf = new char[strlen(classpath)+1];
+            strcpy(buf, classpath);
+            classpath = buf;
+
 #ifdef EBCDIC
             //
             //  Maintain CLASSPATH in ASCII and translate back to EBCDIC when building file name
@@ -469,16 +473,26 @@ Option::Option(ArgumentExpander &arguments) : default_path(NULL),
             while (isspace(*classpath))
                 classpath++;
 
-            if (*classpath == U_NULL)
+            if (*classpath == U_NULL) {
+                delete [] classpath;
                 classpath = NULL;
+            }
+
+#ifdef CYGWIN
+            // Under Cygwin, we convert a windows style path into a unix style path
+            // so that we can parse it using the unix path seperator char ':'
+            buf = new char[cygwin_win32_to_posix_path_list_buf_size(classpath)];
+            cygwin_win32_to_posix_path_list(classpath, buf);
+            delete [] classpath;
+            classpath = buf;
+#endif
         }
 
         if (! classpath)
         {
-            default_path = new char[2];
-            default_path[0] = '.';
-            default_path[1] = U_NULL;
-            classpath = default_path;
+            classpath = new char[2];
+            classpath[0] = '.';
+            classpath[1] = U_NULL;
         }
     }
 
@@ -513,7 +527,7 @@ Option::~Option()
     for (int i = 0; i < bad_options.Length(); i++)
         delete bad_options[i];
 
-    delete [] default_path;
+    delete [] classpath;
     delete [] directory;
 
 #ifdef WIN32_FILE_SYSTEM
@@ -521,5 +535,9 @@ Option::~Option()
         delete [] current_directory[c];
 #endif
 
+#ifdef HAVE_ICONV_H
+    if(converter)
+        iconv_close(converter);
+#endif
     return;
 }

@@ -244,7 +244,6 @@ void SemanticError::StaticInitializer()
 
     warning[INVALID_OPTION] = 1;
     warning[DISABLED_OPTION] = 1;
-    warning[UNSUPPORTED_ENCODING] = 1;
     warning[CANNOT_OPEN_ZIP_FILE] = 1;
     warning[CANNOT_OPEN_PATH_DIRECTORY] = 1;
 
@@ -558,7 +557,6 @@ void SemanticError::StaticInitializer()
     print_message[INVALID_CLASS_FILE] = PrintINVALID_CLASS_FILE;
     print_message[CANNOT_OPEN_CLASS_FILE] = PrintCANNOT_OPEN_CLASS_FILE;
 
-    print_message[ONE_ONE_FEATURE] = PrintONE_ONE_FEATURE;
     print_message[STATIC_NOT_INNER_CLASS] = PrintSTATIC_NOT_INNER_CLASS;
     print_message[TYPE_NOT_INNER_CLASS] = PrintTYPE_NOT_INNER_CLASS;
     print_message[SUPER_TYPE_NOT_INNER_CLASS] = PrintSUPER_TYPE_NOT_INNER_CLASS;
@@ -4382,14 +4380,6 @@ void SemanticError::PrintCANNOT_OPEN_CLASS_FILE(ErrorInfo &err, LexStream *lex_s
     }
     Coutput << err.insert2
             << "\".";
-
-    return;
-}
-
-
-void SemanticError::PrintONE_ONE_FEATURE(ErrorInfo &err, LexStream *lex_stream, Control &control)
-{
-    Coutput << "This is a 1.1 feature.";
 
     return;
 }

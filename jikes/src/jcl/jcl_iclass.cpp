@@ -262,7 +262,8 @@ Code_attribute *InputClassFile::get_Code_attribute(u2 &name_index, u4 &length)
     u4 code_length;
     code_length = get_u4();
     p -> code.resize(code_length);
-    for (int i = 0; i < code_length; i++)
+    int i;
+    for (i = 0; i < code_length; i++)
         p -> code[i] = get_u1();
     u2 exception_table_length = get_u2();
     p -> exception_table.resize(exception_table_length);
@@ -474,7 +475,8 @@ void InputClassFile::get_method_info(method_info &m)
 
 InputClassFile::~InputClassFile()
 {
-    for (int i = 1; i < constant_pool.length(); i++)
+    int i;
+    for (i = 1; i < constant_pool.length(); i++)
         delete constant_pool[i];
 
     for (i = 0; i < attributes.length(); i++)
@@ -499,7 +501,8 @@ InputClassFile::InputClassFile(char* filename)
     u2 constant_pool_count = get_u2();
     constant_pool.resize(constant_pool_count);
     constant_pool[0] = NULL;
-    for (int i = 1; i < constant_pool_count; i++)
+    int i;
+    for (i = 1; i < constant_pool_count; i++)
     {
         constant_pool[i] = get_cp_info();
         if (constant_pool[i] -> tag == CONSTANT_Long ||

@@ -11,6 +11,7 @@
 #define jcl_DYNAMIC_INCLUDED
 
 #include <stdlib.h>
+#include <string.h>
 
 //
 // This DynamicArray template class can be used to construct a dynamic

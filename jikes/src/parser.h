@@ -13,7 +13,9 @@
 #include "config.h"
 #include <limits.h>
 #include <ctype.h>
-#include <wchar.h>
+#ifdef HAVE_WCHAR_H
+# include <wchar.h>
+#endif
 #include <string.h>
 #include <stdio.h>
 #include "lpginput.h"

@@ -119,7 +119,7 @@ private:
 
     enum { BIAS = 1023 };
 
-#ifdef BIGENDIAN
+#ifdef WORDS_BIGENDIAN
     u4 &High() { return value.word[0]; }
     u4 &Low()  { return value.word[1]; }
 #else

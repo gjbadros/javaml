@@ -70,7 +70,7 @@ public:
     typedef int TypeIndex;
     typedef int TokenIndex;
     typedef int CommentIndex;
-    enum { INFINITY = INT_MAX }; // the largest possible value for TokenIndex
+    enum { LEX_INFINITY = INT_MAX }; // the largest possible value for TokenIndex
 
     FileSymbol *file_symbol;
 
@@ -291,6 +291,7 @@ private:
 
     int hexvalue(wchar_t ch);
     
+#if defined(HAVE_LIB_ICU_UC) || defined(HAVE_ICONV_H)
     enum UnicodeLexerState
     {
         RAW,
@@ -301,6 +302,7 @@ private:
         UNICODE_ESCAPE_DIGIT_1,
         UNICODE_ESCAPE_DIGIT_2
     };
+#endif
     
     friend class Scanner;
 
@@ -388,9 +390,9 @@ private:
 
     void ReadInput();
     void ProcessInput(char *, long);
-    void ProcessInputAscii(char *, long);
-#ifdef HAVE_LIB_ICU_UC
-    void ProcessInputUnicode(char *, long);
+    void ProcessInputAscii(const char *, long);
+#if defined(HAVE_LIB_ICU_UC) || defined(HAVE_ICONV_H)
+    void ProcessInputUnicode(const char *, long);
 #endif  
 
     wchar_t *KeywordName(int);

@@ -12,7 +12,9 @@
 #define case_INCLUDED
 
 #include "config.h"
-#include <wchar.h>
+#ifdef HAVE_WCHAR_H
+# include <wchar.h>
+#endif
 
 //
 // NOTE that this class is hard-wired to work on an ASCII machine.

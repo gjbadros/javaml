@@ -16,7 +16,8 @@ void BaseLong::divide(BaseLong dividend, BaseLong divisor, BaseLong &quotient, B
        low  = dividend.low_word(),
        remainder_high = 0;
 
-    for (int i = 0; i < 32; i++)
+    int i;
+    for (i = 0; i < 32; i++)
     {
         remainder_high = (remainder_high << 1) | (high >> 31);
         high <<= 1;

@@ -23,7 +23,7 @@ class SymbolSet;
 class CycleChecker
 {
 public:
-    enum { OMEGA = -1, INFINITY = INT_MAX };
+    enum { OMEGA = -1, CYCLE_INFINITY = INT_MAX };
 
     inline int Min(int x, int y) { return (x < y ? x : y); }
 };

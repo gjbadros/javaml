@@ -18,8 +18,10 @@
 #include "code.h"
 #include "tuple.h"
 
-#ifdef HAVE_LIB_ICU_UC
+#if defined(HAVE_LIB_ICU_UC)
 # include <ucnv.h>
+#elif defined(HAVE_ICONV_H)
+# include <iconv.h>
 #endif
 
 class ArgumentExpander
@@ -29,7 +31,7 @@ public:
     int argc;
     char **argv;
 
-    ArgumentExpander::ArgumentExpander(int, char **);
+    ArgumentExpander(int, char **);
 
     ArgumentExpander(Tuple<char> &);
 
@@ -115,8 +117,10 @@ public:
          *dependence_report_name,
          *encoding;
 
-#ifdef HAVE_LIB_ICU_UC
+#if defined(HAVE_LIB_ICU_UC)
          UConverter *converter;
+#elif defined(HAVE_ICONV_H)
+         iconv_t converter;
 #endif
          
     Tuple<KeywordMap> keyword_map;
@@ -130,7 +134,6 @@ public:
          depend,
          nowarn,
          classpath_search_order,
-         one_one,
          zero_defect;
     int first_file_index;
 
@@ -139,11 +142,9 @@ public:
     bool debug_dump_lex,
          debug_dump_ast,
          debug_unparse_ast,
-         debug_xml_unparse_ast,
          debug_unparse_ast_debug,
          debug_dump_class,
          nocleanup,
-         applet_author,
          incremental,
          makefile,
 	 dependence_report,
@@ -151,7 +152,6 @@ public:
          full_check,
          unzip,
          dump_errors,
-         ascii,
          errors,
          comments,
          pedantic;

@@ -35,7 +35,8 @@ public:
                 while (c == 'u')
                     c = getc(srcfile);
                 ch = 0;
-                for (int i = 0; isxdigit(c) && i < 4; i++)
+                int i;
+                for (i = 0; isxdigit(c) && i < 4; i++)
                 {
                     int multiplier[4] = {4096, 256, 16, 1};
 
@@ -106,7 +107,8 @@ public:
     //
     static size_t read_block(FILE *srcfile, wchar_t *block, size_t max_size)
     {
-        for (int n = 0; n < max_size; n++)
+        int n;
+        for (n = 0; n < max_size; n++)
         {
             int ch = Getc(srcfile);
             if (ch == EOF)

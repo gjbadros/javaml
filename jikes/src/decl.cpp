@@ -393,13 +393,6 @@ void Semantic::CheckClassMembers(TypeSymbol *containing_type, AstClassBody *clas
     {
         AstClassDeclaration *class_declaration = class_body -> NestedClass(i);
 
-        if (! control.option.one_one)
-        {
-             ReportSemError(SemanticError::ONE_ONE_FEATURE,
-                            class_declaration -> LeftToken(),
-                            class_declaration -> RightToken());
-        }
-
         ProcessNestedClassName(containing_type, class_declaration);
     }
 
@@ -407,24 +400,7 @@ void Semantic::CheckClassMembers(TypeSymbol *containing_type, AstClassBody *clas
     {
         AstInterfaceDeclaration *interface_declaration = class_body -> NestedInterface(j);
 
-        if (! control.option.one_one)
-        {
-            ReportSemError(SemanticError::ONE_ONE_FEATURE,
-                           interface_declaration -> LeftToken(),
-                           interface_declaration -> RightToken());
-        }
-
         ProcessNestedInterfaceName(containing_type, interface_declaration);
-    }
-
-    for (int k = 0; k < class_body -> NumBlocks(); k++)
-    {
-        if (! control.option.one_one)
-        {
-            ReportSemError(SemanticError::ONE_ONE_FEATURE,
-                           class_body -> Block(k) -> LeftToken(),
-                           class_body -> Block(k) -> RightToken());
-        }
     }
 
     for (int l = 0; l < class_body -> NumEmptyDeclarations(); l++)
@@ -599,26 +575,12 @@ void Semantic::CheckInterfaceMembers(TypeSymbol *containing_type, AstInterfaceDe
     {
         AstClassDeclaration *class_declaration = interface_declaration -> NestedClass(i);
 
-        if (! control.option.one_one)
-        {
-             ReportSemError(SemanticError::ONE_ONE_FEATURE,
-                            class_declaration -> LeftToken(),
-                            class_declaration -> RightToken());
-        }
-
         ProcessNestedClassName(containing_type, class_declaration);
     }
 
     for (int j = 0; j < interface_declaration -> NumNestedInterfaces(); j++)
     {
         AstInterfaceDeclaration *inner_interface_declaration = interface_declaration -> NestedInterface(j);
-
-        if (! control.option.one_one)
-        {
-            ReportSemError(SemanticError::ONE_ONE_FEATURE,
-                           inner_interface_declaration -> LeftToken(),
-                           inner_interface_declaration -> RightToken());
-        }
 
         ProcessNestedInterfaceName(containing_type, inner_interface_declaration);
     }
@@ -1172,7 +1134,16 @@ void Semantic::ProcessTypeHeaders(AstClassDeclaration *class_declaration)
                           this_type -> super,
                           (class_declaration -> super_opt ? class_declaration -> super_opt -> LeftToken()
                                                           : class_declaration -> identifier_token));
-        }
+             //
+             // Also, check whether or not the super type of this outermost type is accessible.
+             //
+             if (class_declaration -> super_opt)
+             {
+                 state_stack.Push(this_type -> semantic_environment); // we need an environment for the type check.
+                 TypeAccessCheck(class_declaration -> super_opt, this_type -> super);
+                 state_stack.Pop();
+             }
+       }
 
         for (int i = 0; i < class_declaration -> NumInterfaces(); i++)
         {
@@ -3650,12 +3621,6 @@ void Semantic::ProcessFormalParameters(BlockSymbol *block, AstMethodDeclarator *
         AstArrayType *array_type = parameter -> type -> ArrayTypeCast();
         Ast *actual_type = (array_type ? array_type -> type : parameter -> type);
 
-        if ((! control.option.one_one) && parameter -> NumParameterModifiers() > 0)
-        {
-            ReportSemError(SemanticError::ONE_ONE_FEATURE,
-                           parameter -> ParameterModifier(0) -> LeftToken(),
-                           parameter -> ParameterModifier(0) -> RightToken());
-        }
         AccessFlags access_flags = ProcessFormalModifiers(parameter);
 
         AstPrimitiveType *primitive_type = actual_type -> PrimitiveTypeCast();

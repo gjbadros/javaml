@@ -393,7 +393,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     //
@@ -818,7 +817,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -855,7 +853,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -887,7 +884,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -937,7 +933,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -980,7 +975,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -1011,7 +1005,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -1043,7 +1036,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -1096,11 +1088,8 @@ public:
 
 #ifdef TEST
     virtual void Print(LexStream &);
-    virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
-
     virtual void Unparse(LexStream &, char * directory); // special form
-    virtual void XMLUnparse(LexStream &, char * directory); // special form
+    virtual void Unparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -1157,7 +1146,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -1187,7 +1175,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -1304,7 +1291,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -1381,7 +1367,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -1429,7 +1414,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -1471,7 +1455,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -1509,7 +1492,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -1567,7 +1549,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -1612,7 +1593,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -1665,7 +1645,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -1731,7 +1710,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -1764,7 +1742,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -1824,7 +1801,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -1889,7 +1865,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -1949,7 +1924,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -2000,7 +1974,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -2125,7 +2098,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -2177,7 +2149,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -2240,7 +2211,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -2281,7 +2251,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -2319,7 +2288,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -2361,7 +2329,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -2392,7 +2359,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -2445,7 +2411,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -2508,7 +2473,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -2547,7 +2511,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -2588,7 +2551,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -2648,7 +2610,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -2688,7 +2649,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -2727,7 +2687,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -2766,7 +2725,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -2805,7 +2763,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -2844,7 +2801,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -2881,7 +2837,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -2912,7 +2867,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -2957,7 +2911,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -3027,7 +2980,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -3059,7 +3011,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -3091,7 +3042,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -3122,7 +3072,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -3153,7 +3102,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -3184,7 +3132,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -3215,7 +3162,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -3246,7 +3192,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -3277,7 +3222,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -3308,7 +3252,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -3340,7 +3283,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -3374,7 +3316,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -3406,7 +3347,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -3472,7 +3412,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -3507,7 +3446,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -3559,7 +3497,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -3637,7 +3574,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -3696,7 +3632,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -3731,7 +3666,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -3790,7 +3724,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -3849,7 +3782,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -3901,7 +3833,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -3980,7 +3911,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -4016,7 +3946,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);
@@ -4100,7 +4029,6 @@ public:
 #ifdef TEST
     virtual void Print(LexStream &);
     virtual void Unparse(Ostream &, LexStream &);
-    virtual void XMLUnparse(Ostream &, LexStream &);
 #endif
 
     virtual Ast *Clone(StoragePool *);

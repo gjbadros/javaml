@@ -37,6 +37,8 @@ SystemTable::~SystemTable()
 {
     for (int i = 0; i < directories.Length(); i++)
         delete directories[i];
+
+    delete [] base;
 }
 
 void SystemTable::Rehash()
@@ -1630,7 +1632,7 @@ bool Utf8LiteralTable::IsConstant(AstExpression *expression)
     AstBinaryExpression *binary_expression;
     AstCastExpression *cast_expression;
     AstParenthesizedExpression *parenthesized_expression;
-    if (binary_expression = expression -> BinaryExpressionCast())
+    if ((binary_expression = expression -> BinaryExpressionCast()))
     {
         int left_start_marker = expr -> Length();
 
@@ -1652,9 +1654,9 @@ bool Utf8LiteralTable::IsConstant(AstExpression *expression)
 
         expr -> Reset(left_start_marker);
     }
-    else if (cast_expression = expression -> CastExpressionCast())
+    else if ((cast_expression = expression -> CastExpressionCast()))
          return IsConstant(cast_expression -> expression);
-    else if (parenthesized_expression = expression -> ParenthesizedExpressionCast())
+    else if ((parenthesized_expression = expression -> ParenthesizedExpressionCast()))
          return IsConstant(parenthesized_expression -> expression);
 
     return false; // Not a constant String expression

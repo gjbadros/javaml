@@ -202,20 +202,20 @@ LDFLAGS=
 #SYSOBJECTS=
 #
 ## g++ definitions (RedHat 5.* - glibc)
-#CC=g++
+CC=g++
 ## use -W to see warnings (should review from time to time)
-#CCREQUIREDFLAGS=-DSTAT_POSIX -DUNIX -funsigned-char  -c -DTYPE_bool -ansi 
-#CCDEBUGFLAGS=-DTEST -g
-#CCOPTFLAGS=-O
-#CCFLAGS=$(CCREQUIREDFLAGS) $(CCDEBUGFLAGS)
+CCREQUIREDFLAGS=-DSTAT_POSIX -DUNIX -funsigned-char  -c -DTYPE_bool -ansi 
+CCDEBUGFLAGS=-DTEST -g 
+CCOPTFLAGS=-O
+CCFLAGS=$(CCREQUIREDFLAGS) $(CCDEBUGFLAGS)
 #CCFLAGS=$(CCREQUIREDFLAGS) $(CCOPTFLAGS)
-#ERASE=rm -f
-#EXECUTABLE=jikes
-#LD=g++
-#LDDEBUGFLAGS=-g
-#LDFLAGS=-L. -o$(EXECUTABLE)
-#O=o
-#SYSOBJECTS=
+ERASE=rm -f
+EXECUTABLE=jcl
+LD=g++
+LDDEBUGFLAGS=-g
+LDFLAGS=-L. -o$(EXECUTABLE)
+O=o
+SYSOBJECTS=
 
 OBJECTS= jcl.$(O) jcl_iclass.$(O) jcl_long.$(O) jcl_class.$(O) jcl_bc_op.$(O) 
 

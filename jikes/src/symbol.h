@@ -213,8 +213,8 @@ public:
     virtual ~FileSymbol()
     {
         delete [] file_name;
+        if (buffer) delete buffer;
         delete lex_stream;
-        delete buffer;
     }
 
     FileSymbol *Clone()
@@ -356,6 +356,7 @@ public:
     virtual NameSymbol *Identity() { return name_symbol; }
     char *Utf8Name() { return (char *) (name_symbol -> Utf8_literal ? name_symbol -> Utf8_literal -> value : NULL); }
     int Utf8NameLength() { return (name_symbol -> Utf8_literal ? name_symbol -> Utf8_literal -> length : 0); }
+    // This name is fully qualified, using slashes.
 
     void SetPackageName();
     // This name is fully qualified, using slashes.
@@ -1214,10 +1215,10 @@ public:
                                                name_symbol(name_symbol_),
                                                owner(NULL),
                                                initial_value(NULL),
-                                               local_variable_index_(-1),
                                                accessed_local(NULL),
                                                external_name_symbol(NULL),
                                                status(0),
+                                               local_variable_index_(-1),
                                                type_(NULL),
                                                signature_string(NULL)
     {

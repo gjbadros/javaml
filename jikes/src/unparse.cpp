@@ -43,7 +43,6 @@ void AstCompilationUnit::Unparse(LexStream& lex_stream, char *directory)
         Ostream() << "Cannot open output file " << out_file_name << "\n";
         abort();
     }
-
     Ostream os(&os_base);
     this -> Unparse(os, lex_stream);
     delete[] out_file_name;

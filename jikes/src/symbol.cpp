@@ -270,8 +270,7 @@ TypeSymbol *TypeSymbol::GetArrayType(Semantic *sem, int num_dimensions_)
         // All arrays implement the interfaces java.io.Serializable and
         // java.io.Cloneable
         //
-        if (sem -> control.option.one_one)
-            type -> AddInterface(sem -> control.Serializable());
+        type -> AddInterface(sem -> control.Serializable());
         type -> AddInterface(sem -> control.Cloneable());
         type -> base_type = this;
         type -> num_dimensions = num;
@@ -582,6 +581,8 @@ TypeSymbol::TypeSymbol(NameSymbol *name_symbol_) : semantic_environment(NULL),
 
 TypeSymbol::~TypeSymbol()
 {
+    if (read_method) delete read_method;
+    if (write_method) delete write_method;
     delete semantic_environment;
     delete local;
     delete non_local;
