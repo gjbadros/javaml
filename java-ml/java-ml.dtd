@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!-- java-ml.dtd 0.92 -->
+<!-- java-ml.dtd 0.94 -->
 <!-- Copyright (C) 2000, Greg J. Badros <gjb@cs.washington.edu> -->
 <!-- A DTD for JavaML, an XML representation of Java Source Code -->
 <!-- http://www.cs.washington.edu/homes/gjb/papers/javaml/javaml.html -->
@@ -18,6 +18,8 @@
 <!ENTITY % expr-elems "send|new|new-array|var-ref|field-access|array-ref|paren|assignment-expr|conditional-expr|binary-expr|unary-expr|cast-expr|instanceof-test|literal-number|literal-string|literal-char|literal-true|literal-false|literal-null|this|super">
 <!ENTITY % stmt-elems "block|local-variable|try|throw|if|switch|loop|do-loop|return|continue|break|synchronized|%expr-elems;">
 
+<!ELEMENT code-fragment ANY>
+<!ELEMENT result ANY>
 <!ELEMENT java-source-program (package-decl?,import*,(class|interface)+) >
 <!ATTLIST java-source-program
     name CDATA #IMPLIED
