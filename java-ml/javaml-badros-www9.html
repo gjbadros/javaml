@@ -90,50 +90,133 @@ University of Washington</h6>
       representation format for Java programs.
 
 <h3><a name="keywords">Keywords</a></h3>
-Java, source-code, XML, AST, parsing, analysis, software-engineering, AST, Jikes
+
+Java, source-code, SGML, XML, abstract syntax tree, AST, parsing,
+analysis, software-engineering, Jikes
 
 <h3><a name="introduction">1 - Introduction</a></h3>
-<pre>
-* PLs have always used char-based parsing
-** lexical analysis and parsing are well-understood, solved problems,
-    relegated to undergraduate compilers class
-*** strong theoretical foundations in grammars
-*** well-automated by tools such as Lex (Flex), Yacc (bison), CUP
-** also nice for humans to work with
-*** similar to natural languages
-*** concise
-*** works well with common tools, e.g., text editor, universal format
 
-* but there are problems
-** modern languages push the limits of parsing capabilities
-*** witness the `typename' keyword in C++
-*** extending a language means changing the grammar -- often very tricky
-** parsing is not very robust
-*** small changes in the source representation can have dramatic effects 
-    on the semantics  (perl as notorious example; extra semi-colon on
-    loop as more classical difficulty)
-** deep structure of the program is made manifest only after parsing
-*** forces language-specific parsing functionality to be duplicated in every tool that
-    wants to reason about the program beyond its lexical nature
-    (compilers, of course, but also software-engineering tools)
-*** often results in programmer's using inferior tools involving
-    lexical approaches such as grep and text-editor search and replace
-  -> change a variable named `result' to `answer', literal strings
-     containing result must be carefully avoided;  precludes the
-    possibility of complete automation (i.e., requires human
-    intervention)
+Since the first computer programming languages, a text representation
+has been used as the medium for encoding software structure and
+computation.  Over the years, techniques have been developed that
+largely mechanize the front-end of compilers which perform the lexical
+analysis and parsing necessary to uncover the structure of programming
+language constructs represented as plain text.  Tools such as Lex/Flex
+and Yacc/Bison <cite>[LexYacc]</cite> automate these uninteresting tasks
+by using well-founded concepts of regular expressions and
+grammars. Regular expressions describe how individual characters combine
+to form tokens, and the grammar enumerates how higher-level constructs
+are composed of tokens and more primitive constructs.  Together, these
+procedures convert from a sequence of characters into a data structure
+called an <em>abstract syntax tree</em> (AST) that more directly
+reflects the structure of the source program.
+
+<p>
+
+The textual representation of source code has several nice properties.
+It can be concise and is similar to natural languages thus often making
+it easy to read.  Text is a universal data format thus making source
+code is to exchange and manipulate using a wide variety of tools
+including text editors and command pipeline utilities such as
+<code>grep</code>, <code>awk</code>, and <code>wc</code>.  
+
+<p>
+
+Nevertheless, the <em>plain old source representation</em> (hereafter abbreviated
+POSR) has numerous problems.  The syntax of popular contemporary
+languages such as C++ and Perl push the limits of parsing capabilities
+(witness the <code>typename</code> keyword in C++ that is necessary to
+resolve an ambiguity in template-based code).  Constructing a front end
+for such languages is a difficult task despite the support from grammar
+tools.  Perhaps more disconcerting is that evolving the syntax of the
+language often requires manipulating a fragile grammar.  This limitation
+complicates handling an evolving language, but is a difficulty even for
+stable grammars because it disallows the possibility of user-defined
+syntactic extensions.
+
+<p>
+
+Another problem with the POSR is that parsing is not very
+robust.  A small change in the source code can have a dramatic effect on
+the resulting AST and thus the semantics of the computation.  For
+example, a single extraneous semicolon can change a looping block into
+an ordinary one and result in an infinite loop:
+
+<code>
+<pre>
+  int i = 10;
+  while (i > 0);
+    {
+    // ...
+    --i;
+    }
+</pre>
+</code>
+
+Other, more-concise languages suffer from far more disastrous semantic
+changes stemming from small syntactic errors (Perl is the infamous
+example).
+
+<p>
+
+Probably the most disturbing problem with the POSR is that the structure 
+      of the program is made manifest only after parsing.  This
+      shortcoming forces language-specific parsing functionality to be
+      duplicated in every tool that needs to reason about the program
+      beyond its lexical nature.  Compilers, by necessity, must work
+      with the AST, but numerous other software-engineering tools
+      would perform better with access to the structured representation
+      of the source code.  Unfortunately, many software-engineering
+      tools do not embed a parser and thus are limited to lexical
+      reasoning.
+
+<p>
+
+There are several reasons why embedding a parser is avoided in many
+tools.  As mentioned previously, building a complete front-end is
+challenging for syntactically-complex languages.  Though re-using
+existing infrastructure (e.g., the grammar definition) simplifies
+things, the resulting AST is not always intuitive to work with.  A
+typical AST reflects quirky artifacts of the grammar rather than
+representing the programming-level constructs directly.  Additionally,
+embedding the front-end of a compiler can deemed overkill when targeting
+a simple analysis that can do "good enough" with lexical information.
+Finally, using a parser in a tool necessarily targets that tool to a
+specific language, thus reducing its applicability and generality.
+
+<p>
+
+The end result of these complications is that developers often use
+simple, lexically-oriented tools such as <code>grep</code> or search and
+replace within an editor.  This approach sacrifices accuracy:
+imagine wanting to rename a local variable from <code>result</code> to
+<code>answer</code>.  With simple search and replace, all occurrences of
+the word will be changed, even if they refer to characters inside
+comments, literal strings, or an unrelated instance field.
+
+<p>
+
+An alternate route taken by some developers is that they rely instead on
+a fixed set of tools provided within an integrated development
+environment (IDE) that has access to the structure of their source
+program via an integrated language-specific parser.  This approach
+sacrifies flexibility.  IDEs generally provide only a limited set of
+capabilities and extending those is hard.  Additionally, analyses and
+transformation on source code are often hard to automate or perform in
+batch using exisiting interactive environments.  Some more advanced
+IDEs, such as IBM VisualAge for C++ <cite>[Montana]</cite>, expose an
+application programming interface to the representation of the program.
+Though an improvement, such a technique still suffers from an inability
+to separate simple tools from a complex environment and additionally
+creates a dependency on proprietary technology that may be undesirable.
+
+<p>
 *** no canonical deep representation of source program, so different
     tools either have to rely on reusing the same grammar, or have
     gratuitous differences in their view of the program
   -> changes to deep representation must be swizzled back into the
      universal character-based representation before being further
     munged
-** IDEs can get around some of these issues by providing tools and
-    infrastructure to support querying and transforming the deep
-    structure, but it's only a partial solution
-*** fixed, often limited, capabilities
-*** often hard to automate, batch process, use externally
-*** tied to a specific IDE, reliant on proprietary technology
 
 * XML is a solution
 ** XML's capability to represent arbitrary nested hierarchy can
@@ -313,16 +396,16 @@ to nest elements or to use attributes.  In the above example, we could
 <ul>
 
 <li> Attributes/value pairs are unordered, while nested children have a
-	specific order;
+specific order;
 
 <li> values for attributes may contain only character data, and may not
-	include other markup, while nested children can arbitrarily nest 
-	further;
+include other markup, while nested children can arbitrarily nest
+further;
 
 <li> only one value for an attribute can be given, while multiple
-	elements of the same class can be siblings (e.g., we could have
-	multiple <code>to</code> elements contained by the
-	<code>head</code> with only a simple change to the DTD).
+elements of the same class can be included by a parent element (e.g., we
+could have multiple <code>to</code> elements contained by the
+<code>head</code> with only a simple change to the DTD).
 
 </ul>
 
@@ -337,17 +420,21 @@ the document.
 <!--GJB:FIXME:: lots of cite s here--> 
 
 XML, in part due to its SGML heritage, is very well supported by tools
-such as Emacs editing modes, structure-based editors, validation
-utilities, querying systems, transformation and style languages, and
-much more.  Many other W3C recommendations inter-relate to XML including
-Cascading Style Sheets <cite>[CSS2]</cite>, XSL (Extensible Stylesheet
-Language) <cite>[XSL]</cite> and XSLT (XSL for Transformations)
+such as Emacs editing modes, structure-based editors, DTD parsers and
+editors, validation utilities, querying systems, transformation and
+style languages, and much more.  Many other W3C recommendations
+inter-relate to XML including Cascading Style Sheets
+<cite>[CSS2]</cite>, XSL (Extensible Stylesheet Language)
+<cite>[XSL]</cite> and XSLT (XSL for Transformations)
 <cite>[XSLT]</cite>, XPath <cite>[XPath]</cite>, and DOM (Document
 Object Model) <cite>[DOM]</cite>.
 
 <p><span class="index"><a href="#top">[top]</a>
 
 <h3><a name="javaml">3 - JavaML: The Java Markup Language</a></h3>
+
+
+
 <pre>
 give the DTD -- see appendix 1
 
@@ -463,10 +550,10 @@ The best is yet to come.  XML tools are improving all the time.
 
 <h3><a name="acknowledgments">Acknowledgments</a></h3> 
 
-I thank Stefan Bjarni Sigurdsson, Zack Ives, and Craig Kaplan for their
-helpful discussion. Thanks to IBM for constructing the
-Jikes compiler framework, and for making it publically available, and
-thanks to Mike Ernst for helpful pointers on its use.
+I thank Miguel Figueroa, Zack Ives, Craig Kaplan, Todd Millstein, Stefan
+Bjarni Sigurdsson, for their helpful discussion. Thanks to IBM for
+constructing the Jikes compiler framework, and for making it publically
+available, and thanks to Mike Ernst for helpful pointers on its use.
 
 <p><span class="index"><a href="#top">[top]</a></span>
 
@@ -646,6 +733,7 @@ thanks to Mike Ernst for helpful pointers on its use.
 
 
 <h3><a name="set.java">Appendix 2a - Extended Example, <strong>Set.java</strong></a></h3>
+<small>
 <pre>
 // $Id$
 //
@@ -717,11 +805,13 @@ class Set {
   private Hashtable hash;
 }
 </pre>
+</small>
 
 <p><span class="index"><a href="#top">[top]</a></span>
 
 
 <h3><a name="set.java.xml">Appendix 2b - Extended Example, <strong>Set.java.xml</strong></a></h3>
+<small>
 <pre>
 &lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;!DOCTYPE java-source-program SYSTEM "java-ml.dtd"&gt;
@@ -940,6 +1030,7 @@ class Set {
   &lt;/class&gt;
 &lt;/java-source-program&gt;
 </pre>
+</small>
 
 
 <p><span class="index"><a href="#top">[top]</a></span>
