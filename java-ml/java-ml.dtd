@@ -2,7 +2,8 @@
 <!-- java-ml.dtd 0.9 -->
 <!-- Copyright (C) 2000, Greg J. Badros <gjb@cs.washington.edu> -->
 <!-- A DTD for JavaML, an XML representation of Java Source Code -->
-<!-- See: http://www.cs.washington.edu/homes/gjb/papers/javaml/javaml.html -->
+<!-- http://www.cs.washington.edu/homes/gjb/papers/javaml/javaml.html -->
+
 <!ENTITY % visibility-attribute "visibility (public|private|protected) #IMPLIED">
 <!ENTITY % interface-visibility-attribute "visibility (public) #IMPLIED">
 <!ENTITY % kind-attribute "kind (integer|long|real|double) #IMPLIED">
@@ -33,7 +34,7 @@
 <!ELEMENT superclass EMPTY>
 <!ATTLIST superclass
     class CDATA #REQUIRED>
-<!ELEMENT interface ((extend)*, (method|field)*) >
+<!ELEMENT interface (extend*, (method|field)*) >
 <!ATTLIST interface
     name CDATA #REQUIRED
     %interface-visibility-attribute;>
