@@ -1224,7 +1224,7 @@ void AstReturnStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
     // just drop the return tag if there is nothing to return --11/12/99 gjb
     if (expression_opt) {
       xml_open(os,"return");
-      expression_opt -> XMLUnparse(os, lex_stream);
+      xml_unparse_maybe_var_ref(os,lex_stream,expression_opt);
       xml_close(os,"return",true);
     }
     if (Ast::debug_unparse) os << "/*:AstReturnStatement#" << this-> id << "*/";
@@ -1482,7 +1482,7 @@ void AstMethodInvocation::XMLUnparse(Ostream& os, LexStream& lex_stream)
     if (Ast::debug_unparse) os << "/*AstMethodInvocation:#" << this-> id << "*/";
     xml_open(os,"send");
     xml_open(os,"target");
-    method -> XMLUnparse(os, lex_stream);
+    xml_unparse_maybe_var_ref(os,lex_stream,method);
     xml_close(os,"target",false);
 #ifdef SHORTCUT_XML_CLOSE
     if (NumArguments() > 0) {
