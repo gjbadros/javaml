@@ -310,15 +310,15 @@ xml_name_string(LexStream &ls, LexStream::TokenIndex i)
   if (strcmp(sz,"<") == 0) {
     // GJB:FIXME:: this is an ugly hack;
     // does XML really disallow this? --11/13/99 gjb
-    nm << "lt";
+    nm << "&lt;";
   } else if (strcmp(sz,"<=") == 0) {
-    nm << "le";
+    nm << "&le;";
   } else if (strcmp(sz,"&&") == 0) {
-    nm << "logand";
+    nm << "&amp;&amp;";
   } else if (strcmp(sz,"&") == 0) {
-    nm << "bitand";
+    nm << "&amp;";
   } else if (strcmp(sz,"<<") == 0) { 
-    nm << "left-shift";
+    nm << "&lt;&lt;";
   } else {
     nm << ls.NameString(i);
   }
@@ -465,6 +465,8 @@ void AstBlock::XMLUnparse(Ostream& os, LexStream& lex_stream)
     // at the start of method bodies.
     if ( !no_braces && !fLastWasSwitchBlock) {
       if (!((NumStatements() == 1 && dynamic_cast<AstBlock *>(Statement(0))) ||
+            (NumStatements() == 2 && dynamic_cast<AstBlock *>(Statement(0)) &&
+             dynamic_cast<AstReturnStatement *>(Statement(1))) ||
             (NumStatements() == 2 && dynamic_cast<AstBlock *>(Statement(1)) &&
              (dynamic_cast<AstThisCall*>(Statement(0)) || dynamic_cast<AstSuperCall*>(Statement(0)))))) {
         char szNum[20];
@@ -477,10 +479,6 @@ void AstBlock::XMLUnparse(Ostream& os, LexStream& lex_stream)
                    NULL);
         xml_nl(os);
         fDidOpenStatements = true;
-      } else {
-#if 0
-        xml_output(os, "extra-statements", XML_CLOSE);
-#endif
       }
     }
     fLastWasMethodDeclarator = false;
@@ -529,7 +527,7 @@ void AstArrayType::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstSimpleName::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstSimpleName:#" << this-> id << "*/";
-#if 0
+#if 0 /* GJB:FIXME:: are these ever var-refs? */
     xml_output(os,"var-ref",
                "name",xml_name_string(lex_stream,identifier_token),
                XML_CLOSE);
@@ -598,14 +596,8 @@ void AstEmptyDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstClassBody::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstClassBody:#" << this-> id << "*/";
-#ifdef XML_LONG_WINDED
-    xml_open(os,"class-body");
-#endif
     for (int k = 0; k < this -> NumClassBodyDeclarations(); k++)
 	this -> ClassBodyDeclaration(k) -> XMLUnparse(os, lex_stream);
-#ifdef XML_LONG_WINDED
-    xml_close(os,"class-body",true);
-#endif
     if (Ast::debug_unparse) os << "/*:AstClassBody#" << this-> id << "*/";
 }
 
@@ -685,7 +677,7 @@ void AstClassDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
 	for (int j = 0; j < NumInterfaces(); j++)
 	  {
             xml_output(os,"implement",
-                       "class",SzFromUnparse(lex_stream, this->Interface(j)),
+                       "interface",SzFromUnparse(lex_stream, this->Interface(j)),
                        XML_CLOSE);
             xml_nl(os);
 	  }
@@ -747,7 +739,7 @@ void AstFieldDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
     bool fVolatile = false;
     bool fTransient = false;
     char *szVisibility = NULL;
-#if 0
+#if 1 /* GJB:FIXME:: Can fields be Abstract, native, or synchronized? */
     bool fAbstract = false;
     bool fSynchronized = false;
     bool fNative = false;
@@ -764,7 +756,7 @@ void AstFieldDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
         fVolatile = true; break;
       case Ast::TRANSIENT: /* fields */
         fTransient = true; break;
-#if 0
+#if 1 /* GJB:FIXME:: Can fields be Abstract, native, or synchronized? */
       case Ast::ABSTRACT: /* class/methods */
         fAbstract = true; break;
       case Ast::NATIVE:  /* methods */
@@ -813,7 +805,7 @@ void AstFormalParameter::XMLUnparse(Ostream& os, LexStream& lex_stream)
     if (Ast::debug_unparse) os << "/*AstFormalParameter:#" << this-> id << "*/";
 
     bool fFinal = false;
-#if 0
+#if 1 /* GJB:FIXME:: which of these are allowed for FormalParameters? */
     bool fAbstract = false;
     bool fStatic = false;
     bool fSynchronized = false;
@@ -828,7 +820,7 @@ void AstFormalParameter::XMLUnparse(Ostream& os, LexStream& lex_stream)
       switch (ParameterModifier(i)->kind) {
       case Ast::FINAL: /* class/methods/fields */
         fFinal = true; break;
-#if 0
+#if 1 /* GJB:FIXME:: which of these are allowed for FormalParameters? */
       case Ast::ABSTRACT: /* class/methods */
         fAbstract = true; break;
       case Ast::STATIC: /* methods/fields */
@@ -1202,7 +1194,7 @@ void AstLocalVariableDeclarationStatement::XMLUnparse(Ostream& os, LexStream& le
     bool fVolatile = false;
     bool fTransient = false;
     char *szVisibility = NULL;
-#if 0
+#if 1 /* GJB:FIXME:: Which of these are allowed for VariableDeclarations? */
     bool fAbstract = false;
     bool fSynchronized = false;
     bool fNative = false;
@@ -1219,7 +1211,7 @@ void AstLocalVariableDeclarationStatement::XMLUnparse(Ostream& os, LexStream& le
         fVolatile = true; break;
       case Ast::TRANSIENT: /* fields */
         fTransient = true; break;
-#if 0
+#if 1 /* GJB:FIXME:: Which of these are allowed for VariableDeclarations? */
       case Ast::ABSTRACT: /* class/methods */
         fAbstract = true; break;
       case Ast::NATIVE:  /* methods */
@@ -1293,9 +1285,9 @@ void AstIfStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstEmptyStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstEmptyStatement:#" << this-> id << "*/";
-#if 0 /* we do not need to print the semicolon */
-    os << lex_stream.NameString(semicolon_token);
-    os << "\n";
+#if 0 /* GJB:FIXME:: do we need a <statements/> here? */
+    xml_output(os,"statements",XML_CLOSE);
+    xml_nl(os);
 #endif
     if (Ast::debug_unparse) os << "/*:AstEmptyStatement#" << this-> id << "*/";
 }
@@ -1643,7 +1635,7 @@ void AstClassInstanceCreationExpression::XMLUnparse(Ostream& os, LexStream& lex_
       xml_nl(os);
       if (0 /* class_type is an interface GJB:FIXME:: how do I get at that? */) {
         xml_output(os,"implement",
-                   "class",SzFromUnparse(lex_stream, class_type->type),
+                   "interface",SzFromUnparse(lex_stream, class_type->type),
                    XML_CLOSE);
       } else {
         /* GJB:FIXME:: this always get sused, even when the class_type is
