@@ -150,7 +150,10 @@
   <xsl:for-each select="*">
     <xsl:apply-templates select="."/>
     <xsl:choose>
-      <xsl:when test="if|true-case|false-case|loop|statements|local-variable"/>
+      <xsl:when test="if|true-case|false-case|loop|statements"/>
+      <xsl:when test="following-sibling::local-variable[@continued and position()=1]">
+        <xsl:value-of select="following-sibling"/>
+      </xsl:when>
       <xsl:otherwise>
         <xsl:text>;&#xA;</xsl:text>
       </xsl:otherwise>
@@ -222,7 +225,7 @@
 
 <xsl:template match="local-variable" name="local-variable-or-field">
   <xsl:choose>
-    <xsl:when test="not(@FIXMEGJB-continued)">
+    <xsl:when test="not(@continued)">
      <xsl:if test="@visibility">
       <xsl:value-of select="@visibility"/>
       <xsl:text> </xsl:text>
