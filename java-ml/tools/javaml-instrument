@@ -1,0 +1,47 @@
+#!/usr/bin/perl -w
+use XML::DOM;
+use IO::Handle;
+
+my $filename = shift @ARGV;
+
+my $parser = new XML::DOM::Parser;
+my $doc = $parser->parsefile ($filename);
+
+my $nodes = $doc->getElementsByTagName("method");
+for (my $i = 0; $i < $nodes->getLength(); $i++) {
+  my $method = $nodes->item($i);
+  my $method_blocks = 
+    $method->getElementsByTagName("block");
+  my $method_block = $method_blocks->item(0);
+  my $start_instrumentation 
+    = SendMessageBlock($doc,"Tracer","StartMethod",
+		       $method->getAttribute("name"));
+  $method_block->insertBefore($start_instrumentation,
+			      $method_block->getFirstChild());
+  my $exit_instrumentation 
+    = SendMessageBlock($doc,"Tracer","ExitMethod",
+		       $method->getAttribute("name"));
+  $method_block->appendChild($exit_instrumentation);
+}
+print $doc->toString;
+
+sub SendMessageBlock {
+  my ($doc,$target_var,$method_name,$data) = (@_);
+  # insert, e.g:  Tracer.StartMethod("paint");
+ return parseXMLFragment($doc,<<"__END_FRAGMENT__"
+<send message="$method_name">
+  <target><var-ref name="$target_var"/></target>
+  <arguments><literal-string value="$data"/></arguments>
+</send>  
+__END_FRAGMENT__
+ );
+}
+
+sub parseXMLFragment {
+  my ($doc,$code) = (@_);
+  my $newdoc = $parser->parse($code);
+  my $subtree = $newdoc->getDocumentElement();
+  $newdoc->removeChild($subtree);
+  $subtree->setOwnerDocument($doc);
+  return $subtree;
+}
