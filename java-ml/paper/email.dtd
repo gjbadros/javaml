@@ -1,0 +1,10 @@
+<!-- email DTD -->
+<!ELEMENT email (head,body)>
+<!ELEMENT head (to,from,subject?)>
+<!ELEMENT to (#PCDATA)>
+<!ELEMENT from (#PCDATA)>
+<!ELEMENT subject (#PCDATA)>
+<!ELEMENT body (#PCDATA)>
+<!ATTLIST body
+    encoding (ascii|mime) #REQUIRED
+    encrypted (yes|no) #IMPLIED>

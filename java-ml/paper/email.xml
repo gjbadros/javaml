@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE email SYSTEM "email.dtd">
+<email>
+  <head>
+    <to>Mom</to>
+    <from>Greg</from>
+    <subject>My trip</subject>
+  </head>
+  <body encoding="ascii">Weather is terrific</body>
+</email>
