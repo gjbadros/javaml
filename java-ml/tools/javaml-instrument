@@ -8,20 +8,23 @@ my $parser = new XML::DOM::Parser;
 my $doc = $parser->parsefile ($filename);
 
 my $nodes = $doc->getElementsByTagName("method");
+
 for (my $i = 0; $i < $nodes->getLength(); $i++) {
   my $method = $nodes->item($i);
-  my $method_blocks = 
-    $method->getElementsByTagName("block");
-  my $method_block = $method_blocks->item(0);
-  my $start_instrumentation 
+  my $block = $method->
+    getElementsByTagName("block")->item(0);
+  my $name = $method->getAttribute("name");
+
+  my $start_code
     = SendMessageBlock($doc,"Tracer","StartMethod",
-		       $method->getAttribute("name"));
-  $method_block->insertBefore($start_instrumentation,
-			      $method_block->getFirstChild());
-  my $exit_instrumentation 
+		       $name);
+  my $exit_code 
     = SendMessageBlock($doc,"Tracer","ExitMethod",
-		       $method->getAttribute("name"));
-  $method_block->appendChild($exit_instrumentation);
+		       $name);
+
+  $block->insertBefore($start_code,
+		       $block->getFirstChild());
+  $block->appendChild($exit_code);
 }
 print $doc->toString;
 
@@ -31,7 +34,9 @@ sub SendMessageBlock {
  return parseXMLFragment($doc,<<"__END_FRAGMENT__"
 <send message="$method_name">
   <target><var-ref name="$target_var"/></target>
-  <arguments><literal-string value="$data"/></arguments>
+  <arguments>
+    <literal-string value="$data"/>
+  </arguments>
 </send>  
 __END_FRAGMENT__
  );
