@@ -34,7 +34,7 @@
     %mod-static
     %mod-volatile
     %mod-transient>
-<!ELEMENT constructor (comment?,formal-arguments,throws?,(super-call|this-call)?,statements)>
+<!ELEMENT constructor (comment?,formal-arguments,throws*,(super-call|this-call)?,statements)>
 <!ATTLIST constructor
     name CDATA #REQUIRED
     id ID #REQUIRED
@@ -45,7 +45,7 @@
     %mod-volatile
     %mod-transient
     %mod-native>
-<!ELEMENT method (comment?,formal-arguments,throws?,statements?)>
+<!ELEMENT method (comment?,formal-arguments,throws*,statements?)>
 <!ATTLIST method 
     name CDATA #REQUIRED
     id ID #REQUIRED
