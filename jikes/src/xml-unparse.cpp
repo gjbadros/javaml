@@ -18,8 +18,7 @@
 #define XML_CLOSE ((char *) 1)
 
 /* Output any prefix header for the converted XML file */
-void
-xml_prefix(Ostream &xo)
+void xml_prefix(Ostream &xo)
 {
   xo << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
      << "<!DOCTYPE java-source-program SYSTEM \"../java-ml.dtd\">\n\n"
@@ -27,8 +26,7 @@ xml_prefix(Ostream &xo)
 }
 
 /* Output any suffix for the converted XML file */
-void
-xml_suffix(Ostream &xo)
+void xml_suffix(Ostream &xo)
 {
   xo << "</java-source-program>\n";
 }
@@ -38,10 +36,28 @@ static char *szIdSeparator = ".";
 // GJB:FIXME:: convert _ to -
 
 char *
+SzNewConvertingUnderscores(const char *sz)
+{
+  char *szNew = new char[strlen(sz)+1];
+  char *pch = szNew;
+  while (*sz) {
+    if (*sz == '_') *pch = '-';
+    else *pch = *sz;
+    ++sz;
+    ++pch;
+  }
+  *pch = '\0';
+  return szNew;
+}
+
+
+char *
 SzIdFromMethod(long id, const char *szClassName,const char *szMethodName)
 {
   ostrstream xo;
-  xo << szClassName << szIdSeparator << szMethodName << szIdSeparator << id << ends;
+  char *szConverted = SzNewConvertingUnderscores(szMethodName);
+  xo << szClassName << szIdSeparator << szConverted << szIdSeparator << id << ends;
+  delete [] szConverted;
   return xo.str();
 }
 
@@ -49,15 +65,20 @@ char *
 SzIdFromConstructor(long id, const char *szClassName,const char *szConstructorName)
 {
   ostrstream xo;
-  xo << szClassName << szIdSeparator << szConstructorName << szIdSeparator << id << ends;
+  char *szConverted = SzNewConvertingUnderscores(szConstructorName);
+  xo << szClassName << szIdSeparator << szConverted << szIdSeparator << id << ends;
+  delete [] szConverted;
   return xo.str();
 }
 
 char *
-SzIdFromFormalArgument(long id, const char *szClassName,const char *szMethodName,const char *szFormalArg)
+SzIdFromFormalArgument(long id, const char *szClassName,
+                       const char *szMethodName, const char *szFormalArg)
 {
   ostrstream xo;
-  xo << SzIdFromMethod(id,szClassName,szMethodName) << "-" << szFormalArg << ends;
+  char *szConverted = SzNewConvertingUnderscores(szFormalArg);
+  xo << SzIdFromMethod(id,szClassName,szMethodName) << "-" << szConverted << ends;
+  delete [] szConverted;
   return xo.str();
 }
 
@@ -271,6 +292,7 @@ void AstPackageDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
     xml_output(os,"package-decl",
                "name",SzFromUnparse(lex_stream,name),
                NULL);
+    xml_nl(os);
     if (Ast::debug_unparse) os << "/*:AstPackageDeclaration#" << this-> id << "*/";
 }
 
@@ -458,20 +480,16 @@ void AstVariableDeclaratorId::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstVariableDeclarator::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstVariableDeclarator:#" << this-> id << "*/";
-    variable_declarator_name -> XMLUnparse(os, lex_stream);
+    // name is handled in AstFieldDeclaration, AstFormalParameter, AstLocalVariableDeclarationStatement
+    //    variable_declarator_name -> XMLUnparse(os, lex_stream); 
     if (variable_initializer_opt)
-	{
-	    os << " = ";
-	    variable_initializer_opt -> XMLUnparse(os, lex_stream);
-	}
+      variable_initializer_opt -> XMLUnparse(os, lex_stream);
     if (Ast::debug_unparse) os << "/*:AstVariableDeclarator#" << this-> id << "*/";
 }
 
 void AstFieldDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstFieldDeclaration:#" << this-> id << "*/";
-
-
 
     bool fFinal = false;
     bool fStatic = false;
@@ -523,7 +541,7 @@ void AstFieldDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
     char *szType = SzFromUnparse(lex_stream, type);
     for (int k = 0; k < this -> NumVariableDeclarators(); k++)
       {
-        char *szName = SzFromUnparse(lex_stream,VariableDeclarator(k));
+        char *szName = SzFromUnparse(lex_stream,VariableDeclarator(k)->variable_declarator_name);
         /* GJB:FIXME:: use two elements, instance-field and class-field, instead? */
         xml_output(os,"field",
                    "type",szType,
@@ -534,7 +552,8 @@ void AstFieldDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
                    "volatile",SzOrNullFromF(fVolatile),
                    "transient",SzOrNullFromF(fTransient),
                    NULL);
-        xml_nl(os);
+        xml_unparse_maybe_var_ref(os,lex_stream,VariableDeclarator(k));
+        xml_close(os,"field",true);
       }
     if (Ast::debug_unparse) os << "/*:AstFieldDeclaration#" << this-> id << "*/";
 }
@@ -590,7 +609,7 @@ void AstFormalParameter::XMLUnparse(Ostream& os, LexStream& lex_stream)
     }
 
     char *szType = SzFromUnparse(lex_stream, type);
-    char *szName = SzFromUnparse(lex_stream,formal_declarator);
+    char *szName = SzFromUnparse(lex_stream,formal_declarator->variable_declarator_name);
     // GJB:FIXME:: these need to be gotten from the AST somehow
     char *szClassName = "FIXME";
     char *szMethodName = "FIXME";
@@ -735,7 +754,7 @@ void AstThisCall::XMLUnparse(Ostream& os, LexStream& lex_stream)
     xml_open(os,"arguments");
     for (int i = 0; i < this -> NumArguments(); i++)
       {
-	this -> Argument(i) -> XMLUnparse(os, lex_stream);
+        xml_unparse_maybe_var_ref(os,lex_stream,Argument(i));
       }
     xml_close(os,"arguments");
     xml_close(os,"this-call");
@@ -937,7 +956,7 @@ void AstLocalVariableDeclarationStatement::XMLUnparse(Ostream& os, LexStream& le
     char *szType = SzFromUnparse(lex_stream, type);
     for (int k = 0; k < this -> NumVariableDeclarators(); k++)
       {
-        char *szName = SzFromUnparse(lex_stream,VariableDeclarator(k));
+        char *szName = SzFromUnparse(lex_stream,VariableDeclarator(k)->variable_declarator_name);
         /* GJB:FIXME:: use two elements, instance-field and class-field, instead? */
         xml_output(os,"local-variable",
                    "type",szType,
@@ -948,7 +967,8 @@ void AstLocalVariableDeclarationStatement::XMLUnparse(Ostream& os, LexStream& le
                    "volatile",SzOrNullFromF(fVolatile),
                    "transient",SzOrNullFromF(fTransient),
                    NULL);
-        xml_nl(os);
+        xml_unparse_maybe_var_ref(os,lex_stream,VariableDeclarator(k));
+        xml_close(os,"local-variable",true);
       }
     
     if (Ast::debug_unparse) os << "/*:AstLocalVariableDeclarationStatement#" << this-> id << "*/";
@@ -1043,59 +1063,53 @@ void AstSwitchStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstWhileStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstWhileStatement:#" << this-> id << "*/";
-    os << lex_stream.NameString(while_token);
     // What about Label_opt?
-    os << " ";
-    AstParenthesizedExpression *parenth = expression -> ParenthesizedExpressionCast();
-    if (!parenth)
-	os << "(";
-    expression -> XMLUnparse(os, lex_stream);
-    if (!parenth)
-	os << ")";
-    os << "\n";
+    xml_output(os,"loop",
+               "kind","while",
+               NULL);
+    xml_open(os,"test");
+    xml_unparse_maybe_var_ref(os,lex_stream,expression);
+    xml_close(os,"test");
     statement -> XMLUnparse(os, lex_stream);
+    xml_close(os,"loop",true);
     if (Ast::debug_unparse) os << "/*:AstWhileStatement#" << this-> id << "*/";
 }
 
 void AstDoStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstDoStatement:#" << this-> id << "*/";
-    os << lex_stream.NameString(do_token);
-    os << "\n";
+    xml_open(os,"do-loop");
     statement -> XMLUnparse(os, lex_stream);
-    os << lex_stream.NameString(while_token);
-    AstParenthesizedExpression *parenth = expression -> ParenthesizedExpressionCast();
-    if (!parenth)
-	os << "(";
-    expression -> XMLUnparse(os, lex_stream);
-    if (!parenth)
-	os << ")";
-    os << lex_stream.NameString(semicolon_token);
-    os << "\n";
+    xml_open(os,"test");
+    xml_unparse_maybe_var_ref(os,lex_stream,expression);
+    xml_close(os,"test");
+    xml_close(os,"do-loop",true);
     if (Ast::debug_unparse) os << "/*:AstDoStatement#" << this-> id << "*/";
 }
 
 void AstForStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstForStatement:#" << this-> id << "*/";
-    os << lex_stream.NameString(for_token);
-    os << " (";
-    for (int i = 0; i < this -> NumForInitStatements(); i++)
-      {
-	if (i>0) os << ", ";
-	this -> ForInitStatement(i) -> XMLUnparse(os, lex_stream);
-      }
-    os << "; ";
-    if (end_expression_opt)
-	end_expression_opt -> XMLUnparse(os, lex_stream);
-    os << "; ";
-    for (int k = 0; k < this -> NumForUpdateStatements(); k++)
-      {
-	if (k>0) os << ", ";
-	this -> ForUpdateStatement(k) -> XMLUnparse(os, lex_stream);
-      }
-    os << ")\n";
+    xml_output(os,"loop",
+               "kind","for",
+               NULL);
+    for (int i = 0; i < this -> NumForInitStatements(); i++) {
+      xml_open(os,"init");
+      xml_unparse_maybe_var_ref(os,lex_stream,ForInitStatement(i));
+      xml_close(os,"init",true);
+    }
+    if (end_expression_opt) {
+      xml_open(os,"test");
+      xml_unparse_maybe_var_ref(os,lex_stream,end_expression_opt);
+      xml_close(os,"test",true);
+    }
+    for (int k = 0; k < this -> NumForUpdateStatements(); k++) {
+      xml_open(os,"update");
+      xml_unparse_maybe_var_ref(os,lex_stream, ForUpdateStatement(k));
+      xml_close(os,"update",true);
+    }
     statement -> XMLUnparse(os, lex_stream);
+    xml_close(os,"loop",true);
     if (Ast::debug_unparse) os << "/*:AstForStatement#" << this-> id << "*/";
 }
 
@@ -1494,7 +1508,7 @@ void AstAssignmentExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
     os << lex_stream.NameString(assignment_operator_token);
     // os << " ";
     expression -> XMLUnparse(os, lex_stream);
-    xml_close(os,"assignment-expr",false);
+    xml_close(os,"assignment-expr",true);
     if (Ast::debug_unparse) os << "/*:AstAssignmentExpression#" << this-> id << "*/";
 }
 #endif
