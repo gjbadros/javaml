@@ -18,6 +18,7 @@
 \usepackage[english]{babel}
 \usepackage{floatflt}
 \usepackage{multicol}
+%\usepackage{hyperref}
 
 \setlength\topmargin{-0.25in} \setlength\oddsidemargin{-0.25in}
 \setlength\textheight{9.0in} \setlength\textwidth{7.0in}
@@ -30,6 +31,7 @@
 \bibliographystyle{abbrv}
 \newcommand{\smtexttt}[1]{{\small\texttt{#1}}}
 \newcommand{\ignore}[1]{}
+\newcommand{\href}[2]{#2}
 \newenvironment{smverbatim}{\small \begin{verbatim}}{\end{verbatim}}
 \newenvironment{shellcommand}{\begin{verbatim}}{\end{verbatim}}
 \newenvironment{shelloutput}{\begin{verbatim}}{\end{verbatim}}
@@ -110,8 +112,9 @@ Another problem with the classical representation is that parsing is not
 very robust.  A small change in the source code can have a dramatic
 effect on the resulting AST and, thus, the semantics of the computation.
 For example, a single extraneous semicolon can change a looping block
-into an ordinary one and result in an infinite loop:
-
+into an ordinary one and result in an infinite loop.
+%% IGNORE
+\ignore{
 {\small
 \begin{verbatim}
   int i = 10;
@@ -120,8 +123,9 @@ into an ordinary one and result in an infinite loop:
   }
 \end{verbatim}
 }
-
-\noindent Other, more concise, languages may suffer from far more dangerous
+%% END-IGNORE
+}
+Other, more concise, languages may suffer from far more dangerous
 semantic changes stemming from small syntactic errors (the Perl language
 is the infamous example).
 
@@ -449,7 +453,7 @@ import java.awt.*;
 public class FirstApplet 
                    extends Applet {
   public void paint(Graphics g) {
-    g.drawString("Hello World", 25, 50);
+    g.drawString("FirstApplet", 25, 50);
   }
 }
 \end{verbatim}
@@ -517,7 +521,7 @@ to:
           <name>g</name>
         </formal-arguments>) 
     <statements>{
-    g.drawString("Hello World", 25, 50);
+    g.drawString("FirstApplet", 25, 50);
   } </statements>
  </method-definition>
 }
@@ -578,7 +582,7 @@ program in JavaML as show in figure~\ref{fig-firstapplet-javaml}.
         <send message="drawString">
           <target><var-ref name="g" idref="frmarg-13"/></target>
             <arguments>
-              <literal-string length="11">Hello World</literal-string>
+              <literal-string length="11">FirstApplet</literal-string>
               <literal-number kind="integer" value="25"/>
               <literal-number kind="integer" value="50"/>
             </arguments>
@@ -596,34 +600,22 @@ In the above document, concepts such as methods, superclasses, message
 sends, and literal numbers are all directly represented in the elements
 and attributes of the representation.  The representation reflects the
 structure of the programming language in the nesting of the elements.
-For example, the literal string "Hello World" is a part of the message
+For example, the literal string "FirstApplet" is a part of the message
 send, thus the \smtexttt{literal-string} element is nested inside the
 \smtexttt{send} element.  This nesting is even more apparent when
 presented visually as in figure~\ref{fig-treeview}. See
  the author's JavaML web page~\cite{Badros-javaml}
 for further examples.
 
-\ignore{
 \begin{figure*}[p]
 \begin{centering}
-\includegraphics[height=3.25in]{treeview1.eps}
-\hspace*{.5cm}
-\includegraphics[height=3.25in]{treeview2.eps}
-\caption{Tree views of the JavaML representation 
-of the \smtexttt{FirstApplet} example as displayed by the 
-XML Notepad utility~\cite{XMLNotepad}.  The left
-screenshot has all nodes but the \smtexttt{block} element expanded,
-and the right screenshot has earlier nodes collapsed to make room
-for the full expansion of that element.
-\label{fig-treeview}}
-\end{centering}
-\end{figure*}
-}
-\begin{figure*}[p]
-\begin{centering}
+\includegraphics[height=3.4in]{treeview-tall.eps}
+\hspace*{.5in}
 \includegraphics[height=3.4in]{xml-spy-treeview.eps}
 \caption{Tree views of the JavaML representation 
-of the \smtexttt{FirstApplet} example as displayed by XML Spy~\cite{XMLSpy}.
+of the \smtexttt{FirstApplet} example as displayed by the 
+XML Notepad utility~\cite{XMLNotepad} (on the left) and XML Spy~\cite{XMLSpy} (on the 
+right).
 \label{fig-treeview}}
 \end{centering}
 \end{figure*}
@@ -772,8 +764,8 @@ groups:
 which contains \smtexttt{sgcount},
 \smtexttt{sgrpg}, \smtexttt{sggrep}, and more;
 
-\item James Clark's XSLT~\cite{XSLT} implementation, XT~\cite{Clark-XT}, 
-      and XML processor, XP~\cite{Clark-XP};
+\item XSLT~\cite{XSLT} processors (e.g., XT~\cite{Clark-XT} and Saxon~\cite{Saxon}
+      and the XML parser XP~\cite{Clark-XP};
 
 \item the perlSGML utilities~\cite{perlSGML} which
 contains \smtexttt{dtd2html}, \smtexttt{dtddiff},
@@ -823,11 +815,10 @@ field-access          18
 import                5
 java-source-program   1
 literal-char          5
-literal-false         1
+literal-boolean       5
 literal-null          5
 literal-number        127
 literal-string        61
-literal-true          4
 local-variable        23
 loop                  13
 method                18
@@ -863,13 +854,13 @@ representation of the program:
 \noindent\emph{outputs:}
 {\small
 \begin{verbatim}
-<literal-string>audio/dance.au</..>
-<literal-string>images/dancing-duke/T</..>
-<literal-string>.gif</..>
-<literal-string>images/hanging-duke/h</..>
-<literal-string>.gif</..>
-<literal-string>Courier</..>
-<literal-string>Courier</..>
+<literal-string value='audio/dance.au'/>
+<literal-string value='images/dancing-duke/T'/>
+<literal-string value='.gif'/>
+<literal-string value='images/hanging-duke/h'/>
+<literal-string value='.gif'/>
+<literal-string value='Courier'/>
+<literal-string value='Courier'/>
 ...
 \end{verbatim}
 }
@@ -877,23 +868,26 @@ representation of the program:
 \noindent Notice that the output of \smtexttt{sggrep} is also a (not necessarily
 valid nor even well-formed) XML document.  Thus we can string together
 SGML and XML tools in a Unix pipeline to combine tools in novel and
-useful ways.  For example, if we want to just see the strings, we can
-run \smtexttt{stripsgml} on the output of the above query:
+useful ways.  For example, it is useful to convert results back into
+ordinary Java source representation to aid the human software-engineer.
+We can do this using \smtexttt{results-to-plain-source} which is a
+wrapper around an XSLT stylesheet that converts JavaML back into
+plain source code:
 
 \begin{verbatim}
 % sggrep '.*/literal-string' \
-           < Hangman.java.xml | stripsgml
+   < Hangman.java.xml | results-to-plain-source
 \end{verbatim}
 
 \noindent\emph{outputs:}
 \begin{verbatim}
-audio/dance.au
-images/dancing-duke/T
-.gif
-images/hanging-duke/h
-.gif
-Courier
-Courier
+"audio/dance.au"
+"images/dancing-duke/T"
+".gif"
+"images/hanging-duke/h"
+".gif"
+"Courier"
+"Courier"
 ...
 \end{verbatim}
 
@@ -903,30 +897,35 @@ message \smtexttt{setFont} we can do so easily and reliably:
 
 \begin{verbatim}
 % sggrep '.*/send[message=setFont]' \
-                      < Hangman.java.xml 
+                    < Hangman.java.xml 
 \end{verbatim}
 
 \noindent\emph{outputs:}
 {\small
 \begin{verbatim}
 <send message='setFont'>
-<target>
-<var-ref name='g' idref='frmarg-212'/>
-</target>
-<arguments>
-<var-ref name='font' idref='locvar-611'/>
-</arguments>
+  <target>
+   <var-ref name='g' idref='frmarg-212'/>
+  </target>
+  <arguments>
+   <var-ref name='font' idref='locvar-611'/>
+  </arguments>
 </send>
 <send message='setFont'>
-<target>
-<var-ref name='g' idref='frmarg-212'/>
-</target>
-<arguments>
-<var-ref name='wordFont'/>
-</arguments>
+  <target>
+   <var-ref name='g' idref='frmarg-212'/>
+  </target>
+  <arguments>
+   <var-ref name='wordFont'/>
+  </arguments>
 </send>
 \end{verbatim}
 }
+
+\noindent Because of the structural markup, places where the seven characters
+``setFont'' appear in a comment or a literal string will \emph{not} be reported by
+this query.  A similar attempt to retrieve this information using lexical tools would 
+likely contain those false positives.
 
 Another class of common analyses is the semantic checks done by the
 compiler prior to translation.  For example, in Java code, only abstract
@@ -1003,7 +1002,7 @@ C++.  For example, we can rename all methods named \smtexttt{isBall} to
 
 { \small
 \begin{verbatim}
-<xsl:stylesheet ...>xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+<xsl:stylesheet ......>
 
 <xsl:param name="oldname"/>
 <xsl:param name="newname"/>
@@ -1046,10 +1045,76 @@ text-based transformation. This is a key benefit of the JavaML
 representation: we have more fine-grained, semantically-based control
 over the affected constructs.
 
-Other possibilities for transformations include using a style sheet to
-output a browesable HTML representation of the program or
-syntax-highlighted PostScript.  Adding debug or instrumentation code at
-entry and exit to and from functions is also straightforward.
+Other possibilities for transformations include using a style sheet to output a
+browesable HTML representation of the program (see Figure~\ref{fig:ie-hangman-html})
+or syntax-highlighted PostScript.  Adding debug or instrumentation code at entry and
+exit to and from functions is also straightforward (see Figure~\ref{fig:dom-instrument}).
+
+\begin{figure*}[htbp]
+\begin{centering}
+\includegraphics[height=8in]{ie-hangman-html.eps}
+\caption{A view of Hangman.java.xml processed by an XSLT HTML pretty-printer and
+  indexer.  The method index links to the start of the definition of each method, and 
+  syntax highlighting is done using color-coding and italics.
+\label{fig:ie-hangman-html}}
+\end{centering}
+\end{figure*}
+
+\begin{figure*}[p]
+\begin{listing}{1}
+use XML::DOM;
+use IO::Handle;
+
+my $filename = shift @ARGV;
+
+my $parser = new XML::DOM::Parser;
+my $doc = $parser->parsefile ($filename);
+
+my $nodes = $doc->getElementsByTagName("method");
+for (my $i = 0; $i < $nodes->getLength(); $i++) {
+  my $method = $nodes->item($i);
+  my $method_blocks = 
+    $method->getElementsByTagName("block");
+  my $method_block = $method_blocks->item(0);
+  my $start_instrumentation 
+    = SendMessageBlock($doc,"Tracer","StartMethod",
+                       $method->getAttribute("name"));
+  $method_block->insertBefore($start_instrumentation,
+                              $method_block->getFirstChild());
+  my $exit_instrumentation 
+    = SendMessageBlock($doc,"Tracer","ExitMethod",
+                       $method->getAttribute("name"));
+  $method_block->appendChild($exit_instrumentation);
+}
+print $doc->toString;
+
+sub SendMessageBlock {
+  my ($doc,$target_var,$method_name,$data) = (@_);
+  # insert, e.g:  Tracer.StartMethod("paint");
+ return parseXMLFragment($doc,<<"__END_FRAGMENT__"
+<send message="$method_name">
+  <target><var-ref name="$target_var"/></target>
+  <arguments><literal-string value="$data"/></arguments>
+</send>  
+__END_FRAGMENT__
+ );
+}
+
+sub parseXMLFragment {
+  my ($doc,$code) = (@_);
+  my $newdoc = $parser->parse($code);
+  my $subtree = $newdoc->getDocumentElement();
+  $newdoc->removeChild($subtree);
+  $subtree->setOwnerDocument($doc);
+  return $subtree;
+}
+\end{listing}
+\caption{Perl program to instrument every method with invocations of
+  Tracer.StartMethod(\textit{method\_name}) and
+  Tracer.ExitMethod(\textit{method\_name}).  The program uses the Document Object
+  Model (DOM)~\cite{DOM} Perl module~\cite{perlDOM}.
+\label{fig:dom-instrument}}
+\end{figure*}
 
 \section{Related work}
 \label{sec-related}
@@ -1072,6 +1137,12 @@ respect to a current object.  The approach that Crew uses may be
 interesting to apply to the XML world, but the numerous XML tools
 already provide comparable functionality through a more conventional (if
 perhaps less convenient) framework.
+
+GRAS~\cite{Kiesel95} is a graph-oriented database system for software engineering
+environments.  Front-ends are available for integrating source-code from
+ordinary representation of C, Modula-3, and Modula-2 into the database.  The database 
+approach may prove useful for storing XML, especially in the context of
+the software-engineering applications for which JavaML is designed.
 
 CCEL~\cite{CCEL92} provides a metalanguage for expressing non-linguistic
 intentions (i.e., ones that cannot be expressed in the language) about
@@ -1096,6 +1167,8 @@ likely a fruitful avenue for future work.  There are several utilities
 for documenting and comparing DTDs (e.g., \smtexttt{dtd2html} and
 \smtexttt{dtddiff}) that would be helpful when applying this technique.
 
+
+%% Knuth's literate programming?  \cite{Knuth92}.
 
 \section{Future work}
 \label{sec-future}
@@ -1214,29 +1287,9 @@ fellowship and by NSF Grant No.~IIS-9975990.
 \verbatiminput{java-ml.dtd-formatted}
 }
 
-%\end{multicols}
-
-%\section{Extended Example}
-%\label{app-ext-eg}
-
-%\subsection{Set.java}
-%{\small 
-%\verbatiminput{Set.java} 
-%}
-
-
-%\subsection{Set.java.xml}
-%{\small
-%\verbatiminput{Set.java.xml} 
-%}
-
-%\begin{multicols}{2}
-
 {\small
 \bibliography{library,articles,applications} %style plain, from above.
 }
-
-%\end{multicols}
 
 %% GJB:FIXME:VISUAL
 %\vspace{2in}
@@ -1246,25 +1299,23 @@ fellowship and by NSF Grant No.~IIS-9975990.
 \hspace*{-.8cm}
 \includegraphics[width=1.4in]{gjb-face.eps}
 \end{floatingfigure}
-%%<a href="http://www.cs.washington.edu/homes/gjb">
-\textbf{Greg J. Badros} is a final-year Ph.D. candidate at the
-%% <a href="http://www.cs.washington.edu">
-University of Washington in Seattle, USA where he earned his
-M.Sc.\  degree in 1998.  He graduated \textit{magna cum laude} with a B.S.
-degree in Mathematics and Computer Science from
-%% <a href="http://www.math.duke.edu">
-%% <a href="http://www.cs.duke.edu">
-%% <a href="http://www.duke.edu">
-Duke University in 1995.  He is the primary author of the 
-%% <a href="http://scwm.mit.edu">
-Scheme Constraints Window Manager and the 
-%% <a href="http://www.cs.washington.edu/research/constraints/cassowary/">
-Cassowary Constraint Solving Toolkit.  His research interests include
+
+\textbf{\href{http://www.cs.washington.edu/homes/gjb}{Greg J. Badros}}
+is a final-year Ph.D. candidate at the
+\href{http://www.cs.washington.edu}{University of Washington} 
+in Seattle, USA where he earned his M.Sc.\  degree in 1998.  
+He graduated \textit{magna cum laude} with a B.S.
+degree in \href{http://www.math.duke.edu}{Mathematics} and 
+\href{http://www.cs.duke.edu}{Computer Science} from
+\href{http://www.duke.edu}{Duke University} in 1995.  He is the 
+primary author of the 
+\href{http://scwm.mit.edu}{Scheme Constraints Window Manager} and the 
+\href{http://www.cs.washington.edu/research/constraints/cassowary}{Cassowary
+Constraint Solving Toolkit}.  His research interests include
 constraint technology, software engineering, languages, and the
 Internet.
 
 \end{multicols}
-
 \end{document}
 
 %%% Local Variables: 
