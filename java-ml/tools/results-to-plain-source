@@ -2,4 +2,3 @@
 tag="code-fragment"
 awk "NR == 2 { print; print \"<$tag>\"; next } { print } END { print \"</$tag>\" }" "$@" | \
   javaml-to-plain-source
-
