@@ -9,6 +9,7 @@
 //
 #include "config.h"
 #include "ast.h"
+#include "stream.h"
 #include <iostream.h>
 #include <strstream>
 #include <fstream.h>
@@ -50,6 +51,17 @@ xml_close(Ostream &xo, char *szTag, bool fNewline = false)
   if (fNewline)
     xml_nl(xo);
 }
+
+char *
+xml_name_string(LexStream &ls, LexStream::TokenIndex i)
+{
+  ostrstream xnm;
+  Ostream nm(&xnm);
+  nm << ls.NameString(i);
+  xnm << ends;
+  return xnm.str();
+}
+
 
 #ifdef TEST
 // Special top-level form
@@ -244,7 +256,7 @@ void AstClassDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
     }
 
     xml_output(os,"class",
-               "name",lex_stream.NameString(identifier_token),
+               "name", xml_name_string(lex_stream,identifier_token),
                "visibility",szVisibility,
                "extends",szExtends,
                NULL);
