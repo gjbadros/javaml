@@ -1,3 +1,18 @@
+Sat Nov 13 12:40:58 1999  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Added xml_open, and use it pervasively as
+	appropriate (replaces xml_output(...,...,NULL)).  Handle
+	array-refs.
+
+Sat Nov 13 12:28:54 1999  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Added xml_unparse_maybe_var_ref to turn uses of 
+	variables into var-ref elements (when it is used appropriately;
+	must be careful to not use it when printing into an attribute
+	field). Handle if statments, preunaryexpressions (e.g., !),
+	parenthesized expressions, unary expressions, cast expressions.
+	Got to cassowary/java/Timer.java passing the validity check.
+
 Sat Nov 13 11:38:16 1999  Greg J. Badros  <gjb@cs.washington.edu>
 
 	* xml-unparse.cpp: Handle IDs (still broken, though).  Handle
