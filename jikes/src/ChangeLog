@@ -1,3 +1,16 @@
+Sat Nov 13 21:16:44 1999  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Added xml_unparse_maybe_type(), and use it to
+	get types to be elements.  Moved all type attributes into child
+	elements.  Change target-type element to plain type (for casts).
+
+Sat Nov 13 20:34:51 1999  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Split out field-access elements (were all
+	considered var-refs). Make variable-initializers use
+	xml_unparse_maybe_var_ref(). Handle break, continue, try, catch,
+	finally. Rework InstanceCreation and ArrayCreation nodes.
+
 Sat Nov 13 17:44:44 1999  Greg J. Badros  <gjb@cs.washington.edu>
 
 	* xml-unparse.cpp: Track class and method name for mangling of
