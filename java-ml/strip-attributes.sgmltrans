@@ -1,4 +1,0 @@
-# Strip out all attributes
-.*/.
-	"<$gi>"
-	"</$gi>"
