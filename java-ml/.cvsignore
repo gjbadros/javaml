@@ -1,6 +1,4 @@
-ClAbstractVariable.class
-ComplexApplet.class
-Timer.class
+*.class
 classes
 unparsed
 xml-unparsed

@@ -23,17 +23,35 @@ http://www.oasis-open.org/cover/duplTokens.html
 
 
 
-
+/////// If
     if ( !TimerIsRunning )                            // Normal case
       return (double) ElapsedMs/1000;
     else
       return (double) (ElapsedMs + System.currentTimeMillis() - StartReading)/1000;
 
-
 <if><test>!TimerIsRunning</test>
   <true-case><return>...</return></true-case>
   <false-case><return>...</return></false-case>
 </if>
+
+
+
+/////// For
+      for (Enumeration e = terms.keys(); e.hasMoreElements() ; ) {
+	ClAbstractVariable clv = (ClAbstractVariable) e.nextElement();
+	_terms.put(clv,((ClDouble) terms.get(clv)).clone());
+      }
+
+<for-loop>
+   <init>...</init>
+   <init>...</init>
+   <test>...</test>
+   <update>...</update>
+   <update>...</update>
+   <statements>
+     ...
+   </statements>
+</for-loop
 
 
 Thoughts for paper:
@@ -47,3 +65,8 @@ Semantic analysis phase of compiler is simplified
 
 canonical external representation of AST for java source program
  -> interacting compilers, tools, etc.
+
+Issue:
+  for-loop element vs. loop:
+  -> do we care about preserving the looping format initially chosen in source
+  -> or should we canonicalize to <loop> element
