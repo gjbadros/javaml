@@ -51,7 +51,7 @@
 <!ELEMENT extend EMPTY>
 <!ATTLIST extend
     interface CDATA #REQUIRED>
-<!ELEMENT field (type,(%expr-elems;)*)>
+<!ELEMENT field (type,(array-initializer|%expr-elems;)?)>
 <!ATTLIST field
     name CDATA #REQUIRED
     %visibility-attribute;
@@ -104,16 +104,19 @@
     primitive CDATA #IMPLIED
     name CDATA #REQUIRED
     dimensions CDATA #IMPLIED>
-<!ELEMENT new-array (type,dim-expr*,(%expr-elems;)?)>
+<!ELEMENT new-array (type,dim-expr*,array-initializer?)>
 <!ATTLIST new-array
     dimensions CDATA #REQUIRED>
 <!ELEMENT dim-expr (%expr-elems;)>
-<!ELEMENT local-variable (type,(static-initializer|(%expr-elems;)+)?)>
+<!ELEMENT local-variable (type,(static-initializer|array-initializer|%expr-elems;)?)>
 <!ATTLIST local-variable
     name CDATA #REQUIRED
     id ID #REQUIRED
     continued CDATA #IMPLIED
     %mod-final;>
+<!ELEMENT array-initializer (array-initializer|%expr-elems;)*>
+<!ATTLIST array-initializer
+    length CDATA #REQUIRED>
 <!ELEMENT arguments (%expr-elems;)*>
 <!ELEMENT literal-string (#PCDATA)>
 <!ATTLIST literal-string
@@ -172,7 +175,7 @@
 <!ELEMENT loop (init*,test?,update*,(%stmt-elems;)?)>
 <!ATTLIST loop
     kind (for|while) #IMPLIED>
-<!ELEMENT init (local-variable|%expr-elems;)>
+<!ELEMENT init (local-variable|%expr-elems;)*>
 <!ELEMENT update (%expr-elems;)>
 <!ELEMENT do-loop ((%stmt-elems;)?,test?)>
 <!ELEMENT try ((%stmt-elems;),catch*,finally?)>
