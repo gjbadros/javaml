@@ -1,7 +1,7 @@
 To get started, try:
 
 export CLASSPATH=/usr/lib/netscape/java/classes/java40.jar:$CLASSPATH
-../jikes/src/jikes +ux FirstApplet.java
+../jikes/src/jikes -nowrite +B +ux FirstApplet.java
 
 Then use: 
 
