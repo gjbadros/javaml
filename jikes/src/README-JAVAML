@@ -55,7 +55,7 @@ Just grab the file, then do:
 
 cd ..../jikes/src
 tar xvzf ...../jikes-latest/src/jikes-gjb-xml-unparse-4-feb-2000.tar.gz
-patch <gjb-xml-unparse-4-feb-2000.patch 
+patch < gjb-xml-unparse-4-feb-2000.patch 
 ./configure --enable-debug   
 make all
 
@@ -116,7 +116,14 @@ This then lets you do all sorts of nifty static software-engineering
 analyses and transformations using all of the XML and SGML tools out
 there.  See the paper for more details.
 
-Thanks,
+You can add an edited version of the following line to a CATALOG file
+(listed in your SGML_CATALOG environment variable) to have various tools
+find the DTD more easily (e.g., nsgmls, Jade):
+
+SYSTEM "java-ml.dtd" "/path/to/java-ml/java-ml.dtd"
+
+Enjoy!  Comments and feedback are appreciated!
+
 Greg J. Badros
 gjb@cs.washington.edu
 Seattle, WA  USA
