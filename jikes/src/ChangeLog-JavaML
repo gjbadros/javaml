@@ -1,0 +1,62 @@
+Sun Feb  6 10:56:08 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp (xml_name_string): convert < and & on a
+	character-by-character basis to be more robust.
+	(AstArrayInitializer) Use xml_unparse_maybe_var_ref so that
+	elements in an array initializer are appropriately marked-up as
+	variable references.  (AstCharacterLiteral) Use xml_name_string so 
+	'<' gets output as '&lt;'.  (AstBinaryExpression) Handle
+	instanceof expressions separately since they're second argument is 
+	a type, not an %expr-elem;
+
+Sat Feb  5 19:46:44 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	**** All changes to xml-unparse.cpp
+	
+	* Use &lt;=, not &le; for <=.  Duh.
+
+	* Added FXMLStatementTagNeeded() and use it to try to eliminate
+ 	redundant <statement> tags more rationally.  Added
+ 	g_fTopLevelBlock to help in this regard.
+
+	* Do not ignore all return statements that are at the end of a
+	block -- only ignore them if at the end of a top-level block, and
+	use g_fTopLevelBlock to track that state.
+
+	* Added op attribute to assignment-expr to handle +=, /=, etc.
+
+	* Eliminated some extraneous code.
+
+Sat Feb  5 14:05:54 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: More changes -- avoid nested <statements> more
+	reliably.  Clean up a bunch of #if 0 code, #ifdef XML_LONG_WINDED
+	code.  Use "interface" attribute on "implement" tag (not
+	"class").  Use &lt; and &amp; in xml_name_string, instead of
+	trying to use higher-level operator names that won't convert back
+	properly to plain text.
+
+Mon Jan 31 13:17:56 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* README-JAVAML: Added.
+
+	* java-ml.dtd: Added. The document type definition (DTD) for
+ 	JavaML; useful with SGML-aware editors (e.g., psgml mode for
+ 	Emacs) and for validating parsers (e.g., JADE:
+ 	http://www.jclark.com/jade)
+
+ 	* xml-unparse.cpp: Added to unparse into JavaML representation.
+  	See http://www.cs.washington.edu/homes/gjb/papers/javaml/javaml.html
+
+	* Makefile.in: Added xml-unparse.o to list of files, and added its 
+	build rule.
+
+	* ast.h: Updated all AST node classes to have XMLUnparse() method
+	(analogous to existing Unparse() method)
+
+	* control.cpp: Added handing of debug_xml_unparse_ast option
+
+	* jikes.cpp: Updated usage message to include usage for +ux, +udx, 
+	the new XML unparsing options.
+
+	* option.cpp, option.h: Handle the +ux, +udx options
