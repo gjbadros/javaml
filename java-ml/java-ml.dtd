@@ -11,7 +11,7 @@
 
 <!ENTITY % expr-elems "send|new|new-array|var-ref|field-access|array-ref|paren|assignment-expr|conditional-expr|binary-expr|unary-expr|cast-expr|literal-number|literal-string|literal-true|literal-false|literal-null|this|super">
 
-<!ELEMENT java-source-program (package-decl?,import*,class+) >
+<!ELEMENT java-source-program (package-decl?,import*,(class|interface)+) >
 <!ATTLIST java-source-program
     name CDATA #IMPLIED
     version CDATA #IMPLIED>
@@ -26,9 +26,16 @@
     %mod-final;
     %mod-synchronized;
     superclass CDATA "Object">
+<!ELEMENT interface ((extend)*, method*) >
+<!ATTLIST interface
+    name CDATA #REQUIRED
+    %visibility-attribute;>
 <!ELEMENT implement EMPTY>
 <!ATTLIST implement
     class CDATA #REQUIRED>
+<!ELEMENT extend EMPTY>
+<!ATTLIST extend
+    interface CDATA #REQUIRED>
 <!ELEMENT field (type,(%expr-elems;)?)>
 <!ATTLIST field
     name CDATA #REQUIRED
