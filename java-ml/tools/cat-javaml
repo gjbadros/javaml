@@ -1,0 +1,11 @@
+#!/uns/bin/zsh -f
+cat <<END
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE java-source-program SYSTEM "java-ml.dtd">
+
+<java-source-program>
+END
+for i in "$@"; do
+  awk 'NR > 4 && $0 !~ /^<\/java-source-program>$/' <$i
+done
+echo "</java-source-program>"
