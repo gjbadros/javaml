@@ -116,9 +116,10 @@ reflects the structure of the source program.
 The textual representation of source code has several nice properties.
 It can be concise and is similar to natural languages thus often making
 it easy to read.  Text is a universal data format thus making source
-code is to exchange and manipulate using a wide variety of tools
-including text editors and command pipeline utilities such as
-<code>grep</code>, <code>awk</code>, and <code>wc</code>.  
+code easy to exchange and manipulate using a wide variety of tools
+including text editors, version control systems, and command pipeline
+utilities such as <code>grep</code>, <code>awk</code>, and
+<code>wc</code>.
 
 <p>
 
@@ -159,16 +160,15 @@ example).
 
 <p>
 
-Probably the most disturbing problem with the POSR is that the structure 
-      of the program is made manifest only after parsing.  This
-      shortcoming forces language-specific parsing functionality to be
-      duplicated in every tool that needs to reason about the program
-      beyond its lexical nature.  Compilers, by necessity, must work
-      with the AST, but numerous other software-engineering tools
-      would perform better with access to the structured representation
-      of the source code.  Unfortunately, many software-engineering
-      tools do not embed a parser and thus are limited to lexical
-      reasoning.
+Probably the most disturbing problem with the POSR is that the structure
+of the program is made manifest only after parsing.  This shortcoming
+forces language-specific parsing functionality to be duplicated in every
+tool that needs to reason about the program beyond its lexical nature.
+Compilers, by necessity, must work with the AST, but numerous other
+software-engineering tools would perform better with access to the
+structured representation of the source code.  Unfortunately, many
+software-engineering tools do not embed a parser and thus are limited to
+lexical reasoning.
 
 <p>
 
@@ -181,8 +181,23 @@ typical AST reflects quirky artifacts of the grammar rather than
 representing the programming-level constructs directly.  Additionally,
 embedding the front-end of a compiler can deemed overkill when targeting
 a simple analysis that can do "good enough" with lexical information.
-Finally, using a parser in a tool necessarily targets that tool to a
-specific language, thus reducing its applicability and generality.
+
+<p>
+
+Other complications arise if a transformation of the source code is
+desired: a change in the AST must ultimately be reflected in the POSR
+since that is the primary long-term representation.  This is most
+straightforwardly done using an unparsing approach that can create
+undesired lexical side effects (e.g., changes in indentation or
+whitespace) that confuse the other lexical tools that the developer is
+relying upon (e.g., a version control system that is unable to
+disambiguate between a meaningful change and a gratuitous one affected
+unintentionally).  Finally, using a parser in a tool necessarily targets
+that tool to a specific language, thus reducing its applicability and
+generality.  Worse, since there is no canonical structured
+representation of a source program, supporting interoperability of
+independent tools even targeting the same programming language is
+very difficult.
 
 <p>
 
@@ -211,12 +226,6 @@ to separate simple tools from a complex environment and additionally
 creates a dependency on proprietary technology that may be undesirable.
 
 <p>
-*** no canonical deep representation of source program, so different
-    tools either have to rely on reusing the same grammar, or have
-    gratuitous differences in their view of the program
-  -> changes to deep representation must be swizzled back into the
-     universal character-based representation before being further
-    munged
 
 * XML is a solution
 ** XML's capability to represent arbitrary nested hierarchy can
@@ -248,9 +257,8 @@ transformations such as renaming a local variable, etc.
 
 <h3><a name="background">2 - Background</a></h3>
 
-The Java Markup Language describes Java programs using an XML
-application.  JavaML is influenced by and benefits from numerous of the
-features of these technologies.
+The Java Markup Language is influenced by and benefits from numerous of the
+features of the two technologies it builds a bridge between: Java and XML.
 
  <h4><a name="java">2.1 - Java</a></h4>
     
