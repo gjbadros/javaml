@@ -261,19 +261,17 @@ void xml_unparse_maybe_var_set(Ostream &xo, LexStream &ls, Ast *pnode)
 void xml_unparse_maybe_type(Ostream &xo, LexStream &ls, Ast *pnode, int cBrackets = 0)
 {
   if (pnode->IsName()) {
+    char *sz = NULL;
     if (cBrackets > 0) {
       char *sz = SzNewFromLong(cBrackets);
-      xml_output(xo,"type",
-                 "dimensions",sz,
-                 NULL);
-      delete sz;
-    } else {
-      xml_open(xo,"type");
     }
-  }
-  pnode->XMLUnparse(xo,ls);
-  if (pnode->IsName()) {
-    xml_close(xo,"type");
+    xml_output(xo,"type",
+               "name", SzFromUnparse(ls,pnode),
+               "dimensions",sz,
+               XML_CLOSE);
+    delete sz;
+  } else {
+    pnode->XMLUnparse(xo,ls);
   }
 }
 
@@ -349,9 +347,10 @@ void AstBlock::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstPrimitiveType::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstPrimitiveType:#" << this-> id << "*/";
-    xml_open(os,"type");
-    os << lex_stream.NameString(primitive_kind_token);
-    xml_close(os,"type");
+    xml_output(os,"type",
+               "name",xml_name_string(lex_stream,primitive_kind_token),
+               "primitive","true",
+               XML_CLOSE);
     if (Ast::debug_unparse) os << "/*:AstPrimitiveType#" << this-> id << "*/";
 }
 
@@ -360,11 +359,10 @@ void AstArrayType::XMLUnparse(Ostream& os, LexStream& lex_stream)
     if (Ast::debug_unparse) os << "/*AstArrayType:#" << this-> id << "*/";
     char *szNumBrackets = SzNewFromLong(NumBrackets());
     xml_output(os,"type",
+               "name",SzFromUnparse(lex_stream,type),
                "dimensions",szNumBrackets,
-               NULL);
+               XML_CLOSE);
     delete szNumBrackets;
-    type -> XMLUnparse(os, lex_stream);
-    xml_close(os,"type");
     if (Ast::debug_unparse) os << "/*:AstArrayType#" << this-> id << "*/";
 }
 
@@ -820,13 +818,12 @@ void AstMethodDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
 
     delete szNumBrackets;
 
+    xml_unparse_maybe_type(os,lex_stream,type);
+
     g_szMethodName = szMethodName;
     method_declarator -> XMLUnparse(os, lex_stream);
 
     xml_unparse_throws(os,lex_stream,this);
-
-    xml_unparse_maybe_type(os,lex_stream,type);
-
     method_body -> XMLUnparse(os, lex_stream);
     g_szMethodName = NULL;
 
@@ -1428,9 +1425,9 @@ void AstParenthesizedExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstTypeExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstTypeExpression:#" << this-> id << "*/";
-    xml_open(os,"type");
-    type -> XMLUnparse(os, lex_stream);
-    xml_close(os,"type");
+    xml_output(os,"type",
+               "name",SzFromUnparse(lex_stream,type),
+               XML_CLOSE);
     if (Ast::debug_unparse) os << "/*:AstTypeExpression#" << this-> id << "*/";
 }
 
@@ -1438,11 +1435,9 @@ void AstClassInstanceCreationExpression::XMLUnparse(Ostream& os, LexStream& lex_
 {
     if (Ast::debug_unparse) os << "/*AstClassInstanceCreationExpression:#" << this-> id << "*/";
     xml_open(os,"new");
-    //    xml_open(os,"type");
     xml_unparse_maybe_type(os,lex_stream,class_type);
     if (dot_token_opt /* base_opt - see ast.h for explanation */)
 	base_opt -> XMLUnparse(os, lex_stream);
-    //    xml_close(os,"type");
     xml_open(os,"arguments");
     for (int j = 0; j < NumArguments(); j++)
       {
