@@ -871,7 +871,7 @@ representation of the program:
 
 <pre>
 <strong>
-% sggrep '.*/literal-string' < Set.java.xml        
+% sggrep '.*/literal-string' &lt; Set.java.xml
 </strong>
 &lt;?xml version='1.0' encoding='UTF-8'?&gt;
 &lt;!DOCTYPE java-source-program SYSTEM "java-ml.dtd" &gt;
@@ -888,11 +888,12 @@ above query:
 
 <pre>
 <strong>
-% sggrep '.*/literal-string' < Set.java.xml | stripsgml
+% sggrep '.*/literal-string' &lt; Set.java.xml | stripsgml
 { 
 , 
  }\n
 </strong>
+</pre>
 
 <p>
 
@@ -902,7 +903,7 @@ message <code>clone</code> we can do so easily and reliably:
 
 <pre>
 <strong>
-% sggrep '.*/send[message=clone]' < Set.java.xml 
+% sggrep '.*/send[message=clone]' &lt; Set.java.xml 
 </strong>
 &lt;?xml version='1.0' encoding='UTF-8'?&gt;
 &lt;!DOCTYPE java-source-program SYSTEM "java-ml.dtd" &gt;
@@ -923,7 +924,7 @@ for not-abstract classes that contain a method that is abstract:
 
 <pre>
 <strong>
-% sggrep -q '.*/class[abstract!=true]/method[abstract=true]' < Set.java.xml
+% sggrep -q '.*/class[abstract!=true]/method[abstract=true]' &lt; Set.java.xml
 </strong>
 </pre>
 
@@ -942,9 +943,9 @@ the assigned-to variable is a boolean). If we wish to find these
 
 <pre>
 <strong>
-% sggrep -q '.*/if/test/assignment-expr' < Set.java.xml
+% sggrep -q '.*/if/test/assignment-expr' &lt; Set.java.xml
 </strong>
-<pre>
+</pre>
 
 <p>
 
@@ -955,7 +956,7 @@ a top-level query with a restriction on the children and an output
 <pre>
 <strong>
 % sgrpg '.*/method' '.*/send[message=hasMoreElements]' '' '%s %s 
-' visibility name < Set.java.xml
+' visibility name &lt; Set.java.xml
 </strong>
 public toString
 </pre>
@@ -1017,14 +1018,10 @@ also straightforward.
 
 <p>
 
-<p>
-* list functions that do not call a function
--> sggrep -v -q '.*/method' -s '.*/send[message=drawString]' xml-unparsed/ComplexApplet.java.xml | sgmltrans -r method-names.sgmltrans 
+GJB:FIXME:: need another transformation example, ideally using XSLT if I
+can find a working implementation of that.
 
-### sggrep cannot do anything that requires a transformation, obviously
-
-## Transformations, etc.
-
+<!--
 * changing sense of a default parameter (via overriding, since no
 defaults in Java)
 
@@ -1038,16 +1035,7 @@ defaults in Java)
 
 * better diff utility; canonical ast differ for cheating check
 
-Compare versions of dtd w/ perlSGML's dtddiff.
-e.g., make true-case an optional child of an if element
---> might be useful for IP-like stuff discussed at end of Section 5.
-
-* dtd2html and dtdparse+dtdformat
---> nice for documenting, also useful for above IP-like stuff
-
-Another possibility: a DSSSL pretty printer from the JavaML source to
-plain java source.  No need for a parser in the pretty printer!
-
+ -->
 </pre>
 
 <p><span class="index"><a href="#top">[top]</a></span>
@@ -1101,13 +1089,17 @@ is syntax-independent.  Their goal appears to be to permit developers to
 describe new abstractions along with techniques to reduce those
 abstractions down to known primitives.  In essence, they are interested
 in permitting the developer to grow a domain-specific language as they
-build their software.  JavaML is especially exciting as a representation 
+build their software.  JavaML is especially exciting as a representation
 for this approach.  We can view new abstractions as incrementally
-extended DTDs.  In order for the new document type, call it Java++ML, to 
+extended DTDs.  In order for the new document type, call it Java++ML, to
 still be compilable by a stock Java compiler, the developer must simply
 write a transformation from Java++ML to JavaML.  Since DTDs are
 exceptionally easy to extend, this approach is tenable, and likely a
-fruitful avenue for future work.
+fruitful avenue for future work.  There are several utilities for
+documenting and comparing DTDs (e.g., <code>dtd2html</code> and
+<code>dtddiff</code>) that would be helpful when applying this
+technique.
+
 
 <p><span class="index"><a href="#top">[top]</a></span>
 
