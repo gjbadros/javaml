@@ -1491,11 +1491,31 @@ void AstFieldAccess::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstMethodInvocation::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstMethodInvocation:#" << this-> id << "*/";
-    xml_open(os,"send");
+    Ast *pnodeTarget = method;
+
+    AstFieldAccess *pfaNode = dynamic_cast<AstFieldAccess *>(method);
+    if (pfaNode) {
+      xml_output(os,"send",
+                 "message", xml_name_string(lex_stream, pfaNode->identifier_token),
+                 NULL);
+      pnodeTarget = pfaNode->base;
+    } else if (method->IsName()){
+      xml_output(os,"send",
+                 "message", SzFromUnparse(lex_stream,method),
+                 NULL);
+      pnodeTarget = NULL;
+    } else {
+      // GJB:FIXME:: we don't want to ever output this,
+      // but validating the result XML file will point
+      // out if we had to do this
+      xml_open(os,"send");
+    }
     xml_nl(os);
-    xml_open(os,"target");
-    xml_unparse_maybe_var_ref(os,lex_stream,method);
-    xml_close(os,"target",true);
+    if (pnodeTarget) {
+      xml_open(os,"target");
+      xml_unparse_maybe_var_ref(os,lex_stream,pnodeTarget);
+      xml_close(os,"target",true);
+    }
 #ifdef SHORTCUT_XML_CLOSE
     if (NumArguments() > 0) {
 #endif
