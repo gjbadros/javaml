@@ -335,6 +335,17 @@ Option::Option(ArgumentExpander &arguments) :
             {
                 debug_xml_unparse_ast = true;
             }
+            else if (strcmp(arguments.argv[i], "+ulx") == 0)
+            {
+                debug_xml_unparse_ast = true;
+                debug_xml_unparse_ast_show_locations = true;
+            }
+            else if (strcmp(arguments.argv[i], "+uldx") == 0)
+            {
+                debug_xml_unparse_ast = true;
+                debug_xml_unparse_ast_show_locations = true;
+                debug_unparse_ast_debug = true;
+            }
             else if (strcmp(arguments.argv[i], "+udx") == 0)
             {
                 debug_unparse_ast_debug = true;

@@ -214,7 +214,7 @@ void LexStream::InitializeColumns()
 void LexStream::CompressSpace()
 {
     tokens = token_stream.Array();
-    if (control.option.dump_errors)
+    if (control.option.dump_errors || control.option.debug_xml_unparse_ast_show_locations)
         InitializeColumns();
     comments = comment_stream.Array();
     locations = line_location.Array();

@@ -143,6 +143,7 @@ public:
          debug_dump_ast,
          debug_unparse_ast,
          debug_xml_unparse_ast,
+         debug_xml_unparse_ast_show_locations,
          debug_unparse_ast_debug,
          debug_dump_class,
          nocleanup,

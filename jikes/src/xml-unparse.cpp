@@ -61,14 +61,6 @@ PackageSymbol *ThisPackage() {
   return ThisSemantic()->Package();
 }
 
-
-void xml_unhandled(Ostream &xo, char *szType, char *szExtra)
-{
-  xo << "<!-- Unhandled `" << szType << "'";
-  if (szExtra)
-    xo << ": " << szExtra << "-->\n";
-}
-
 /* Output any prefix header for the converted XML file */
 void xml_prefix(Ostream &xo,char *szInfilename)
 {
@@ -282,49 +274,78 @@ xml_close(Ostream &xo, char *szTag, bool fNewline = false)
     xml_nl(xo);
 }
 
+
 void
-xml_location_element(Ostream &xo, LexStream &lex_stream, LexStream::TokenIndex start, LexStream::TokenIndex end)
+xml_output_with_location(Ostream &xo, LexStream &lex_stream, Ast *pnode,
+                         char *szTag, ...)
 {
-  FileLocation flStart(&lex_stream,start);
-  char *szLocationStart = wstring2string(flStart.location);
-  char *pchLineStart = strrchr(szLocationStart,':');
-  *pchLineStart = '\0';
-  // Only include column attribute if column information exists
-  // need to run with +D to get the column information;
-  int columnStart = lex_stream.Column(start); // 0 means no column information available
-  // but we subtract by 1 to make the column number reported be 0-based
-  // since Emacs is 0-based for columns
-  char *szColStart = columnStart != 0? SzNewFromLong(columnStart - 1) : NULL;
+  xml_handle_indent(xo);
+  xo << "<" << szTag;
+  va_list ap;
+  va_start(ap, szTag);
 
-  FileLocation *pflEnd = NULL;
-  char *szLocationEnd = NULL;
-  char *pchLineEnd = NULL;
-  char *szColEnd = NULL;
-  if (end > 0) {
-    pflEnd = new FileLocation(&lex_stream, end);
-    szLocationEnd = wstring2string(pflEnd->location);
-    pchLineEnd = strrchr(szLocationEnd,':');
-    int columnEnd = lex_stream.Column(end);
-    szColEnd = columnEnd != 0? SzNewFromLong(columnEnd - 1) : NULL;
+  char *sz;
+  while ((sz = va_arg(ap, char *)) != NULL && sz != XML_CLOSE) {
+    char *szVal = va_arg(ap, char *);
+    assert (szVal != XML_CLOSE && 
+            "Broken xml_output call -- check parameters");
+    if (szVal)
+      xo << " " << sz << "=\"" << szVal << "\"";
   }
-  xml_output(xo,"location",
-             "filename",szLocationStart,
-             "line",(pchLineStart + 1),
-             "column", szColStart,
-             "end-line",(pchLineEnd? pchLineEnd + 1: NULL),
-             "end-column", szColEnd,
-             XML_CLOSE);
+  va_end(ap);
 
-  delete szColStart;
-  delete szColEnd;
+  if (lex_stream.control.option.debug_xml_unparse_ast_show_locations) {
+    LexStream::TokenIndex start = pnode->LeftToken();
+    LexStream::TokenIndex end = pnode->RightToken();
+    FileLocation flStart(&lex_stream,start);
+    char *szLocationStart = wstring2string(flStart.location);
+    char *pchLineStart = strrchr(szLocationStart,':');
+    *pchLineStart = '\0';
+    // Only include column attribute if column information exists
+    // need to run with +D to get the column information;
+    int columnStart = lex_stream.Column(start); // 0 means no column information available
+    // but we subtract by 1 to make the column number reported be 0-based
+    // since Emacs is 0-based for columns
+    char *szColStart = columnStart != 0? SzNewFromLong(columnStart - 1) : NULL;
+    
+    FileLocation *pflEnd = NULL;
+    char *szLocationEnd = NULL;
+    char *pchLineEnd = NULL;
+    char *szColEnd = NULL;
+    if (end > 0) {
+      pflEnd = new FileLocation(&lex_stream, end);
+      szLocationEnd = wstring2string(pflEnd->location);
+      pchLineEnd = strrchr(szLocationEnd,':');
+      int columnEnd = lex_stream.Column(end);
+      szColEnd = columnEnd != 0? SzNewFromLong(columnEnd - 1) : NULL;
+    }
+    
+    xo << " line" << "=\"" << pchLineStart + 1 << "\"";
+    if (szColStart)
+      xo << " col" << "=\"" << szColStart << "\"";
+    if (pchLineEnd) 
+      xo << " end-line" << "=\"" << pchLineEnd + 1 << "\"";
+    if (szColEnd)
+      xo << " end-col" << "=\"" << szColEnd << "\"";
 
-  // remove null terminator so delete works
-  *pchLineStart = ':';
+    delete szColStart;
+    delete szColEnd;
+    
+    // remove null terminator so delete works
+    *pchLineStart = ':';
+    
+    delete [] szLocationStart;
+    delete [] szLocationEnd;
+  }
 
-  delete [] szLocationStart;
-  delete [] szLocationEnd;
+  if (XML_CLOSE == sz)
+    xo << "/>";
+  else {
+    xo << ">";
+    g_cchIndent += g_dcchIndent;
+  }
 }
-                       
+
 char *
 xml_name_string(LexStream &ls, LexStream::TokenIndex i)
 {
@@ -344,6 +365,7 @@ xml_name_string(LexStream &ls, LexStream::TokenIndex i)
     ++pch;
   }
   xnm << ends;
+  delete sz;
   return xnm.str();
 }
 
@@ -521,13 +543,14 @@ void AstBlock::XMLUnparse(Ostream& os, LexStream& lex_stream)
       char szNum[20];
       sprintf(szNum,"%d",this->NumStatements());
 #endif
-      xml_output(os, "block",
+      xml_output_with_location(os, lex_stream, this,
+                               "block",
 #ifdef JIKES_XML_STATEMENT_HAS_NUMBER_ATTRIBUTE
    // GJB:FIXME:: having num=5, e.g., makes harder to update and is of marginal utility
-                 // DTD needs updating if this code is used
+   // DTD needs updating if this code is used
                  "num",szNum,
 #endif
-                 NULL);
+                               NULL);
       xml_nl(os);
       fDidOpenStatements = true;
       for (int i = 0; i < this -> NumLabels(); i++)
@@ -649,15 +672,15 @@ void AstCompilationUnit::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstModifier::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstModifier:#" << this-> id << "*/";
-    xml_unhandled(os,"modifier",
-                  wstring2string(lex_stream.NameString(modifier_kind_token)));
+    assert(!"AstModifier is not handled");
+    // wstring2string(lex_stream.NameString(modifier_kind_token))
     if (Ast::debug_unparse) os << "/*:AstModifier#" << this-> id << "*/";
 }
 
 void AstEmptyDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstEmptyDeclaration:#" << this-> id << "*/";
-    xml_unhandled(os,"empty-declaration",NULL);
+    assert(!"AstEmptyDeclaration is not handled");
     if (Ast::debug_unparse) os << "/*:AstEmptyDeclaration#" << this-> id << "*/";
 }
 
@@ -729,21 +752,17 @@ void AstClassDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
                           "Object");
     const char *szClassName = xml_name_string(lex_stream,identifier_token);
 
-    xml_output(os,"class",
-               "name", szClassName,
-               "visibility",szVisibility,
-               "abstract",SzOrNullFromF(fAbstract),
-               "final",SzOrNullFromF(fFinal),
-               "synchronized",SzOrNullFromF(fSynchronized),
-               "static",SzOrNullFromF(fStatic),
-               "",SzOrNullFromF(false),
-               NULL);
-    // os << ") #" << class_body -> id << "\n";
-
-    LexStream::TokenIndex start_token = 
-      NumClassModifiers() > 0? ClassModifier(0)->modifier_kind_token : class_token;
-
-    xml_location_element(os, lex_stream, LeftToken(), RightToken());
+    xml_output_with_location(os,lex_stream, this,
+                             "class",
+                             "name", szClassName,
+                             "visibility",szVisibility,
+                             "abstract",SzOrNullFromF(fAbstract),
+                             "final",SzOrNullFromF(fFinal),
+                             "synchronized",SzOrNullFromF(fSynchronized),
+                             "static",SzOrNullFromF(fStatic),
+                             "",SzOrNullFromF(false),
+                             NULL);
+ 
     xml_nl(os);
     xml_output(os,"superclass",
                "name",szSuperclass,
@@ -867,19 +886,19 @@ void AstFieldDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
       {
         AstVariableDeclarator *pvarid = VariableDeclarator(k);
         char *szName = SzFromUnparse(lex_stream,pvarid->variable_declarator_name);
-        xml_output(os,"field",
-                   "name",szName,
-                   "visibility",szVisibility,
-                   "final",SzOrNullFromF(fFinal),
-                   "static",SzOrNullFromF(fStatic),
-                   "volatile",SzOrNullFromF(fVolatile),
-                   "transient",SzOrNullFromF(fTransient),
-                   NULL);
-        xml_location_element(os, lex_stream, pvarid->variable_declarator_name->identifier_token, -1);
+        xml_output_with_location(os,lex_stream,this,
+                                 "field",
+                                 "name",szName,
+                                 "visibility",szVisibility,
+                                 "final",SzOrNullFromF(fFinal),
+                                 "static",SzOrNullFromF(fStatic),
+                                 "volatile",SzOrNullFromF(fVolatile),
+                                 "transient",SzOrNullFromF(fTransient),
+                                 NULL);
+        // xml_location_element(os, lex_stream, pvarid->variable_declarator_name->identifier_token, -1);
         // GJB:FIXME:: which should I use here? the below is for the entire field declaration
         // and will treat "int x, y;" differently.  The above just marks the identifiers location.
         //xml_location_element(os, lex_stream, LeftToken(), RightToken());
-        xml_unparse_maybe_type(os,lex_stream,type);
         xml_unparse_maybe_var_ref(os,lex_stream,pvarid);
         xml_close(os,"field",true);
       }
@@ -1039,21 +1058,20 @@ void AstMethodDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
     // GJB:FIXME:: it'd be better to get these from the AST somehow
     const char *szClassName = g_szClassName;
 
-    xml_output(os,"method",
-               "name", szMethodName,
-               "visibility", szVisibility,
-               "abstract",SzOrNullFromF(fAbstract),
-               "final",SzOrNullFromF(fFinal),
-               "static",SzOrNullFromF(fStatic),
-               "synchronized",SzOrNullFromF(fSynchronized),
-               "native",SzOrNullFromF(fNative),
-               "num-brackets", szNumBrackets,
-               "id",SzIdFromMethod(id,this),
-               NULL);
+    xml_output_with_location(os,lex_stream,this,
+                             "method",
+                             "name", szMethodName,
+                             "visibility", szVisibility,
+                             "abstract",SzOrNullFromF(fAbstract),
+                             "final",SzOrNullFromF(fFinal),
+                             "static",SzOrNullFromF(fStatic),
+                             "synchronized",SzOrNullFromF(fSynchronized),
+                             "native",SzOrNullFromF(fNative),
+                             "num-brackets", szNumBrackets,
+                             "id",SzIdFromMethod(id,this),
+                             NULL);
 
     delete szNumBrackets;
-
-    xml_location_element(os, lex_stream, LeftToken(), RightToken() );
     xml_nl(os);
 
     xml_unparse_maybe_type(os,lex_stream,type);
@@ -1169,17 +1187,17 @@ void AstConstructorDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
     // GJB:FIXME:: it'd be better to get these from the AST somehow
     const char *szClassName = g_szClassName;
 
-    xml_output(os,"constructor",
-               "name", szConstructorName,
-               "visibility", szVisibility,
-               "abstract",SzOrNullFromF(fAbstract),
-               "final",SzOrNullFromF(fFinal),
-               "static",SzOrNullFromF(fStatic),
-               "synchronized",SzOrNullFromF(fSynchronized),
-               "native",SzOrNullFromF(fNative),
-               "id",SzIdFromConstructor(id,this),
-               NULL);
-    xml_location_element(os, lex_stream, LeftToken(), RightToken());
+    xml_output_with_location(os,lex_stream,this,
+                             "constructor",
+                             "name", szConstructorName,
+                             "visibility", szVisibility,
+                             "abstract",SzOrNullFromF(fAbstract),
+                             "final",SzOrNullFromF(fFinal),
+                             "static",SzOrNullFromF(fStatic),
+                             "synchronized",SzOrNullFromF(fSynchronized),
+                             "native",SzOrNullFromF(fNative),
+                             "id",SzIdFromConstructor(id,this),
+                             NULL);
     xml_nl(os);
 
     g_szMethodName = szConstructorName;
@@ -1242,15 +1260,14 @@ void AstInterfaceDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
 
     char *szInterfaceName = xml_name_string(lex_stream,identifier_token);
 
-    xml_output(os,"interface",
-               "name", szInterfaceName,
-               "visibility",szVisibility,
-               "abstract",SzOrNullFromF(fAbstract),
-               "final",SzOrNullFromF(fFinal),
-               "synchronized",SzOrNullFromF(fSynchronized),
-               NULL);
-
-    xml_location_element(os, lex_stream, LeftToken(), RightToken());
+    xml_output_with_location(os,lex_stream,this,
+                             "interface",
+                             "name", szInterfaceName,
+                             "visibility",szVisibility,
+                             "abstract",SzOrNullFromF(fAbstract),
+                             "final",SzOrNullFromF(fFinal),
+                             "synchronized",SzOrNullFromF(fSynchronized),
+                             NULL);
 
     if (NumExtendsInterfaces() > 0)
       {
@@ -1431,9 +1448,10 @@ void AstWhileStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstWhileStatement:#" << this-> id << "*/";
     // What about Label_opt?
-    xml_output(os,"loop",
-               "kind","while",
-               NULL);
+    xml_output_with_location(os, lex_stream, this,
+                             "loop",
+                             "kind","while",
+                             NULL);
     xml_open(os,"test");
     xml_unparse_maybe_var_ref(os,lex_stream,expression);
     xml_close(os,"test");
@@ -1457,9 +1475,10 @@ void AstDoStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstForStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstForStatement:#" << this-> id << "*/";
-    xml_output(os,"loop",
-               "kind","for",
-               NULL);
+    xml_output_with_location(os, lex_stream, this,
+                             "loop",
+                             "kind","for",
+                             NULL);
     for (int i = 0; i < this -> NumForInitStatements(); i++) {
       xml_open(os,"init");
       xml_unparse_maybe_var_ref(os,lex_stream,ForInitStatement(i));
@@ -1729,8 +1748,8 @@ void AstClassInstanceCreationExpression::XMLUnparse(Ostream& os, LexStream& lex_
     xml_unparse_arguments(os,lex_stream,this);
     if (class_body_opt) {
       xml_nl(os);
-      xml_open(os,"anonymous-class");
-      xml_location_element(os, lex_stream, LeftToken(), RightToken());
+      xml_output_with_location(os,lex_stream,this,
+                               "anonymous-class", NULL);
       xml_nl(os);
       if (0 /* class_type is an interface GJB:FIXME:: how do I get at that? */) {
         xml_output(os,"implement",

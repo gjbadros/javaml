@@ -78,14 +78,19 @@ int main(int argc, char *argv[])
         "+u                 unparse AST; produces Java code for the AST\n"
         "+ud                unparse AST, with extra debugging information\n"
         "+ux                unparse AST into JavaML XML representation\n"
+        "+ulx               unparse AST into JavaML XML representation w/ location information\n"
         "+udx               unparse AST into JavaML, with extra debugging info\n"
+        "+uldx               unparse AST into JavaML, with extra debugging info & locations\n"
 #endif
         "\nVersion 1.11 (10 Jan 2000)\n"
         "Originally written by Philippe Charles and David Shields \n"
         "of IBM Research, Jikes is now maintained and refined by the\n"
         "Jikes Project at http://ibm.com/developerworks/opensource.\n"
         "Please consult this URL for more information and to learn \n"
-        "how to report problems.\n");
+        "how to report problems.\n"
+        "JavaML XML unparsing by Greg J. Badros <gjb@cs.washington.edu>\n"
+        "See http://www.cs.washington.edu/homes/gjb/JavaML for more information.\n"
+                );
 
         return_code = 1;
     }

@@ -287,6 +287,8 @@ void LexStream::Dump(); // temporary function used to dump token stream.
         return comment_stream.Length() * sizeof(Comment);
     }
 
+    Control &control;
+
 private:
 
     int hexvalue(wchar_t ch);
@@ -385,8 +387,6 @@ private:
     wchar_t *input_buffer;
     size_t input_buffer_length;
     wchar_t *comment_buffer;
-
-    Control &control;
 
     void ReadInput();
     void ProcessInput(char *, long);
