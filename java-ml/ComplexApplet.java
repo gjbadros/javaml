@@ -19,7 +19,7 @@ public abstract class ComplexApplet extends Applet {
     String foo;
     int i = 64, j;
     if (i == 22) {
-      g.drawString("Hello World", 25, 50);
+      g.drawString("Hello <begin>\"there D&M\"</begin> World", 25, 50);
     }
     System.err.println(Math.sqrt(49));
     System.err.println(Math.sqrt(i));
