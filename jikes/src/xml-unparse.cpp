@@ -37,6 +37,7 @@ bool g_fInsideCatch = false;
 bool g_fTopLevelBlock = false;
 bool g_fNewline = true;
 bool g_fRequireBlockTag = false;
+LexStream::TokenIndex g_tiLastCommentHandled = -1;
 
 int g_cchIndent = 0;
 /* GJB:FIXME:: this should be an option */
@@ -343,6 +344,19 @@ xml_output_with_location(Ostream &xo, LexStream &lex_stream, Ast *pnode,
   else {
     xo << ">";
     g_cchIndent += g_dcchIndent;
+    if (lex_stream.control.option.comments) {
+      bool f = false;
+      for (LexStream::CommentIndex com = lex_stream.FirstCommentSince(g_tiLastCommentHandled);
+           com < lex_stream.NumComments() && lex_stream.PrecedingToken(com) < pnode->LeftToken(); ++com)
+        {
+          wchar_t *sz = lex_stream.CommentString(com);
+          if (sz) {
+            f = true;
+            xo << sz;
+          }
+        }
+      g_tiLastCommentHandled = pnode->LeftToken();
+    }
   }
 }
 
@@ -895,10 +909,11 @@ void AstFieldDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
                                  "volatile",SzOrNullFromF(fVolatile),
                                  "transient",SzOrNullFromF(fTransient),
                                  NULL);
+        // GJB:FIXME:: which should I use here? the below marks the identifiers separately
+        // and will treat "int x, y;" differently.  The above _with_locations marks up the
+        // whole list of vars all as one.
         // xml_location_element(os, lex_stream, pvarid->variable_declarator_name->identifier_token, -1);
-        // GJB:FIXME:: which should I use here? the below is for the entire field declaration
-        // and will treat "int x, y;" differently.  The above just marks the identifiers location.
-        //xml_location_element(os, lex_stream, LeftToken(), RightToken());
+        xml_unparse_maybe_type(os,lex_stream,type);
         xml_unparse_maybe_var_ref(os,lex_stream,pvarid);
         xml_close(os,"field",true);
       }

@@ -224,12 +224,10 @@ void LexStream::CompressSpace()
 }
 
 
-//
-// Find and return the index of the first comment that immediately
-// follows tok. Return 0 if there is not a comment that immediately
-// follows tok.
-//
-LexStream::CommentIndex LexStream::FirstComment(TokenIndex tok)
+// Find and return the index of the first comment that 
+// follows tok. Return 0 if there is no comment that follows.
+// N.B. the comment does not have to be immediately following tok!
+LexStream::CommentIndex LexStream::FirstCommentSince(TokenIndex tok)
 {
     unsigned location = Location(tok);
     int lo = 0,
@@ -253,7 +251,19 @@ LexStream::CommentIndex LexStream::FirstComment(TokenIndex tok)
         i = (comment_stream[lo].location > location ? lo : lo + 1);
     }
 
-    return (i < comment_stream.Length() && comment_stream[i].previous_token == tok ? i : 0);
+    return (i < comment_stream.Length() ? i : 0);
+}
+
+
+//
+// Find and return the index of the first comment that immediately
+// follows tok. Return 0 if there is not a comment that immediately
+// follows tok.
+// N.B. Like FirstCommentSince, but it *does* have to be immediately following
+LexStream::CommentIndex LexStream::FirstComment(TokenIndex tok)
+{
+  int i = FirstCommentSince(tok);
+  return (comment_stream[i].previous_token == tok ? i : 0);
 }
 
 

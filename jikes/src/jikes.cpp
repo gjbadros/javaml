@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
         "-Xstdout           redirect output listings to stdout\n"
         "++                 compile in incremental mode\n"
         "+B                 do not invoke bytecode generator\n"
-        "+c                 do not discard comments from lexer output\n"
+        "+c                 do not discard comments from lexer/JavaML output\n"
         "+CSO               search for both java and classfile in classpath\n"
         "+D                 report errors immediately in emacs-form without buffering\n"
         "+DR=filename       generate dependence report in filename\n"

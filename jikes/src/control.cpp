@@ -1371,6 +1371,8 @@ void Control::CleanUp(FileSymbol *file_symbol)
                 sem -> compilation_unit -> debug_unparse = true;
                 Ast::debug_unparse = true;
               }
+            if (option.comments)
+              sem -> lex_stream -> SetUpComments();
             sem -> compilation_unit -> XMLUnparse(*sem -> lex_stream,
                                                   "xml-unparsed/");
         }

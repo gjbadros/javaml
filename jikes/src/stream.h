@@ -166,6 +166,8 @@ public:
     wchar_t *InputBuffer() { return input_buffer; }
     size_t InputBufferLength() { return input_buffer_length; }
 
+    CommentIndex FirstCommentSince(TokenIndex);
+
     CommentIndex FirstComment(TokenIndex);
 
     inline int NumTypes() { return type_index.Length(); }
