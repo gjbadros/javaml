@@ -59,7 +59,7 @@ University of Washington</h6>
       of Java source code. This XML-based representation, called JavaML,
       is more natural for tools and permits easy specification of
       numerous software-engineering analysis by leveraging the plethora
-      of XML tools and techniques.  A robust converter built inside the
+      of XML tools and techniques.  A robust converter built with the IBM
       Jikes Java compiler framework translates from plain-text Java
       source code to JavaML.  I argue that the plain-text representation
       should be viewed as only artifact of the interactive
@@ -71,15 +71,92 @@ Java, source-code, XML, AST, parsing, analysis, software-engineering, AST, Jikes
 
 <h3>Introduction</h3>
 
+<h3>Background</h3>
+
+ <h4>Java</h4>
+
+Parsing technology, clean OO design, nice source-code properties (less
+    redundancy than, say, C++)
+
+ <h4>XML</h4>
+
+Properties of XML that influenced DTD design:
+
+attributes are unordered, finite
+ -> cannot use for arguments
+attributes are only text strings, so cannot have references
+ -> e.g., types need to be encoded as elements
+    not 
+     <method return-type="boolean" ...> ... 
+    but
+     <method ...><type name="boolean" primitive="true"/> ...
+Didn't want stuff like boolean[][] since then end user
+would have to do string processing on the attribute value to
+get at the base type.
+
+
 <h3>JavaML</h3>
+
+give the DTD
+
+issues include loop (for/while) vs. do-loop;  var-ref, var-set; 
+field/method element w/ "static" attribute, or two kinds of field/method elements:
+instance-field, class-field? 
+High level question: language-independence good or bad?  I lose
+the single variable type + multiple variable declarations abstraction -- 
+but it's really more than a syntactic artifact. (Maybe I shouldn't -- 
+add a continued-decl="true" attribute?).
+	
+
+<h3>Example uses</h3>
+
+<h3>Related work</h3>
+
+SGML/XML tools discussed in prior section.
+
+TAWK
+
+ASTLog
+
+Intentional Programming
+
+Structured Editors
+
+<h3>Future work</h3>
+
+Comments need to be preserved;  attaching them may be a bit tricky, but
+    is helped by JavaDoc conventions.
+
+Robust converter back to plain Java source.  Ideally do this with Jikes
+    and a XML DOM -> Jikes AST function, then let Jikes unparse and then 
+    indent.
+
+Another possibility: a DSSSL pretty printer from the JavaML source to
+	plain java source.  No need for a parser in the pretty printer!
+
+More id/idref matchups -- types to their class definitions in other
+files, etc.
+
+Redo some of the related work in the context of this more principled
+	approach.
+
+New abstractions?  Define a JavaML++ DTD w/ that abstraction, and
+	provide a JavaML++ -> JavaML transformation.  Bit like the
+	enzymes in IP.
+
+XML editors that display and let edit on the
+	plain-old-source-representation.
 
 <h3>Conclusion</h3>
 
+The best is yet to come.  XML tools are improving all the time.
+
 <h3>Acknowledgments</h3> 
 
-I thank Zack Ives, Craig Kaplan, Stefan Bjarni Sigurdsson for their
-helpful discussion.  I also thank Michael Ernst for advice on use of the
-Jikes compiler framework.
+I thank Stefan Bjarni Sigurdsson, Zack Ives, and Craig Kaplan for their
+helpful discussion. Thanks to IBM for constructing the
+Jikes compiler framework, and for making it publically available, and
+thanks to Mike Ernst for helpful pointers on its use.
 
 <h3>Appendix 1 - JavaML DTD</h3>
 
