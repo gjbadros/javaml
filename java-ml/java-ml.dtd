@@ -67,10 +67,12 @@
     name CDATA #REQUIRED
     %mod-final;
     id ID #REQUIRED>
-<!ELEMENT send (target,arguments)>
+<!ELEMENT send (target?,arguments)>
+<!ATTLIST send
+    message CDATA #REQUIRED>
 <!ELEMENT target (%expr-elems;)>
 <!ELEMENT return (%expr-elems;)>
-<!ELEMENT statements (statements|local-variable|try|throw|if|loop|return|continue|break|%expr-elems;)*>
+<!ELEMENT statements (statements|local-variable|try|throw|if|loop|do-loop|return|continue|break|%expr-elems;)*>
 <!ELEMENT throw (%expr-elems;)>
 <!ELEMENT throws EMPTY>
 <!ATTLIST throws
