@@ -75,8 +75,6 @@ void xml_suffix(Ostream &xo)
   xo << "</java-source-program>\n";
 }
 
-// GJB:FIXME:: should \" turn into "
-// should \n, \t, etc. be expanded?
 void
 OutputLiteralString(Ostream &xo, const char *sz)
 {
@@ -96,57 +94,6 @@ OutputLiteralString(Ostream &xo, const char *sz)
   }
 }
 
-#ifdef XML_MANGLE_FOR_IDS
-static char *szIdSeparator = ".";
-
-char *
-SzNewConvertingUnderscores(const char *sz)
-{
-  if (!sz) return NULL;
-  char *szNew = new char[strlen(sz)+1];
-  char *pch = szNew;
-  while (*sz) {
-    if (*sz == '_') *pch = '-';
-    else *pch = *sz;
-    ++sz;
-    ++pch;
-  }
-  *pch = '\0';
-  return szNew;
-}
-
-
-char *
-SzIdFromMethod(long id, const char *szClassName,const char *szMethodName)
-{
-  ostrstream xo;
-  char *szConverted = SzNewConvertingUnderscores(szMethodName);
-  xo << szClassName << szIdSeparator << szConverted << szIdSeparator << id << ends;
-  delete [] szConverted;
-  return xo.str();
-}
-
-char *
-SzIdFromConstructor(long id, const char *szClassName,const char *szConstructorName)
-{
-  ostrstream xo;
-  char *szConverted = SzNewConvertingUnderscores(szConstructorName);
-  xo << szClassName << szIdSeparator << szConverted << szIdSeparator << id << ends;
-  delete [] szConverted;
-  return xo.str();
-}
-
-char *
-SzIdFromFormalArgument(long id, const char *szClassName,
-                       const char *szMethodName, const char *szFormalArg)
-{
-  ostrstream xo;
-  char *szConverted = SzNewConvertingUnderscores(szFormalArg);
-  xo << SzIdFromMethod(id,szClassName,szMethodName) << "-" << szConverted << ends;
-  delete [] szConverted;
-  return xo.str();
-}
-#else
 char *
 SzIdFromMethod(long id, const char *szClassName,const char *szMethodName)
 {
@@ -174,11 +121,7 @@ SzIdFromFormalArgument(long id, const char *szClassName,
   // point back to locvar-#, not frmarg-# so we
   // need to be sure that the formal-argument gets
   // an id locvar-#, not frmarg-#
-  if (g_fInsideCatch) {
-    xo << "locvar-" << id << ends;
-  } else {
-    xo << "frmarg-" << id << ends;
-  }
+  xo << "frmarg-" << id << ends;
   return xo.str();
 }
 
@@ -189,7 +132,6 @@ SzIdFromLocalVariable(long id, const char *szVarName)
   xo << "locvar-" << id << ends;
   return xo.str();
 }
-#endif
 
 
 char *
@@ -592,13 +534,7 @@ void AstArrayType::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstSimpleName::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstSimpleName:#" << this-> id << "*/";
-#if 0 /* GJB:FIXME:: are these ever var-refs? */
-    xml_output(os,"var-ref",
-               "name",xml_name_string(lex_stream,identifier_token),
-               XML_CLOSE);
-#else
     os << lex_stream.NameString(identifier_token);
-#endif
     if (Ast::debug_unparse) os << "/*:AstSimpleName#" << this-> id << "*/";
 }
 
@@ -774,7 +710,6 @@ void AstArrayInitializer::XMLUnparse(Ostream& os, LexStream& lex_stream)
 
 void AstBrackets::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
-  // GJB:FIXME:: can we get here?
     if (Ast::debug_unparse) os << "/*AstBrackets:#" << this-> id << "*/";
     os << "[]";
     if (Ast::debug_unparse) os << "/*:AstBrackets#" << this-> id << "*/";
@@ -784,7 +719,6 @@ void AstVariableDeclaratorId::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstVariableDeclaratorId:#" << this-> id << "*/";
     os << lex_stream.NameString(identifier_token);
-    // GJB:FIXME:: can we get here?
     for (int i = 0; i < NumBrackets(); i++)
 	 os << "[]";
     if (Ast::debug_unparse) os << "/*:AstVariableDeclaratorId#" << this-> id << "*/";
@@ -927,8 +861,10 @@ void AstFormalParameter::XMLUnparse(Ostream& os, LexStream& lex_stream)
     xml_output(os,"formal-argument",
                "name",szName,
                "final",SzOrNullFromF(fFinal),
-               //               "id",SzIdFromFormalArgument(this->id,szClassName,szMethodName,szName),
-               "id",SzIdFromFormalArgument(formal_declarator->id,szClassName,szMethodName,szName),
+               "id",
+               (g_fInsideCatch? 
+                SzIdFromLocalVariable(formal_declarator->id,szName):
+                SzIdFromFormalArgument(formal_declarator->id,szClassName,szMethodName,szName)),
                NULL);
     xml_unparse_maybe_type(os,lex_stream,type);
     xml_close(os,"formal-argument",true);
@@ -1058,7 +994,6 @@ void AstMethodDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstStaticInitializer::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstStaticInitializer:#" << this-> id << "*/";
-    // GJB:FIXME:: test this
     xml_open(os,"static-initializer");
     block -> XMLUnparse(os, lex_stream);
     xml_close(os,"static-initializer");
@@ -1175,7 +1110,6 @@ void AstConstructorDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstInterfaceDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstInterfaceDeclaration:#" << this-> id << "*/";
-    // GJB:FIXME:: test this!
 
     bool fAbstract = false;
     bool fFinal = false;
@@ -1302,6 +1236,9 @@ void AstLocalVariableDeclarationStatement::XMLUnparse(Ostream& os, LexStream& le
     for (int k = 0; k < this -> NumVariableDeclarators(); k++)
       {
         char *szName = SzFromUnparse(lex_stream,VariableDeclarator(k)->variable_declarator_name);
+        // continued attribute is used to preserve that
+        // two variables were declared using a single type identifier
+        // (e.g., "int i, j;" -- j will have continued="true")
         xml_output(os,"local-variable",
                    "name",szName,
                    "visibility",szVisibility,
@@ -1313,8 +1250,6 @@ void AstLocalVariableDeclarationStatement::XMLUnparse(Ostream& os, LexStream& le
                    "id",SzIdFromLocalVariable(VariableDeclarator(k)->id,szName),
                    NULL);
         // Repeat the type for each variable
-        // GJB:FIXME:: here we lose the fact that the variables
-        // were declared w/ a single type --11/13/99 gjb
         xml_unparse_maybe_type(os,lex_stream,type);
         xml_unparse_maybe_var_ref(os,lex_stream,VariableDeclarator(k));
         xml_close(os,"local-variable",true);
@@ -1348,10 +1283,8 @@ void AstIfStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstEmptyStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstEmptyStatement:#" << this-> id << "*/";
-#if 0 /* GJB:FIXME:: do we need a <statements/> here? */
     xml_output(os,"block",XML_CLOSE);
     xml_nl(os);
-#endif
     if (Ast::debug_unparse) os << "/*:AstEmptyStatement#" << this-> id << "*/";
 }
 
