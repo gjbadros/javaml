@@ -331,6 +331,16 @@ Option::Option(ArgumentExpander &arguments) :
                 debug_unparse_ast = true;
                 debug_unparse_ast_debug = true;
             }
+            else if (strcmp(arguments.argv[i], "+ux") == 0)
+            {
+                debug_xml_unparse_ast = true;
+            }
+            else if (strcmp(arguments.argv[i], "+udx") == 0)
+            {
+                debug_unparse_ast_debug = true;
+                debug_xml_unparse_ast = true;
+            }
+
 #ifdef EBCDIC
             else if (strcmp(arguments.argv[i], "+ASCII") == 0)
                      ascii = true;

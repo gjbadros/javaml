@@ -77,6 +77,8 @@ int main(int argc, char *argv[])
         "+O numbytes        call no-op op_trap() for bytecodes of the given length\n"
         "+u                 unparse AST; produces Java code for the AST\n"
         "+ud                unparse AST, with extra debugging information\n"
+        "+ux                unparse AST into JavaML XML representation\n"
+        "+udx               unparse AST into JavaML, with extra debugging info\n"
 #endif
         "\nVersion 1.11 (10 Jan 2000)\n"
         "Originally written by Philippe Charles and David Shields \n"
