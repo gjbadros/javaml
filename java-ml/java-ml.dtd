@@ -91,7 +91,10 @@
 <!ELEMENT send (target?,arguments)>
 <!ATTLIST send
     message CDATA #REQUIRED>
-<!ELEMENT block (%stmt-elems;)*>
+<!ELEMENT block (label*,(%stmt-elems;)*)>
+<!ELEMENT label EMPTY>
+<!ATTLIST label
+    name CDATA #REQUIRED>
 <!ELEMENT target (%expr-elems;)>
 <!ELEMENT return (%expr-elems;)?>
 <!ELEMENT throw (%expr-elems;)>
@@ -160,7 +163,7 @@
 <!ELEMENT literal-false EMPTY>
 <!ELEMENT literal-true EMPTY>
 <!ELEMENT literal-null EMPTY>
-<!ELEMENT synchronized (expr,(%stmt-elems;))>
+<!ELEMENT synchronized (expr,block)>
 <!ELEMENT expr (%expr-elems;)>
 <!ELEMENT if (test,true-case,false-case?)>
 <!ELEMENT test (%expr-elems;)>
