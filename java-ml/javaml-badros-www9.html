@@ -318,6 +318,8 @@ features of the two technologies it builds a bridge between: Java and XML.
     
 <p>
       
+
+<!-- Java also is free from parsing "state" like "public:" and "private:" in c++ -->
    Java is being widely used both in industry and in education, and it
    remains popular as a programming language on the web.  Unlike C++, a
    Java class definition exists in a single, self-contained file.  There
@@ -842,6 +844,8 @@ New abstractions?  Define a JavaML++ DTD w/ that abstraction, and
 XML editors that display and let edit on the
 	plain-old-source-representation.
 
+</pre>
+<!-- 
 Issue:
   -> mangling for id/idrefs
 
@@ -853,8 +857,8 @@ Issue:
     [var-ref name="System"]
   [/field-access]
 [/field-access]
+-->
 
-</pre>
 <p><span class="index"><a href="#top">[top]</a></span>
 
 <h3><a name="conclusion">7 - Conclusion</a></h3>
@@ -1101,8 +1105,7 @@ class Set {
   public Enumeration elements()
     { return hash.elements(); }
 
-  public String toString()
-  { 
+  public String toString() { 
     StringBuffer bstr = new StringBuffer("{ ");
     Enumeration e = hash.keys();
     if (e.hasMoreElements())
