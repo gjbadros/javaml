@@ -1,0 +1,66 @@
+#!/usr/bin/perl -w
+
+BEGIN {
+%names = (
+Arnold98,3,
+"Badros-javaml",4,
+"Badros00-spe",6,
+CCEL92,22,
+CSS2,8,
+CassoInI,5,
+Chava,41,
+Chen89,11,
+"Clark-XP",13,
+"Clark-XT",15,
+Clock94,17,
+Crew97,18,
+DOM,2,
+DSSSL,38,
+Dougherty90,21,
+ErnstBadrosNotkin00,23,
+Flanagan97,25,
+Goldberg89,26,
+Goldfarb98,27,
+Goosens99,28,
+Griswold96,29,
+Habermann86,30,
+Jade,12,
+Jikes,32,
+Kiesel95,40,
+Levine92,42,
+Miller99,45,
+Modula2,10,
+SAX,43,
+SDS,46,
+SGML,37,
+Saxon,39,
+Simonyi96,47,
+Soroker97,48,
+Stroustrup97,49,
+SunApplets,50,
+UMLNutshell,1,
+XMI,35,
+XML,9,
+"XML4C++",34,
+XMLDiffMerge,33,
+XMLNotepad,44,
+"XMLQL-EnE",24,
+XMLSchema1,51,
+XMLSchema2,7,
+XMLSpy,36,
+XPath,16,
+XSL,19,
+XSLT,14,
+"ltxml",52,
+perlDOM,20,
+perlSGML,31
+);
+}
+
+while ($index = <>) {
+  chomp($index);
+  my @indices = split(/,/, $index);
+  for my $i (@indices) {
+    print "$names{$i}\n";
+  }
+}
