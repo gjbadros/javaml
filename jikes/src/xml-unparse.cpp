@@ -116,38 +116,28 @@ char *SzNewEscapedLiteralString(const char *sz, bool fIgnoreFirstAndLast = true)
   return szAnswer;
 }
 
-char *
-SzIdFromMethod(long id, const Ast *pnode)
+static char *
+SzIdFor(LexStream &lex_stream, char *szType, long id)
 {
+  FileSymbol *pfs = lex_stream.file_symbol;
+  char *sz = wstring2string(pfs->Name());
   ostrstream xo;
-  xo << "meth-" << id << ends;
+  xo << sz << ":" << szType << "-" << id << ends;
+  delete sz;
   return xo.str();
 }
 
-char *
-SzIdFromConstructor(long id, const Ast *pnode)
-{
-  ostrstream xo;
-  xo << "ctr-" << id << ends;
-  return xo.str();
-}
+static char *SzIdFromMethod(long id, LexStream &lex_stream)
+{ return SzIdFor(lex_stream,"mth",id); }
 
-char *
-SzIdFromFormalArgument(long id, const Ast *pnode)
-{
-  ostrstream xo;
-  xo << "frmarg-" << id << ends;
-  return xo.str();
-}
+static char *SzIdFromConstructor(long id, LexStream &lex_stream)
+{ return SzIdFor(lex_stream,"ctr",id); }
 
-char *
-SzIdFromLocalVariable(long id, const Ast *pnode)
-{
-  ostrstream xo;
-  xo << "locvar-" << id << ends;
-  return xo.str();
-}
+static char *SzIdFromFormalArgument(long id, LexStream &lex_stream)
+{ return SzIdFor(lex_stream,"frm",id); }
 
+static char *SzIdFromLocalVariable(long id, LexStream &lex_stream)
+{ return SzIdFor(lex_stream,"var",id); }
 
 char *
 SzNewFromLong(long i)
@@ -412,12 +402,12 @@ void xml_unparse_maybe_var_ref(Ostream &xo, LexStream &ls, Ast *pnode)
       if (g_pblockdecl && g_pblockdecl->block_symbol)
         var_symbol = g_pblockdecl->block_symbol->FindVariableSymbol(name_symbol);
       if (var_symbol)
-        szIdRef = SzIdFromLocalVariable(var_symbol->declarator->id,pnode);
+        szIdRef = SzIdFromLocalVariable(var_symbol->declarator->id,ls);
       else if (g_pmethoddecl && g_pmethoddecl->method_symbol) {
         var_symbol = g_pmethoddecl->method_symbol->block_symbol->FindVariableSymbol(name_symbol);
         /* GJB:FIXME:: cheat here instead of figuring out classname, methodname, etc. */
         if (var_symbol)
-          szIdRef = SzIdFromFormalArgument(var_symbol->declarator->id,pnode);
+          szIdRef = SzIdFromFormalArgument(var_symbol->declarator->id,ls);
       }
     }
     xml_output(xo,"var-ref",
@@ -990,8 +980,8 @@ void AstFormalParameter::XMLUnparse(Ostream& os, LexStream& lex_stream)
                "final",SzOrNullFromF(fFinal),
                "id",
                (g_fInsideCatch? 
-                SzIdFromLocalVariable(formal_declarator->id,this):
-                SzIdFromFormalArgument(formal_declarator->id,this)),
+                SzIdFromLocalVariable(formal_declarator->id,lex_stream):
+                SzIdFromFormalArgument(formal_declarator->id,lex_stream)),
                NULL);
     xml_unparse_maybe_type(os,lex_stream,type);
     xml_close(os,"formal-argument",true);
@@ -1093,7 +1083,7 @@ void AstMethodDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
                              "synchronized",SzOrNullFromF(fSynchronized),
                              "native",SzOrNullFromF(fNative),
                              "num-brackets", szNumBrackets,
-                             "id",SzIdFromMethod(id,this),
+                             "id",SzIdFromMethod(id,lex_stream),
                              NULL);
 
     delete szNumBrackets;
@@ -1221,7 +1211,7 @@ void AstConstructorDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
                              "static",SzOrNullFromF(fStatic),
                              "synchronized",SzOrNullFromF(fSynchronized),
                              "native",SzOrNullFromF(fNative),
-                             "id",SzIdFromConstructor(id,this),
+                             "id",SzIdFromConstructor(id,lex_stream),
                              NULL);
     xml_nl(os);
 
@@ -1377,7 +1367,7 @@ void AstLocalVariableDeclarationStatement::XMLUnparse(Ostream& os, LexStream& le
                    "volatile",SzOrNullFromF(fVolatile),
                    "transient",SzOrNullFromF(fTransient),
                    "continued",(k==0?NULL:"true"),
-                   "id",SzIdFromLocalVariable(VariableDeclarator(k)->id,this),
+                   "id",SzIdFromLocalVariable(VariableDeclarator(k)->id,lex_stream),
                    NULL);
         // Repeat the type for each variable
         xml_unparse_maybe_type(os,lex_stream,type);
