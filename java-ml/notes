@@ -14,7 +14,7 @@ Possible Analyses:
 * enforce hungarian naming convention
 * metrics:
   -> sgcount xml-unparsed/ClSimplexSolver.java.xml
-
+* better diff utility; canonical ast differ for cheating check
 
 
 XML DTD Stuff:
@@ -109,6 +109,9 @@ Syntactic analysis phase of compiler is replaces with XML parser
 
 Semantic analysis phase of compiler is simplified
  -> some analysis handled by validity check
+   -> it'd be interesting to see which semantic errors jikes
+      reports are handled by the XML validity check on my DTD
+ -> well-formedness doesn't give us much, though
 
 canonical external representation of AST for java source program
  -> interacting compilers, tools, etc.

@@ -1,4 +1,7 @@
 *.class
 classes
+java-ml-dtd
+java-ml-dtd.xml
+java-ml-handers.debug
 unparsed
 xml-unparsed
