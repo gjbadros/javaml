@@ -1,3 +1,15 @@
+Sat Nov 13 11:38:16 1999  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Handle IDs (still broken, though).  Handle
+	Package declarations, throw statements, various literals, new
+	(constructor) expressions.  Split expressions into binary-expr,
+	conditional-expr, assignment-expr.
+
+Fri Nov 12 16:05:42 1999  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Make link to DTD properly; omit return if no
+ 	expression.
+
 Fri Nov 12 15:37:46 1999  Greg J. Badros  <gjb@cs.washington.edu>
 
 	* xml-unparse.cpp:  Handle local variables, message sends.
