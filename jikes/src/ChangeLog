@@ -1,3 +1,11 @@
+Sat Nov 13 22:40:52 1999  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Update xml_name_string() to convert &&, <.
+	(There are others that'll need to be converted, too, it seems).
+	Use XML_CLOSE appropriately throughout so the output empty tags
+	are in the <br/> form for XML to be happy with it (now tests pass
+	using nsgmls-xml script that uses the more restrictive XML rules).
+
 Sat Nov 13 21:34:42 1999  Greg J. Badros  <gjb@cs.washington.edu>
 
 	* xml-unparse.cpp: Make return, target both contain expressions
