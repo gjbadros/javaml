@@ -581,7 +581,7 @@ This is a huge step towards a more useful markup language.
 We have definitely added value to the source code
 and it is trivial to convert back to the classical representation: we simply
 remove all tags and leave the content of the elements behind (this is
-exactly what the <code>stripsgml</code> <cite>[<a href="#REF-PerlSGML">PerlSGML</a>]</cite> utility
+exactly what the <code>stripsgml</code> <cite>[<a href="#REF-perlSGML">perlSGML</a>]</cite> utility
 does).  Though this representation seems useful for many tasks, it still
 has some problems.  First, many of the details of the code are included
 in the textual content of elements.  If we want to determine what
@@ -983,7 +983,7 @@ trivial thanks to the JavaML representation:
 The <code>sgrpg</code> (SGML RePort Generator) program permits combining
 a top-level query with a restriction on the children and an output
 format for the results (a common paradigm for querying tools 
-<cite>[<a href="#REF-XMLQL">XMLQL</a>-EnE]</cite>).  For example:
+<cite>[<a href="#REF-XMLQL">XMLQL-EnE</a>]</cite>).  For example:
 
 <pre>
 <strong>
@@ -1083,11 +1083,11 @@ tools with varying degrees of success.
 
 <p>
 
-TAWK <cite>[<a href="#REF-Griswold96">Griswold96</a>]</cite> extends the AWK <cite>[<a href="#REF-Awk">Awk</a>]</cite>
+TAWK <cite>[<a href="#REF-TAWK">TAWK</a>]</cite> extends the AWK <cite>[<a href="#REF-Awk">Awk</a>]</cite>
 paradigm by matching patterns in the AST of a C program.  Numerous XML
 querying tools provide this same functionality for JavaML, and the
 event-action framework is similar to that used by SAX 
-(Simple API for XML) <cite>[SAX]</cite>.
+(Simple API for XML) <cite>[<a href="#REF-SAX">SAX</a>]</cite>.
 
 <p>
 
@@ -1287,7 +1287,9 @@ fellowship and by NSF Grant No. IIS-9975990.
 &lt;!ENTITY % mod-abstract "abstract CDATA #IMPLIED"&gt;
 &lt;!ENTITY % mod-synchronized "synchronized CDATA #IMPLIED"&gt;
 &lt;!ENTITY % expr-elems
-    "send|new|new-array|var-ref|field-access|array-ref|paren|assignment-expr|conditional-expr|binary-expr|unary-expr|cast-expr|literal-number|literal-string|literal-true|literal-false|literal-null|this|super"&gt;
+    "send|new|new-array|var-ref|field-access|array-ref|paren|assignment-expr|\
+conditional-expr|binary-expr|unary-expr|cast-expr|literal-number|literal-string|\
+literal-true|literal-false|literal-null|this|super"&gt;
 &lt;!ELEMENT java-source-program (package-decl?,import*,(class|interface)+) &gt;
 &lt;!ATTLIST java-source-program name CDATA #IMPLIED version CDATA #IMPLIED&gt;
 &lt;!ELEMENT import EMPTY&gt;
@@ -1623,7 +1625,10 @@ class Set {
       &lt;formal-arguments/&gt;
       &lt;statements&gt;
 	&lt;statements&gt;
-	  &lt;local-variable name="bstr" id="locvar-216"&gt;&lt;type name="StringBuffer"/&gt;&lt;new&gt;&lt;type name="StringBuffer"/&gt;&lt;arguments&gt;&lt;literal-string length="4"&gt;{ &lt;/literal-string&gt;&lt;/arguments&gt;&lt;/new&gt;
+	  &lt;local-variable name="bstr" id="locvar-216"&gt;
+               &lt;type name="StringBuffer"/&gt;
+               &lt;new&gt;&lt;type name="StringBuffer"/&gt;
+                 &lt;arguments&gt;&lt;literal-string length="4"&gt;{ &lt;/literal-string&gt;&lt;/arguments&gt;&lt;/new&gt;
 	  &lt;/local-variable&gt;
 	  &lt;local-variable name="e" id="locvar-223"&gt;&lt;type name="Enumeration"/&gt;&lt;send message="keys"&gt;
 	      &lt;target&gt;&lt;var-ref name="hash"/&gt;&lt;/target&gt;
@@ -1692,28 +1697,29 @@ class Set {
 
 <h3><a name="references">References</a></h3>
 
+<small>
 <p>
 <a name="REF-JavaSpec"><strong>[JavaSpec]</strong></a> &nbsp; 
 James Gosling, Bill Joy, and Guy Steele. 
-<emph>The Java Language Specification</emph>.
+<em>The Java Language Specification</em>.
 Addison-Wesley, 1996.
 
 <p>
 <a name="REF-Java"><strong>[Java]</strong></a> &nbsp; 
 Ken Arnold and James Gosling.
-<emph>The Java Programming Language</emph>, 2nd ed.
+<em>The Java Programming Language</em>, 2nd ed.
 Addison Wesley Longman, 1997.
 
 <p>
 <a name="REF-JavaNutShell"><strong>[JavaNutShell]</strong></a> &nbsp;
 David Flanagan.
-<emph>Java in a Nutshell</emph>, 2nd ed.
+<em>Java in a Nutshell</em>, 2nd ed.
 O'Reilly and Associates, 1996.
 
 <p>
 <a name="REF-UMLNutshell"><strong>[UMLNutshell]</strong></a> &nbsp;
 Sinan Si Alhir.
-<emph>UML in a Nutshell</emph>.
+<em>UML in a Nutshell</em>.
 O'Reilly and Associates, 1998.
 
 <p>
@@ -1736,12 +1742,14 @@ Megginson Technologies.
 
 <p>
 <a name="REF-Jikes"><strong>[Jikes]</strong></a> &nbsp;
-IBM Jikes Java Compiler 
+IBM Jikes Java Compiler.
+<code><a href="http://www.alphaworks.ibm.com/tech/Jikes">http://www.alphaworks.ibm.com/tech/Jikes</a></code>
+
 
 <p>
 <a name="REF-CSS2"><strong>[CSS2]</strong></a> &nbsp;
 Bert Bos, H&aring;kon Wium Lie, Chris Lilley, and Ian Jacobs, eds.
-<emph>Cascading Style Sheets, level 2</emph>.  W3C Recommendation.
+<em>Cascading Style Sheets, level 2</em>.  W3C Recommendation.
 <code><a href="http://www.w3.org/TR/REC-CSS2">http://www.w3.org/TR/REC-CSS2</a></code>
 
 <p>
@@ -1749,60 +1757,61 @@ Bert Bos, H&aring;kon Wium Lie, Chris Lilley, and Ian Jacobs, eds.
 V. Apparao, S. Byrne, M. Champion, S. Isaacs, I. Jacobs,
 A. Le Hors, G. Nicol, J. Robie, R. Sutor, C. Wilson,
 and L. Wood, eds.
-<emph>Document Object Model (DOM) Level 1</emph>.  W3C Recommendation.
+<em>Document Object Model (DOM) Level 1</em>.  W3C Recommendation.
 <code><a href="http://www.w3.org/TR/REC-DOM-Level-1">http://www.w3.org/TR/REC-DOM-Level-1</a></code>
 
 <p>
 <a name="REF-XSLT"><strong>[XSLT]</strong></a> &nbsp;
 James Clark, ed.
-<emph>XSL Transformations</emph>.  W3C Recommendation.
+<em>XSL Transformations</em>.  W3C Recommendation.
 <code><a href="http://www.w3.org/TR/xslt">http://www.w3.org/TR/xslt</a></code>
 
-<a name="REF-strong"><p><strong>[XSL]</strong></a> &nbsp;
+<p>
+<a name="REF-strong"><strong>[XSL]</strong></a> &nbsp;
 Stephen Deach, ed.
-<emph>Extensible Stylesheet Language (XSL) Specification</emph>. W3C Working Draft 21 Apr 1999.
+<em>Extensible Stylesheet Language (XSL) Specification</em>. W3C Working Draft 21 Apr 1999.
 <code><a href="http://www.w3.org/TR/WD-xsl">http://www.w3.org/TR/WD-xsl</a></code>
 
 <p>
 <a name="REF-XPath"><strong>[XPath]</strong></a> &nbsp;
 James Clark and Steve DeRose, eds.
-<emph>XML Path Langauge (XPath) Version 1.0</emph>. W3C Recommendation.
+<em>XML Path Langauge (XPath) Version 1.0</em>. W3C Recommendation.
 <code><a href="http://www.w3.org/TR/xpath">http://www.w3.org/TR/xpath</a></code>
 
 <p>
 <a name="REF-XMLSchema1"><strong>[XMLSchema1]</strong></a> &nbsp;
 Henry S. Thompson, David Beech, Murray Maloney, Noah Mendelsohn, eds.
-<emph>XML Scheme Part 1: Structures</emph>. W3c Working Draft 5 Nov 1999.
+<em>XML Scheme Part 1: Structures</em>. W3c Working Draft 5 Nov 1999.
 <code><a href="http://www.w3.org/TR/xmlschema-1">http://www.w3.org/TR/xmlschema-1</a></code>
 
 <p>
 <a name="REF-XMLSchema1"><strong>[XMLSchema1]</strong></a> &nbsp;
 Paul V. Biron, Ashok Malhotra, eds.
-<emph>XML Scheme Part 2: Datatypes</emph>. W3c Working Draft 5 Nov 1999.
+<em>XML Scheme Part 2: Datatypes</em>. W3c Working Draft 5 Nov 1999.
 <code><a href="http://www.w3.org/TR/xmlschema-2">http://www.w3.org/TR/xmlschema-2</a></code>
 
 <p>
 <a name="REF-Smalltalk"><strong>[Smalltalk]</strong></a> &nbsp;
 Adele Goldberg and David Robson.
-<emp>Smalltalk-80: The Language</emph>.
+<em>Smalltalk-80: The Language</em>.
 Addison-Wesley, 1989.
 
 <p>
 <a name="REF-C++"><strong>[C++]</strong></a> &nbsp;
 Bjarne Stoustrup.
-<emph>The C++ Programming Language</emph>, 3rd ed.
+<em>The C++ Programming Language</em>, 3rd ed.
 Addison-Wesley, 1997.
 
 <p>
 <a name="REF-Modula-2"><strong>[Modula-2]</strong></a> &nbsp;
 British Standards Institution.
-<emph>Modula-2 Draft International Standard</emph>, ISO-94.
+<em>Modula-2 Draft International Standard</em>, ISO-94.
 June 1994.
 
 <p>
 <a name="REF-XML"><strong>[XML]</strong></a> &nbsp;
 Tim Bray, Jean Paoli, and C. M. Sperberg-McQueen, eds.
-<emph>Extensible Markup Language (XML) 1.0</emph>
+<em>Extensible Markup Language (XML) 1.0</em>
 <code><a href="http://www.w3.org/TR/REC-xml">http://www.w3.org/TR/REC-xml</a></code>
 
 <p>
@@ -1823,7 +1832,7 @@ To appear: Software--Practice and Experience.
 <a name="REF-ASTLog"><strong>[ASTLog]</strong></a> &nbsp;
 Roger Crew.
 "ASTLOG: A Language for Examining Abstract Syntax Trees".
-<emph>Proceedings of the USENIX Conference on Domain-Specific Languages</emph>
+<em>Proceedings of the USENIX Conference on Domain-Specific Languages</em>
 October 1997. Santa Barbara, California.
 
 <p>
@@ -1842,40 +1851,85 @@ Mary Fernandez, J&eacute;r&ocirc;me Sim&eacute;on, and Philip Wadler.
 <a name="REF-Montana"><strong>[Montana]</strong></a> &nbsp;
 Danny Soroker, Michael Karasick, John Barton, and David Streeter.
 "Extension Mechanisms in Montana".
-<emph>Proceedings of 8th Israeli Conference on Computer-Based Systems and Software Engineering</emph>.
+<em>Proceedings of 8th Israeli Conference on Computer-Based Systems and Software Engineering</em>.
 June 1997.
 
 <p>
 <a name="REF-CCEL"><strong>[CCEL]</strong></a> &nbsp;
 Carolyn K. Duby, Scott Meyers, Steven P. Reiss.
 "CCEL: A Metalanguage for C++".
-<emph>Proceedings of the USENIX 1992 C++ Conference</emph>.
+<em>Proceedings of the USENIX 1992 C++ Conference</em>.
 August 1992. Portland, Oregon.
 
 <p>
 <a name="REF-LexYacc"><strong>[LexYacc]</strong></a> &nbsp;
 Levine, John R.
-<emph>Lex & Yacc</emph>, 2nd ed.
+<em>Lex & Yacc</em>, 2nd ed.
 O'Reilly and Associates, 1992.
 
 <p>
 <a name="REF-SGML"><strong>[SGML]</strong></a> &nbsp;
-<emph>Standard Generalized Markup Language (SGML)</emph>.
+<em>Standard Generalized Markup Language (SGML)</em>.
 ISO 8879:1986.
 <code><a href="http://www.iso.ch/cate/d16387.html">http://www.iso.ch/cate/d16387.html</a></code>
 
 <p>
+<a name="REF-DSSSL"><strong>[DSSSL]</strong></a> &nbsp;
+<em>Document Style Semantics and Specification Language (DSSSL)</em>.
+ISO/IEC 10179:1996.
+<code><a href="http://www.jclark.com/dsssl">http://www.jclark.com/dsssl</a></code>
+
+<p>
 <a name="REF-LaTeXWeb"><strong>[LaTeXWeb]</strong></a> &nbsp;
 Michael Goosens and Sebastian Rahtz.
-<emph>The LaTeX Web Companion</emph>.
+<em>The LaTeX Web Companion</em>.
 Addison Wesley Longman, 1999.
 
 <p>
 <a name="REF-XML"><strong>[XML-Handbook]</strong></a> &nbsp;
 Charles F. Goldfarb and Paul Prescod.
-<emph>The XML Handbook</emph>
+<em>The XML Handbook</em>
 Prentice Hall PTR, 1998.
 
+
+<p>
+<a name="REF-ltxml"><strong>[ltxml]</strong></a> &nbsp;
+Language Technology Group, University of Edinburgh.
+LT XML version 1.1.
+<code><a href="http://www.ltg.ed.ac.uk/software/xml">http://www.ltg.ed.ac.uk/software/xml</a></code>
+
+<p>
+<a name="REF-perlSGML"><strong>[perlSGML]</strong></a> &nbsp;
+Earl Hood.
+perlSGML library.
+<code><a href="http://www.oac.uci.edu/indiv/ehood/perlSGML.html">http://www.oac.uci.edu/indiv/ehood/perlSGML.html</a></code> 
+
+<p>
+<a name="REF-perlDOM"><strong>[perlDOM]</strong></a> &nbsp;
+Enno Derksen and Clark Cooper.
+Perl <code>XML::DOM</code> module.
+<code><a href="http://users.erols.com/enno/dom/">http://users.erols.com/enno/dom/</a></code>
+
+<p>
+<a name="REF-perlXMLParser"><strong>[perlXMLParser]</strong></a> &nbsp;
+Larry Wall and Clark Cooper.
+Perl <code>XML::Parser</code> module.
+<code><a href="http://wwwx.netheaven.com/~coopercc/xmlparser/intro.html">http://wwwx.netheaven.com/~coopercc/xmlparser/intro.html</a></code>
+
+
+<p>
+<a name="REF-TAWK"><strong>[TAWK]</strong></a> &nbsp;
+William G. Griswold and Darren C. Atkinson.
+"Fast, Flexible Syntactic Pattern Matching and Processing".
+<em>Proceedings of the IEEE 1996 Workshop on Program Comprehension</em>.
+March 1996.
+
+<p>
+<a name="REF-Simonyi96"><strong>[Simonyi96]</strong></a> &nbsp;
+Charles Simonyi.
+"Intentional Programming - Innovation in the Legacy Age".
+<emph>International Federation for Information Processing WG 2.1 meeting</emph>.
+June 1996.
 
 
 <!--
@@ -1884,6 +1938,7 @@ Prentice Hall PTR, 1998.
 http://www.w3.org/XML/1999/XML-in-10-points
 -->
 
+</small>
 <p><span class="index"><a href="#top">[top]</a></span>
 
 
