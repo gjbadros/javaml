@@ -9,7 +9,7 @@
 <!ENTITY % mod-abstract "abstract CDATA #IMPLIED">
 <!ENTITY % mod-synchronized "synchronized CDATA #IMPLIED">
 
-<!ENTITY % expression-types "send|var-ref|array-ref|paren|assignment-expr|conditional-expr|binary-expr|unary-expr|cast-expr|literal-number|literal-string|literal-true|literal-false|literal-null|this|super">
+<!ENTITY % expression-types "send|new|var-ref|array-ref|paren|assignment-expr|conditional-expr|binary-expr|unary-expr|cast-expr|literal-number|literal-string|literal-true|literal-false|literal-null|this|super">
 
 <!ELEMENT java-source-program (package-decl?,import*,class+) >
 <!ATTLIST java-source-program
@@ -25,7 +25,7 @@
     %mod-final
     %mod-synchronized
     superclass CDATA "Object">
-<!ELEMENT field EMPTY>
+<!ELEMENT field (%expression-types)?>
 <!ATTLIST field
     type CDATA #REQUIRED
     name CDATA #REQUIRED
@@ -77,7 +77,7 @@
 <!ELEMENT new (arguments)>
 <!ATTLIST new
     class CDATA #REQUIRED>
-<!ELEMENT local-variable EMPTY>
+<!ELEMENT local-variable (%expression-types)?>
 <!ATTLIST local-variable
     type CDATA #REQUIRED
     name CDATA #REQUIRED>
@@ -123,3 +123,9 @@
 <!ELEMENT this-call (arguments)>
 <!ELEMENT super EMPTY>
 <!ELEMENT this EMPTY>
+<!ELEMENT loop (init*,test?,update*,statements?)>
+<!ATTLIST loop
+    kind (for|while) #IMPLIED>
+<!ELEMENT init ANY>
+<!ELEMENT update ANY>
+<!ELEMENT do-loop (statements?,test?)>
