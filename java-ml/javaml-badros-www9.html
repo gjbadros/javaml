@@ -415,10 +415,10 @@ that document is not valid, though it may still be well-formed.
 
 When modeling data in XML, a primary design decision is choosing whether
 to nest elements or to use attributes.  In the above example, we could
-      have folded all of the information contained in the
-      <code>head</code> into attributes of the <code>email</code>
-      element if we chose.  There are several important differences
-      between using attributes and nesting elements:
+have folded all of the information contained in the <code>head</code>
+into attributes of the <code>email</code> element if we chose.  There
+are several important differences between using attributes and nesting
+elements:
 
 <ul>
 
@@ -443,6 +443,13 @@ revisiting the decision in order to simplify some useful manipulation of
 the document.
 
 <p>
+
+Another useful data modeling capability of XML is the ability to attach
+unique identifiers to elements via an <code>ID</code> attribute.  These
+elements can then be later referred to by <code>IDREF</code> attributes
+of other elements.  A well-formed XML document must have every
+<code>IDREF</code> name an <code>ID</code> given in the document.
+
 
 <!--GJB:FIXME:: lots of cite s here--> 
 
@@ -774,37 +781,243 @@ more about back-converting possibilities.
 
 <h3><a name="leveraging-xml">4 - Leveraging XML</a></h3>
 
+JavaML uses XML as an alternate, structured representation of a Java
+source program.  Though the abstraction away from syntactic details of
+Java is convenient, the more important benefit is that JavaML enables
+the use of the rich infrastructure developed to support SGML and XML.
+Instead of building analysis and transformation tools from scratch to
+work on a proprietary binary structured format for a program, existing
+SGML and XML tools can be used, combined, and extended.  In this paper,
+I will discuss applications of only three tool groups:
+
+<ul>
+<li> The XML toolbox (ltxml) from Edinburgh University
+<cite>[ltxml]</cite> which contains <code>sgcount</code>,
+<code>sgrpg</code>, <code>sggrep</code>, and more.
+
+<li> The perlSGML utilities <cite>[perlSGML]</cite> <!--Earl Hood--> which
+contains <code>dtd2html</code>, <code>dtddiff</code>,
+<code>dtdtree</code>, and more.
+
+<li> The Perl XML::DOM package <cite>[perlDOM]</cite> which exposes a
+DOM level 1 <cite>[DOM]</cite> interface to an XML tree.
+</ul>
+
+These are just a very small subset of the tools that may prove useful
+when working with JavaML.  In the following examples, we will query the
+<code>Set.java.xml</code> document that appears in <a
+href="#set.java.xml">Appendix 2b</a>.
+
+<p>
+
+One common software engineering tasks is to accumulate metrics about a
+source code artifact.  With JavaML, the SGML utility
+<code>sgcount</code> does a fantastic job of summarizing the constructs
+in a Java program:
+
+<pre>
+<strong>
+% sgcount Set.java.xml
+</strong>
+<small>
+new                    5   0
+method                 9   9
+lvalue                 4   0
+if                     1   0
+var-set                4   0
+literal-true           2   0
+assignment-expr        4   0
+loop                   1   0
+formal-argument        7   7
+package-decl           1   0
+local-variable         2   2
+literal-null           2   0
+target                 18  0
+cast-expr              1   0
+constructor            4   4
+arguments              23  0
+import                 1   0
+send                   18  0
+return                 8   0
+test                   2   0
+formal-arguments       13  0
+class                  1   0
+java-source-program    1   0
+true-case              1   0
+type                   25  0
+conditional-expr       2   0
+var-ref                25  0
+literal-false          2   0
+statements             25  0
+literal-string         3   0
+binary-expr            3   0
+field                  1   0
+*Total*               219  22
+</small>
+</pre>
+
+In the above, each row lists an element class and the number of times
+that that element appeared in the document (the third column can be
+ignored).  Thus, we can easily see that there are 9 <code>method</code>
+elements, thus there are 9 method definitions.  Similarly, we can see
+that there is 1 class definition, 25 variable references, 18 message
+sends, and 3 string literals.
+
+<p>
+
+Suppose we wish to see all the string literals that a program contains.
+We can do this trivially using <code>sggrep</code> on the JavaML
+representation of the program:
+
+<pre>
+<strong>
+% sggrep '.*/literal-string' < Set.java.xml        
+</strong>
+&lt;?xml version='1.0' encoding='UTF-8'?&gt;
+&lt;!DOCTYPE java-source-program SYSTEM "java-ml.dtd" &gt;
+&lt;literal-string length='4'&gt;{ &lt;/literal-string&gt;
+&lt;literal-string length='4'&gt;, &lt;/literal-string&gt;
+&lt;literal-string length='6'&gt; }\n&lt;/literal-string&gt;
+</pre>
+
+Notice that the output of <code>sggrep</code> is also an XML document.
+Thus we can string together SGML and XML tools in a Unix pipeline to
+combine tools in novel and useful ways.  For example, if we want to just
+see the strings, we can run <code>stripsgml</code> on the output of the
+above query:
+
+<pre>
+<strong>
+% sggrep '.*/literal-string' < Set.java.xml | stripsgml
+{ 
+, 
+ }\n
+</strong>
+
+<p>
+
+We can also query the JavaML source for elements based on values of
+their attributes.  For example, if we wish to find all sends of the
+message <code>clone</code> we can do so easily and reliably:
+
+<pre>
+<strong>
+% sggrep '.*/send[message=clone]' < Set.java.xml 
+</strong>
+&lt;?xml version='1.0' encoding='UTF-8'?&gt;
+&lt;!DOCTYPE java-source-program SYSTEM "java-ml.dtd" &gt;
+&lt;send message='clone'&gt;
+&lt;target&gt;
+&lt;var-ref name='hash'/&gt;
+&lt;/target&gt;
+&lt;arguments/&gt;
+&lt;/send&gt;
+</pre>
+
+
+Another class of common analyses is the semantic checks done by the
+compiler prior to translation.  For example, in Java code, only abstract
+classes can have abstract methods.  When compiling, a semantic error
+will be flagged if this is not the case.  We can query a JavaML document
+for not-abstract classes that contain a method that is abstract:
+
+<pre>
+<strong>
+% sggrep -q '.*/class[abstract!=true]/method[abstract=true]' < Set.java.xml
+</strong>
+</pre>
+
+and the output will be empty since this semantic restriction is not
+violated in our target document.
+
+<p>
+
+A common error for novice Java programmers is to accidentally use the
+assignment operator, <code>=</code>, instead of using the equality test
+operator, <code>==</code>.  Though the Java type checker will catch
+these most of these errors at compile time (it will miss the problem if
+the assigned-to variable is a boolean). If we wish to find these
+      questionable constructs, <code>sggrep</code> makes easy business
+      of this thanks to the JavaML representation:
+
+<pre>
+<strong>
+% sggrep -q '.*/if/test/assignment-expr' < Set.java.xml
+</strong>
 <pre>
 
-*** examples include diffing source code, code metrics, searches,
-transformations such as renaming a local variable, etc.
+<p>
 
-* metrics:
--> sgcount xml-unparsed/ClSimplexSolver.java.xml
+The <code>sgrpg</code> (SGML RePort Generator) program permits combining
+a top-level query with a restriction on the children and an output
+      format for the results.  For example:
 
-* check that only abstract classes have abstract methods
--> sggrep -q '.*/class[abstract!=true]/method[abstract=true]' ComplexApplet.java.xml
+<pre>
+<strong>
+% sgrpg '.*/method' '.*/send[message=hasMoreElements]' '' '%s %s 
+' visibility name < Set.java.xml
+</strong>
+public toString
+</pre>
 
-* look for all sends of the message "drawString"
--> sggrep -q '.*/send[message=drawString]' xml-unparsed/ComplexApplet.java.xml 
+searches for method definitions that contain message sends of the
+    message <code>hasMoreElements</code>.  It then outputs the
+    <code>visibility</code> and <code>name</code> attributes of the
+    matched elements as shown above.
 
-* returns from inside loops
--> sggrep -q '.*/method/.*/loop|do-loop/.*/return' ComplexApplet.java.xml 
+<p>
 
-* assignments inside ifs:
--> sggrep -q '.*/if/test/assignment-expr' xml-unparsed/ComplexApplet.java.xml 
+A wide variety of analyses are possible just using the querying
+capabilities provided by standard XML tools.  Other things we can find
+are returns from inside for loops, all definitions of integer variables,
+string variables that do not conform to our project's naming convention,
+and much more.
 
-* check that all functions have only one return statement
-=> cannot do this with sggrep, it seems --11/15/99 gjb
+<p>
 
-* all definitions of variables of type int
--> sggrep -q '.*/local-variable' -s './type[name=int]' xml-unparsed/ComplexApplet.java.xml
+Transformations on source code are also very useful when modifying and
+evolving software artifacts.  Obviously, querying tools can only prune
+elements from the source document.  More powerful transformations are
+possible using XSLT <cite>[XSLT]</cite>, DSSSL <cite>[DSSSL]</cite>, or
+directly manipulating the document using a DOM (Document Object Model)
+<cite>[DOM]</cite> interface.  For example, we can rename methods named
+      <code>isBall</code> to <code>FIsBall</code> using the Perl package 
+      <code>XML::DOM</code> and the following as the
+      <code>start_tag</code> subroutine:
 
-* list functions that send message "drawString" (contrast w/ above)
--> sggrep -q '.*/method' -s '.*/send[message=drawString]' xml-unparsed/ComplexApplet.java.xml | sgmltrans -r method-names.sgmltrans
----or---
--> sgrpg '.*/method' '.*/send[message=drawString]' '' '%s %s' visibility name < xml-unparsed/ComplexApplet.java.xml
+<pre>
+sub start_tag { 
+  my ($this,$gi,$attr_spec) = @_;
+  my $empty = '';
+  if ($attr_spec =~ s%/$%%) { $empty = '/'; }
+  my %attrs = SGMLparse_attr_spec($attr_spec);
+  if ($gi eq "method") {
+    if ($attrs{name} eq "bar") {
+      $attrs{name} = "Bar";
+    }
+  } elsif ($gi eq "send") {
+    if ($attrs{message} eq "bar") {
+      $attrs{name} = "Bar";
+    }
+  }
+  $attr_spec = SGMLattr_to_sgml(\%attrs);
+  print "&lt;$gi";
+  if ($attr_spec ne "") { print " $attr_spec"; }
+  print "$empty&gt;";
+}
+</pre>
 
+<p>
+
+Other possibilities for transformations include using a style sheet to
+convert from JavaML back into the plain old source representation or a
+PostScript text representation with nice syntax highlighting.  Adding
+debug or instrumentation code at entry and exit to and from functions is
+also straightforward.
+
+<p>
+
+<p>
 * list functions that do not call a function
 -> sggrep -v -q '.*/method' -s '.*/send[message=drawString]' xml-unparsed/ComplexApplet.java.xml | sgmltrans -r method-names.sgmltrans 
 
@@ -818,9 +1031,6 @@ defaults in Java)
 * renaming a method
 
 * search for unused variables
-
-* ensure that all variables of type String start with str (hungarian)
--> sggrep -q '.*/local-variable[name!~"^str"]' -s './type[name=String]' xml-unparsed/ComplexApplet.java.xml 
 
 * etags
 
@@ -1014,10 +1224,12 @@ process.
 
 <h3><a name="acknowledgments">Acknowledgments</a></h3> 
 
-I thank Miguel Figueroa, Zack Ives, Craig Kaplan, Todd Millstein, Stefan
-Bjarni Sigurdsson, for their helpful discussion. Thanks to IBM for
-constructing the Jikes compiler framework, and for making it publicly
-available, and thanks to Mike Ernst for helpful pointers on using it.
+I enthusiastically thank Zack Ives and Stefan Bjarni Sigurdsson for
+their comments, discussion, and input on this work.  I also thank Miguel
+Figueroa, Craig Kaplan, Todd Millstein, for their helpful
+discussions. Thanks to IBM for constructing the Jikes compiler framework,
+and for making it publicly available, and thanks to Mike Ernst for
+helpful pointers on using it.
 
 <p><span class="index"><a href="#top">[top]</a></span>
 
