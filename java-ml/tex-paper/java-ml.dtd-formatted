@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!-- java-ml.dtd 0.92 -->
+<!-- java-ml.dtd 0.94 -->
 <!-- Copyright (C) 2000, Greg J. Badros 
      <gjb@cs.washington.edu> -->
 <!-- A DTD for JavaML, an XML representation 
@@ -37,13 +37,15 @@
      binary-expr|unary-expr|cast-expr|\
      instanceof-test|literal-number|\
      literal-string|literal-char|\
-     literal-true|literal-false|\
-     literal-null|this|super">
+     literal-boolean|literal-null|this|\
+     super">
 <!ENTITY % stmt-elems 
-    "statements|local-variable|try|throw|\
-     if|switch|loop|do-loop|return|\
-     continue|break|%expr-elems;">
+    "block|local-variable|try|throw|if|\
+     switch|loop|do-loop|return|continue|\
+     break|synchronized|%expr-elems;">
 
+<!ELEMENT code-fragment ANY>
+<!ELEMENT result ANY>
 <!ELEMENT java-source-program 
     (package-decl?,import*,
      (class|interface)+)>
@@ -73,7 +75,7 @@
     %mod-synchronized;>
 <!ELEMENT superclass EMPTY>
 <!ATTLIST superclass
-    class CDATA #REQUIRED>
+    name CDATA #REQUIRED>
 <!ELEMENT interface 
     (extend*, (method|field)*)>
 <!ATTLIST interface
@@ -133,7 +135,10 @@
 <!ELEMENT send (target?,arguments)>
 <!ATTLIST send
     message CDATA #REQUIRED>
-<!ELEMENT statements (%stmt-elems;)*>
+<!ELEMENT block (label*,(%stmt-elems;)*)>
+<!ELEMENT label EMPTY>
+<!ATTLIST label
+    name CDATA #REQUIRED>
 <!ELEMENT target (%expr-elems;)>
 <!ELEMENT return (%expr-elems;)?>
 <!ELEMENT throw (%expr-elems;)>
@@ -166,10 +171,12 @@
 <!ATTLIST array-initializer
     length CDATA #REQUIRED>
 <!ELEMENT arguments (%expr-elems;)*>
-<!ELEMENT literal-string (#PCDATA)>
+<!ELEMENT literal-string EMPTY>
 <!ATTLIST literal-string
-    length CDATA #REQUIRED>
-<!ELEMENT literal-char (#PCDATA)>
+    value CDATA #REQUIRED>
+<!ELEMENT literal-char EMPTY>
+<!ATTLIST literal-char
+    value CDATA #REQUIRED>
 <!ELEMENT literal-number EMPTY>
 <!ATTLIST literal-number
     value CDATA #REQUIRED
@@ -209,13 +216,16 @@
     op CDATA #REQUIRED
     post (true|false) #IMPLIED>
 <!ELEMENT cast-expr (type,(%expr-elems;))>
-<!ELEMENT literal-false EMPTY>
-<!ELEMENT literal-true EMPTY>
+<!ELEMENT literal-boolean EMPTY>
+<!ATTLIST literal-boolean
+    value (true|false) #REQUIRED>
 <!ELEMENT literal-null EMPTY>
+<!ELEMENT synchronized (expr,block)>
+<!ELEMENT expr (%expr-elems;)>
 <!ELEMENT if (test,true-case,false-case?)>
 <!ELEMENT test (%expr-elems;)>
-<!ELEMENT true-case (%stmt-elems;)>
-<!ELEMENT false-case (%stmt-elems;)>
+<!ELEMENT true-case (%stmt-elems;)?>
+<!ELEMENT false-case (%stmt-elems;)?>
 <!ELEMENT array-ref (base,offset)>
 <!ELEMENT base (%expr-elems;)>
 <!ELEMENT offset (%expr-elems;)>
