@@ -275,7 +275,9 @@
 </xsl:template>
 
 <xsl:template match="literal-char">
+  <xsl:text>'</xsl:text>
   <xsl:value-of select="."/>
+  <xsl:text>'</xsl:text>
 </xsl:template>
 
 <xsl:template match="literal-number">
