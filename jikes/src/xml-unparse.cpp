@@ -33,11 +33,15 @@ xml_suffix(Ostream &xo)
   xo << "</java-source-program>\n";
 }
 
+static char *szIdSeparator = ".";
+
+// GJB:FIXME:: convert _ to -
+
 char *
 SzIdFromMethod(long id, const char *szClassName,const char *szMethodName)
 {
   ostrstream xo;
-  xo << szClassName << "-" << szMethodName << "-" << id << ends;
+  xo << szClassName << szIdSeparator << szMethodName << szIdSeparator << id << ends;
   return xo.str();
 }
 
@@ -45,7 +49,7 @@ char *
 SzIdFromConstructor(long id, const char *szClassName,const char *szConstructorName)
 {
   ostrstream xo;
-  xo << szClassName << "-" << szConstructorName << "-" << id << ends;
+  xo << szClassName << szIdSeparator << szConstructorName << szIdSeparator << id << ends;
   return xo.str();
 }
 
@@ -75,6 +79,8 @@ SzOrNullFromF(bool f)
 char *
 SzFromUnparse(LexStream &lex_stream, Ast *pnode)
 {
+  if (!pnode) return NULL;
+
   ostrstream xnm; Ostream nm(&xnm);
   pnode -> XMLUnparse(nm, lex_stream);
   xnm << ends;
@@ -716,22 +722,23 @@ void AstMethodDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstStaticInitializer::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstStaticInitializer:#" << this-> id << "*/";
-    os << lex_stream.NameString(static_token);
+    xml_open(os,"static-initializer");
     block -> XMLUnparse(os, lex_stream);
+    xml_close(os,"static-initializer");
     if (Ast::debug_unparse) os << "/*:AstStaticInitializer#" << this-> id << "*/";
 }
 
 void AstThisCall::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstThisCall:#" << this-> id << "*/";
-    os << lex_stream.NameString(this_token);
-    os << " (";
+    xml_open(os,"this-call");
+    xml_open(os,"arguments");
     for (int i = 0; i < this -> NumArguments(); i++)
       {
-	if (i>0) os << ", ";
 	this -> Argument(i) -> XMLUnparse(os, lex_stream);
       }
-    os << ");\n";
+    xml_close(os,"arguments");
+    xml_close(os,"this-call");
     if (Ast::debug_unparse) os << "/*:AstThisCall#" << this-> id << "*/";
 }
 
@@ -740,21 +747,16 @@ void AstSuperCall::XMLUnparse(Ostream& os, LexStream& lex_stream)
     if (Ast::debug_unparse) os << "/*AstSuperCall:#" << this-> id << "*/";
     if (wcscmp(lex_stream.NameString(super_token), L"super") == 0)
       {
-        if (base_opt)
-          {
-            base_opt -> XMLUnparse(os, lex_stream);
-            os << lex_stream.NameString(dot_token_opt);
-          }
-        os << lex_stream.NameString(super_token);
-        os << lex_stream.NameString(left_parenthesis_token);
+        xml_output(os,"super-call",
+                   "base",SzFromUnparse(lex_stream,base_opt),
+                   NULL);
+        xml_open(os,"arguments");
         for (int j = 0; j < NumArguments(); j++)
           {
-            if (j>0) os << ", ";
-            this -> Argument(j) -> XMLUnparse(os, lex_stream);
+            xml_unparse_maybe_var_ref(os,lex_stream,Argument(j));
           }
-        os << lex_stream.NameString(right_parenthesis_token);
-        os << lex_stream.NameString(semicolon_token);
-        os << "\n";
+        xml_close(os,"arguments", false);
+        xml_close(os,"super-call",true);
       }
     if (Ast::debug_unparse) os << "/*:AstSuperCall#" << this-> id << "*/";
 }
@@ -1290,21 +1292,21 @@ void AstCharacterLiteral::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstNullLiteral::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstNullLiteral:#" << this-> id << "*/";
-    os << lex_stream.NameString(null_token);
+    xml_open(os,"literal-null");
     if (Ast::debug_unparse) os << "/*:AstNullLiteral#" << this-> id << "*/";
 }
 
 void AstThisExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstThisExpression:#" << this-> id << "*/";
-    os << lex_stream.NameString(this_token);
+    xml_open(os,"this");
     if (Ast::debug_unparse) os << "/*:AstThisExpression#" << this-> id << "*/";
 }
 
 void AstSuperExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstSuperExpression:#" << this-> id << "*/";
-    os << lex_stream.NameString(super_token);
+    xml_open(os,"super");
     if (Ast::debug_unparse) os << "/*:AstSuperExpression#" << this-> id << "*/";
 }
 
@@ -1335,8 +1337,7 @@ void AstClassInstanceCreationExpression::XMLUnparse(Ostream& os, LexStream& lex_
     xml_open(os,"arguments");
     for (int j = 0; j < NumArguments(); j++)
       {
-	if (j>0) os << ", ";
-	this -> Argument(j) -> XMLUnparse(os, lex_stream);
+        xml_unparse_maybe_var_ref(os,lex_stream,Argument(j));
       }
     xml_close(os,"arguments",false);
     if (class_body_opt)
@@ -1391,7 +1392,7 @@ void AstMethodInvocation::XMLUnparse(Ostream& os, LexStream& lex_stream)
       xml_open(os,"arguments");
       for (int i = 0; i < this -> NumArguments(); i++)
         {
-          this -> Argument(i) -> XMLUnparse(os, lex_stream);
+          xml_unparse_maybe_var_ref(os,lex_stream,Argument(i));
         }
       xml_close(os,"arguments",false);
 #ifdef SHORTCUT_XML_CLOSE
