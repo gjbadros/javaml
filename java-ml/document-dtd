@@ -1,0 +1,8 @@
+#!/bin/sh -
+# This require Norm Walsh's dtdparse package:
+# http://nwalsh.com/perl/dtdparse/
+
+DTDPARSEDIR=$HOME/xml/dtdparse-2.0b2
+
+perl $DTDPARSEDIR/dtdparse.pl --title "JavaML DTD" --output java-ml-dtd.xml java-ml.dtd && \
+  perl $DTDPARSEDIR/dtdformat.pl --html java-ml-dtd.xml
