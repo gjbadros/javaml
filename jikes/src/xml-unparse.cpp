@@ -80,16 +80,19 @@ void xml_suffix(Ostream &xo)
 
 
 // GJB:FIXME:: this is a dumb, slow implementation
-char *SzNewEscapedLiteralString(const char *sz) 
+char *SzNewEscapedLiteralString(const char *sz, bool fIgnoreFirstAndLast = true) 
 {
+  if (!sz)
+    return NULL;
+
   // reserve five times the space;  worst case
   // is that sz is all double-quote characters
   // that need conversion to &quot;
   char *szAnswer = new char[strlen(sz)*5+1];
-  char *pch = szAnswer;
-  *pch = '\0';
-  ++sz; // skip leading quote (single/double)
-  while (*(sz+1)) { // test one beyond so we skip last quote
+  memset(szAnswer,0,strlen(sz)*5+1);
+  if (fIgnoreFirstAndLast)
+    ++sz; // skip leading quote (single/double)
+  while (*(sz+(fIgnoreFirstAndLast?1:0))) { // test one beyond so we skip last quote
     switch (*sz) {
     case '&':
       strcat(szAnswer,"&amp;"); break;
@@ -99,10 +102,13 @@ char *SzNewEscapedLiteralString(const char *sz)
       strcat(szAnswer,"&gt;"); break;
     case '"':
       strcat(szAnswer,"&quot;"); break;
+    case '\n':
+      strcat(szAnswer,"&#xA;"); break;
     default:
-      int ich = strlen(szAnswer);
-      szAnswer[ich] = *sz;
-      szAnswer[ich+1] = '\0';
+      if (isprint(*sz)) {
+        int ich = strlen(szAnswer);
+        szAnswer[ich] = *sz;
+      }
       break;
     }
     ++sz;
@@ -321,13 +327,13 @@ xml_output_with_location(Ostream &xo, LexStream &lex_stream, Ast *pnode,
       szColEnd = columnEnd != 0? SzNewFromLong(columnEnd - 1) : NULL;
     }
     
-    xo << " line" << "=\"" << pchLineStart + 1 << "\"";
+    xo << " line=\"" << pchLineStart + 1 << "\"";
     if (szColStart)
-      xo << " col" << "=\"" << szColStart << "\"";
+      xo << " col=\"" << szColStart << "\"";
     if (pchLineEnd) 
-      xo << " end-line" << "=\"" << pchLineEnd + 1 << "\"";
+      xo << " end-line=\"" << pchLineEnd + 1 << "\"";
     if (szColEnd)
-      xo << " end-col" << "=\"" << szColEnd << "\"";
+      xo << " end-col=\"" << szColEnd << "\"";
 
     delete szColStart;
     delete szColEnd;
@@ -339,25 +345,29 @@ xml_output_with_location(Ostream &xo, LexStream &lex_stream, Ast *pnode,
     delete [] szLocationEnd;
   }
 
+  g_cchIndent += g_dcchIndent;
+  if (lex_stream.control.option.comments) {
+    ostrstream xnm; Ostream nm(&xnm);
+    for (LexStream::CommentIndex com = lex_stream.FirstCommentSince(g_tiLastCommentHandled);
+         com < lex_stream.NumComments() && lex_stream.PrecedingToken(com) < pnode->LeftToken(); ++com)
+      {
+        wchar_t *wsz = lex_stream.CommentString(com);
+        if (wsz) {
+          nm << wsz;
+        }
+      }
+    xnm << ends;
+    char *sz = SzNewEscapedLiteralString(xnm.str(), false);
+    if (sz) {
+      xo << " comment=\"" << sz << "\"";
+      delete [] sz;
+    }
+    g_tiLastCommentHandled = pnode->LeftToken();
+  }
   if (XML_CLOSE == sz)
     xo << "/>";
-  else {
+  else
     xo << ">";
-    g_cchIndent += g_dcchIndent;
-    if (lex_stream.control.option.comments) {
-      bool f = false;
-      for (LexStream::CommentIndex com = lex_stream.FirstCommentSince(g_tiLastCommentHandled);
-           com < lex_stream.NumComments() && lex_stream.PrecedingToken(com) < pnode->LeftToken(); ++com)
-        {
-          wchar_t *sz = lex_stream.CommentString(com);
-          if (sz) {
-            f = true;
-            xo << sz;
-          }
-        }
-      g_tiLastCommentHandled = pnode->LeftToken();
-    }
-  }
 }
 
 char *
