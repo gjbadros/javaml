@@ -143,6 +143,18 @@ xml_name_string(LexStream &ls, LexStream::TokenIndex i)
   return xnm.str();
 }
 
+void xml_unparse_maybe_var_ref(Ostream &xo, LexStream &ls, Ast *pnode)
+{
+  if (pnode->IsName()) {
+    xml_output(xo,"var-ref",
+               "name",SzFromUnparse(ls,pnode),
+               NULL);
+  } else {
+    pnode -> XMLUnparse(xo, ls);
+  }
+}
+
+
 
 #ifdef TEST
 // Special top-level form
@@ -937,21 +949,22 @@ void AstLocalVariableDeclarationStatement::XMLUnparse(Ostream& os, LexStream& le
 void AstIfStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstIfStatement:#" << this-> id << "*/";
-    os << lex_stream.NameString(if_token);
-    AstParenthesizedExpression *parenth = expression -> ParenthesizedExpressionCast();
-    if (!parenth)
-	os << "(";
-    expression -> XMLUnparse(os, lex_stream);
-    if (!parenth)
-	os << ")";
-    os << "\n";
+    xml_output(os,"if",NULL);
+    xml_output(os,"test",NULL);
+    xml_unparse_maybe_var_ref(os,lex_stream,expression);
+    xml_close(os,"test",true);
+
+    xml_output(os,"true-case",NULL);
     true_statement -> XMLUnparse(os, lex_stream);
+    xml_close(os,"true-case",true);
+
     if (false_statement_opt)
       {
-	os << "else\n";
+        xml_output(os,"false-case",NULL);
 	false_statement_opt -> XMLUnparse(os, lex_stream);
+        xml_close(os,"false-case",true);
       }
-    os << "\n";
+    xml_close(os,"if",true);
     if (Ast::debug_unparse) os << "/*:AstIfStatement#" << this-> id << "*/";
 }
 
@@ -1292,9 +1305,9 @@ void AstSuperExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstParenthesizedExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstParenthesizedExpression:#" << this-> id << "*/";
-    os << lex_stream.NameString(left_parenthesis_token);
+    xml_output(os,"paren",NULL);
     expression -> XMLUnparse(os, lex_stream);
-    os << lex_stream.NameString(right_parenthesis_token);
+    xml_close(os,"paren",false);
     if (Ast::debug_unparse) os << "/*:AstParenthesizedExpression#" << this-> id << "*/";
 }
 
@@ -1405,8 +1418,11 @@ void AstPostUnaryExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstPreUnaryExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstPreUnaryExpression:#" << this-> id << "*/";
-    os << lex_stream.NameString(pre_operator_token);
-    expression -> XMLUnparse(os, lex_stream);
+    xml_output(os,"unary-expr",
+               "op",xml_name_string(lex_stream,pre_operator_token),
+               NULL);
+    xml_unparse_maybe_var_ref(os,lex_stream,expression);
+    xml_close(os,"unary-expr");
     if (Ast::debug_unparse) os << "/*:AstPreUnaryExpression#" << this-> id << "*/";
 }
 
@@ -1415,14 +1431,16 @@ void AstCastExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
     if (Ast::debug_unparse) os << "/*AstCastExpression:#" << this-> id << "*/";
     if (left_parenthesis_token_opt && type_opt)
     {
-	os << "(";
-	type_opt -> XMLUnparse(os, lex_stream);
-	for (int i = 0; i < NumBrackets(); i++)
-	     os << "[]";
-	os << ")";
+      xml_output(os,"cast-expr",NULL);
+      xml_output(os,"target-type",NULL);
+      type_opt -> XMLUnparse(os, lex_stream);
+      for (int i = 0; i < NumBrackets(); i++)
+        os << "[]";
+      xml_close(os,"target-type",false);
     }
-
-    expression -> XMLUnparse(os, lex_stream);
+    xml_unparse_maybe_var_ref(os,lex_stream,expression);
+    if (left_parenthesis_token_opt && type_opt)
+      xml_close(os,"cast-expr",false);
     if (Ast::debug_unparse) os << "/*:AstCastExpression#" << this-> id << "*/";
 }
 
@@ -1432,8 +1450,9 @@ void AstBinaryExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
     xml_output(os,"binary-expr",
                "op",xml_name_string(lex_stream,binary_operator_token),
                NULL);
-    left_expression -> XMLUnparse(os, lex_stream);
-    right_expression -> XMLUnparse(os, lex_stream);
+    xml_unparse_maybe_var_ref(os,lex_stream,left_expression);
+    xml_unparse_maybe_var_ref(os,lex_stream,right_expression);
+    // right_expression -> XMLUnparse(os, lex_stream);
     xml_close(os,"binary-expr",false);
     if (Ast::debug_unparse) os << "/*:AstBinaryExpression#" << this-> id << "*/";
 }
