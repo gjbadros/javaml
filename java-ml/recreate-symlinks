@@ -1,0 +1,7 @@
+ln -s . ./EDU
+ln -s . ./foo
+ln -s . ./grad
+ln -s . ./Washington
+ln -s . ./gjb
+ln -s . ./cassowary
+ln -s . ./classes
