@@ -33,6 +33,11 @@ const char *g_szClassName = NULL;
 
 bool g_fInsideCatch = false;
 bool g_fTopLevelBlock = false;
+bool g_fNewline = true;
+
+int g_cchIndent = 0;
+/* GJB:FIXME:: this should be an option */
+int g_dcchIndent = 2;
 
 AstClassDeclaration *g_pclassdecl = NULL;
 AstBlock *g_pblockdecl = NULL;
@@ -250,6 +255,16 @@ xml_unparse_arguments(Ostream &os, LexStream &lex_stream, T *pnode)
 #endif
 }
 
+static void inline
+xml_handle_indent(Ostream &xo) {
+  if (g_fNewline) {
+    g_fNewline = false;
+    int i = g_cchIndent;
+    while (i-- > 0) {
+      xo << ' ';
+    }
+  }
+}
 
 /* extra parameters are
    attribute/value pairs (always as char *'s).
@@ -264,6 +279,7 @@ nsgmls-xml does this:
 void
 xml_output(Ostream &xo, char *szTag, ...)
 {
+  xml_handle_indent(xo);
   xo << "<" << szTag;
   va_list ap;
   va_start(ap, szTag);
@@ -276,8 +292,10 @@ xml_output(Ostream &xo, char *szTag, ...)
   va_end(ap);
   if (XML_CLOSE == sz)
     xo << "/>";
-  else
+  else {
     xo << ">";
+    g_cchIndent += g_dcchIndent;
+  }
 }
 
 void
@@ -290,11 +308,15 @@ void
 xml_nl(Ostream &xo)
 {
   xo << '\n';
+  g_fNewline = true;
 }
 
 void
 xml_close(Ostream &xo, char *szTag, bool fNewline = false)
 {
+  g_cchIndent -= g_dcchIndent;
+  if (g_cchIndent < 0) g_cchIndent = 0;
+  xml_handle_indent(xo);
   xo << "</" << szTag << ">";
   if (fNewline)
     xml_nl(xo);
