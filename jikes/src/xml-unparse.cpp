@@ -223,6 +223,25 @@ void xml_unparse_maybe_var_ref(Ostream &xo, LexStream &ls, Ast *pnode)
   }
 }
 
+
+void xml_unparse_maybe_var_set(Ostream &xo, LexStream &ls, Ast *pnode)
+{
+  AstFieldAccess *pfaNode = dynamic_cast<AstFieldAccess *>(pnode);
+  if (pfaNode) {
+    xml_output(xo,"field-set",
+               "field",xml_name_string(ls,pfaNode->identifier_token),
+               NULL);
+    xml_unparse_maybe_var_ref(xo,ls,pfaNode->base);
+    xml_close(xo,"field-set");
+  } else if (pnode->IsName()) {
+    xml_output(xo,"var-set",
+               "name",SzFromUnparse(ls,pnode),
+               NULL);
+  } else {
+    pnode -> XMLUnparse(xo, ls);
+  }
+}
+
 void xml_unparse_maybe_type(Ostream &xo, LexStream &ls, Ast *pnode, int cBrackets = 0)
 {
   if (pnode->IsName()) {
@@ -1564,11 +1583,13 @@ void AstAssignmentExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstAssignmentExpression:#" << this-> id << "*/";
     xml_open(os,"assignment-expr");
-    left_hand_side -> XMLUnparse(os, lex_stream);
+    xml_open(os,"lvalue");
+    xml_unparse_maybe_var_set(os,lex_stream,left_hand_side);
+    xml_close(os,"lvalue");
     // os << " ";
-    os << lex_stream.NameString(assignment_operator_token);
+    // os << lex_stream.NameString(assignment_operator_token);
     // os << " ";
-    expression -> XMLUnparse(os, lex_stream);
+    xml_unparse_maybe_var_ref(os,lex_stream,expression);
     xml_close(os,"assignment-expr",true);
     if (Ast::debug_unparse) os << "/*:AstAssignmentExpression#" << this-> id << "*/";
 }
