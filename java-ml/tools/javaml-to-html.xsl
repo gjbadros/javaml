@@ -12,6 +12,7 @@
 <!-- or use saxon: saxon foo.java.xml javaml-to-plain-source.xsl -->
 
 <xsl:param name="annotate-var-refs-with-type"/>
+<xsl:param name="want-method-index">true</xsl:param>
 
 <xsl:param name="clr-import">blue</xsl:param>
 <xsl:param name="clr-package">blue</xsl:param>
@@ -49,6 +50,7 @@
 
 <xsl:output method="html"/>
 
+
 <xsl:template match="*|@*|text()"/>
 
 <xsl:template match="java-source-program">
@@ -57,6 +59,11 @@
       <title><xsl:value-of select="@name"/></title>
     </head>
     <body>
+  <xsl:if test="'true' = $want-method-index">
+   <h1><xsl:text>Method index:</xsl:text></h1>
+   <xsl:apply-templates select="//method" mode="index"/>
+   <h1><xsl:text>Source code:</xsl:text></h1>
+  </xsl:if>
   <xsl:apply-templates/>
     </body>
   </html>
@@ -120,6 +127,15 @@
   <xsl:call-template name="semicolon-newline"/>
 </xsl:template>
 
+<xsl:template match="method" mode="index">
+  <xsl:element name="A">
+    <xsl:attribute name="HREF">
+      <xsl:text>#</xsl:text><xsl:value-of select="@id"/>
+    </xsl:attribute>
+    <xsl:value-of select="@name"/><br/>
+  </xsl:element>
+</xsl:template>
+
 <xsl:template match="method">
   <em><font color="{$clr-visibility}"><xsl:value-of select="@visibility"/></font></em>
   <xsl:text> </xsl:text>
@@ -140,7 +156,12 @@
   </xsl:if>
   <xsl:apply-templates select="*[1]"/>
   <xsl:text> </xsl:text>
-  <strong><xsl:value-of select="@name"/></strong>
+  <xsl:element name="A">
+    <xsl:attribute name="NAME">
+      <xsl:value-of select="@id"/>
+    </xsl:attribute>
+    <strong><xsl:value-of select="@name"/></strong>
+  </xsl:element>
   <xsl:apply-templates select="*[position() > 1]"/>
   <xsl:choose>
     <xsl:when test="block"/>
