@@ -19,6 +19,7 @@ XML tools and techniques. A robust converter built with the IBM Jikes
 Java compiler framework translates from the classical Java source code
 representation to JavaML.
 
+(Installation instructions are below)
 
 I've added an XML unparser to Jikes to support the DTD (document
 type definition) described in java-ml.dtd.  You need to configure
@@ -44,23 +45,72 @@ nsgmls-xml is just:
 
 #!/bin/sh -
 nsgmls -c/usr/doc/jade-1.2.1/pubtext/xml.soc -wxml "$@"
+------------
+Files included:
+
+README-JAVAML
+   this file
+
+ChangeLog-JavaML
+   list of JavaML-relevant changes I've made to Jikes
+
+gjb-xml-unparse-*.patch 
+   the patch to the latest Jikes CVS source code
+
+xml-unparse.cpp
+   the one new file I added to the Jikes source
+
+java-ml.dtd
+   the document type definition for JavaML
+
+jikes-xml
+   simple script to execute Jikes w/ options to convert to JavaML
+
+javaml-to-plain-source (wrapper around javaml-to-plain-source.xsl)
+   convert JavaML representation back into a plain Java source file
+
+javaml-to-html (wrapper around javaml-to-html.xsl)
+   convert JavaML representation into an indexed, pretty-printed HTML file
+
+javaml-extract-comments (wrapper around javaml-extract-comments.xsl)
+   display all the comments in a JavaML file
+
+javaml-list-methods
+   example Perl script using DOM to list methods in a JavaML file
+
+javaml-instrument
+   example Perl script using DOM to instrument JavaML code
+
+results-to-plain-source
+   convert JavaML query results back into plain Java source code
 
 
 ------------
 Install instructions:
 
-ftp.cs.washington.edu:/homes/gjb/code/jikes-gjb-xml-unparse-4-feb-2000.tar.gz
+ftp.cs.washington.edu:/homes/gjb/code/jikes-gjb-xml-unparse-*.tar.gz
 
 Just grab the file, then do:
 
-cd ..../jikes/src
-tar xvzf ...../jikes-latest/src/jikes-gjb-xml-unparse-4-feb-2000.tar.gz
-patch < gjb-xml-unparse-4-feb-2000.patch 
+cvs -d :pserver:anoncvs@CVS.Sourcery.Org:/cvs/jikes co jikes  # if not already present
+cd jikes/src
+tar xvzf ...../jikes-latest/src/jikes-gjb-xml-unparse-*.tar.gz
+patch < gjb-xml-unparse-*-against-1.11.patch 
+./configure --enable-debug   
+make all
+
+Or you can use Jikes-1.11:
+
+tar xvzf jikes-1.11.tar.gz
+cd jikes/src
+tar xvzf ...../jikes-latest/src/jikes-gjb-xml-unparse-*.tar.gz
+patch < gjb-xml-unparse-*-against-1.11.patch 
 ./configure --enable-debug   
 make all
 
 
-The draft of the paper describing this is still at:
+
+The draft of the paper describing this is at:
 
 http://www.cs.washington.edu/homes/gjb/papers/javaml/javaml.html
 
@@ -84,31 +134,33 @@ when you run:
 
 ./jikes +ux FirstApplet.java
 
-not only does FirstApplet.class get created, but the new +ux option
+not only does FirstApplet.class get created, but the new +ulx option
 tells jikes to create xml-unparsed/FirstApplet.java.xml.  That file
-looks like (after indenting using Emacs's psgml-mode):
+looks like:
 
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE java-source-program SYSTEM "java-ml.dtd">
 
-<java-source-program name="FirstApplet.java">
-  <import module="java.applet.*"/>
-  <import module="java.awt.*"/>
-  <class name="FirstApplet" visibility="public">
-    <superclass class="Applet"/>
-    <method name="paint" visibility="public" id="meth-15">
-      <type name="void" primitive="true"/>
-      <formal-arguments>
-	<formal-argument name="g" id="frmarg-13"><type name="Graphics"/></formal-argument>
-      </formal-arguments>
-      <statements>
-	  <send message="drawString">
-	    <target><var-ref name="g" idref="frmarg-13"/></target>
-	    <arguments><literal-string length="11">Hello World</literal-string><literal-number kind="integer" value="25"/><literal-number kind="integer" value="50"/></arguments>
-	  </send>
-      </statements>
-    </method>
-  </class>
+<java-source-program>
+<java-class-file name="FirstApplet.java">
+<import module="java.applet.*"/>
+<import module="java.awt.*"/>
+<class name="FirstApplet" visibility="public" line="5" col="0" end-line="11" end-col="0" comment="// do not forget this import statement!// Or this one for the graphics!">
+  <superclass name="Applet"/>
+  <method name="paint" visibility="public" id="FirstApplet:mth-15" line="8" col="2" end-line="10" end-col="2" comment="// this method displays the applet.// the Graphics class is how you do all the drawing in Java">
+    <type name="void" primitive="true"/>
+    <formal-arguments>
+      <formal-argument name="g" id="FirstApplet:frm-13"><type name="Graphics"/></formal-argument>
+    </formal-arguments>
+    <block line="8" col="32" end-line="10" end-col="2" comment="// do not forget this import statement!// Or this one for the graphics!// this method displays the applet.// the Graphics class is how you do all the drawing in Java">
+      <send message="drawString">
+        <target><var-ref name="g" idref="FirstApplet:frm-13"/></target>
+        <arguments><literal-string value="FirstApplet"/><literal-number kind="integer" value="25"/><literal-number kind="integer" value="50"/></arguments>
+      </send>
+    </block>
+  </method>
+</class>
+</java-class-file>
 </java-source-program>
 
 
