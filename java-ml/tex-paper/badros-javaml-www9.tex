@@ -23,11 +23,11 @@
 \setlength\textheight{9.0in} \setlength\textwidth{7.0in}
 \setlength\columnsep{0.375in}  \newlength\titlebox \setlength\titlebox{2.25in}
 \setlength\headheight{0pt}   \setlength\headsep{0pt}
-\setlength{\parskip}{2pt}
+\setlength{\parskip}{0pt}
 %\flushbottom \twocolumn \sloppy
 
 \begin{document}
-\bibliographystyle{plain}
+\bibliographystyle{abbrv}
 \newcommand{\smtexttt}[1]{{\small\texttt{#1}}}
 \newenvironment{smverbatim}{\small \begin{verbatim}}{\end{verbatim}}
 \newenvironment{shellcommand}{\begin{verbatim}}{\end{verbatim}}
@@ -42,7 +42,6 @@ Seattle, WA ~ 98195-2350, USA}
 \date{}
 
 %\pagestyle{empty}
-
 \maketitle
 \thispagestyle{empty}
 
@@ -60,14 +59,16 @@ alternative representation of Java source code. This XML-based
 representation, called JavaML, is more natural for tools and permits
 easy specification of numerous software-engineering analyses by
 leveraging the abundance of XML tools and techniques.  A robust
-converter built with the IBM Jikes Java compiler framework translates
-from the classical Java source code representation to JavaML.
+converter built with the Jikes Java compiler framework translates
+from the classical Java source code representation to JavaML, and an
+XSLT stylesheet converts from JavaML back into the classical textual
+form.
 
 %% GJB:FIXME:VISUAL
 \vspace*{.2cm} 
 \noindent \textit{Keywords:}
-Java, source-code, SGML, XML, abstract syntax tree, AST, parsing,
-analysis, software-engineering, Jikes
+Java, XML, abstract syntax tree representation, software-engineering
+analysis, Jikes compiler.
 
 \begin{multicols}{2}
 
@@ -218,8 +219,8 @@ richer representation provided by JavaML.  Sections~\ref{sec-related}
 and \ref{sec-future} describe related work and suggest avenues for
 exciting future work, and section~\ref{sec-conclusion} concludes.  The
 full document type definition (DTD) for JavaML appears in
-appendix~\ref{app-javaml-dtd} and an example of converted source code is
-given in appendix~\ref{app-ext-eg}.
+appendix~\ref{app-javaml-dtd} and further examples of converted source
+code are available from the author's JavaML web page~\cite{Badros-javaml}.
 
 \section{Background}
 \label{sec-background}
@@ -555,7 +556,7 @@ appendix~\ref{app-javaml-dtd}, but is best illustrated by example.  For the
 \smtexttt{FirstApplet.java} source code listed above, we represent the
 program in JavaML as show in figure~\ref{fig-firstapplet-javaml}.
 
-\begin{figure*}[htb]
+\begin{figure*}[p]
 \begin{listing}{1}
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE java-source-program SYSTEM "java-ml.dtd">
@@ -571,7 +572,7 @@ program in JavaML as show in figure~\ref{fig-firstapplet-javaml}.
          <formal-argument name="g" id="frmarg-13">
              <type name="Graphics"/></formal-argument>
       </formal-arguments>
-      <statements>
+      <block>
         <send message="drawString">
           <target><var-ref name="g" idref="frmarg-13"/></target>
             <arguments>
@@ -580,7 +581,7 @@ program in JavaML as show in figure~\ref{fig-firstapplet-javaml}.
               <literal-number kind="integer" value="50"/>
             </arguments>
         </send>
-      </statements>
+      </block>
     </method>
   </class>
 </java-source-program>
@@ -597,18 +598,23 @@ For example, the literal string "Hello World" is a part of the message
 send, thus the \smtexttt{literal-string} element is nested inside the
 \smtexttt{send} element.  This nesting is even more apparent when
 presented visually as in figure~\ref{fig-treeview}. See
-appendix~\ref{app-ext-eg} for an example of a more complex converted
-program.
+ the author's JavaML web page~\cite{Badros-javaml}
+for further examples.
 
-\begin{figure}[tb]
+\begin{figure*}[p]
 \begin{centering}
-\includegraphics[width=\linewidth]{treeview.eps}
-\caption{A fully-expanded tree view of the JavaML representation 
-of the \smtexttt{FirstApplet} example as viewed by IBM's
-\smtexttt{xmldiff} utility~\cite{XMLDiffMerge}.
+\includegraphics[height=3.25in]{treeview1.eps}
+\hspace*{.5cm}
+\includegraphics[height=3.25in]{treeview2.eps}
+\caption{Tree views of the JavaML representation 
+of the \smtexttt{FirstApplet} example as displayed by the 
+XML Notepad utility~\cite{XMLNotepad}.  The left
+screenshot has all nodes but the \smtexttt{block} element expanded,
+and the right screenshot has earlier nodes collapsed to make room
+for the full expansion of that element.
 \label{fig-treeview}}
 \end{centering}
-\end{figure}
+\end{figure*}
 
 \subsection{Design decisions}
 \label{ssec-design}
@@ -753,20 +759,26 @@ groups:
 which contains \smtexttt{sgcount},
 \smtexttt{sgrpg}, \smtexttt{sggrep}, and more;
 
+\item James Clark's XSLT~\cite{XSLT} implementation, XT~\cite{Clark-XT}, 
+      and XML processor, XP~\cite{Clark-XP};
+
 \item the perlSGML utilities~\cite{perlSGML} which
 contains \smtexttt{dtd2html}, \smtexttt{dtddiff},
 \smtexttt{dtdtree}, and more; and
 
 \item the Perl XML::DOM package~\cite{perlDOM} which exposes a
 DOM level~1~\cite{DOM} interface to an XML tree.
+
 \end{itemize}
 
 These are just a very small subset of the tools that prove useful when
-working with JavaML.  In the following examples, we will query the
-\smtexttt{Set.java.xml} document that appears in
-appendix~\ref{app-ext-eg}.  Although these examples are small by
-real-world standards, XML and SGML tools target documents ranging up
-through lengthy books so the implementations are designed to scale well.
+working with JavaML.  In the following examples, we will query
+\smtexttt{Hangman.java.xml}, the JavaML representation of the Hangman
+applet available at Sun Microsystems' applet page~\cite{SunApplets} and
+also at the JavaML home page~\cite{Badros-javaml}.  Although these examples
+are small by real-world standards, XML and SGML tools target documents
+ranging up through lengthy books so the implementations are designed to
+scale well.
 
 One common software engineering task (for better or for worse) is to
 accumulate metrics about a source code artifact.  With JavaML, the SGML
@@ -918,7 +930,7 @@ trivial thanks to the JavaML representation:
 
 \noindent The \smtexttt{sgrpg} (SGML RePort Generator) program permits combining a
 top-level query with a restriction on the children and an output format
-for the results (a common paradigm for querying tools~\cite{XMLQL-EnE}.
+for the results (a common paradigm for querying tools~\cite{XMLQL-EnE}).
 For example:
 
 {\small
@@ -1128,14 +1140,14 @@ of the software artifact throughout the development process.
 \label{sec-ack}
 
 I enthusiastically thank Zack Ives for his comments, discussion, and
-input on this work.  I thank Corin Anderson and Alan Borning for
-much-appreciated comments on a draft of this paper.  I also thank Miguel
-Figueroa, Craig Kaplan, and Todd Millstein, and Stefan Bjarni Sigurdsson
-for their helpful discussions. Thanks to IBM for constructing the Jikes
-compiler framework, and for making it publicly available, and thanks to
-Mike Ernst for helpful pointers on using it. This work was supported by
-the University of Washington Computer Science and Engineering Wilma
-Bradley fellowship and by NSF Grant No. IIS-9975990.
+input.  I thank Corin Anderson and Alan Borning for much-appreciated
+comments on a draft of this paper.  I also thank Miguel Figueroa, Craig
+Kaplan, Todd Millstein, and Stefan Bjarni Sigurdsson for their
+helpful discussions. Thanks to IBM for constructing the Jikes compiler
+framework, and for making it publicly available, and thanks to Mike
+Ernst for helpful pointers on using it. This work was supported by the
+University of Washington Computer Science and Engineering Wilma Bradley
+fellowship and by NSF Grant No.~IIS-9975990.
 
 \appendix
 \section{JavaML DTD}
@@ -1145,36 +1157,37 @@ Bradley fellowship and by NSF Grant No. IIS-9975990.
 \verbatiminput{java-ml.dtd-formatted}
 }
 
-\end{multicols}
+%\end{multicols}
 
-\section{Extended Example}
-\label{app-ext-eg}
+%\section{Extended Example}
+%\label{app-ext-eg}
 
-\subsection{Set.java}
+%\subsection{Set.java}
+%{\small 
+%\verbatiminput{Set.java} 
+%}
 
-{\small 
-\verbatiminput{Set.java} 
-}
 
+%\subsection{Set.java.xml}
+%{\small
+%\verbatiminput{Set.java.xml} 
+%}
 
-\subsection{Set.java.xml}
-{\small
-\verbatiminput{Set.java.xml} 
-}
-
-\begin{multicols}{2}
+%\begin{multicols}{2}
 
 {\small
 \bibliography{library,articles,applications} %style plain, from above.
 }
 
+%\end{multicols}
+
 %% GJB:FIXME:VISUAL
 %\vspace{2in}
 
 \section*{Vitae}
-\begin{floatingfigure}[l]{.9in}
-\hspace*{-.6cm}
-\includegraphics[width=1in]{gjb-face.eps}
+\begin{floatingfigure}[l]{1.2in}
+\hspace*{-.8cm}
+\includegraphics[width=1.4in]{gjb-face.eps}
 \end{floatingfigure}
 %%<a href="http://www.cs.washington.edu/homes/gjb">
 \textbf{Greg J. Badros} is a final-year Ph.D. candidate at the
@@ -1192,8 +1205,8 @@ Scheme Constraints Window Manager and the
 Cassowary Constraint Solving Toolkit.  His research interests include
 constraint technology, software engineering, languages, and the
 Internet.
-\end{multicols}
 
+\end{multicols}
 
 \end{document}
 
