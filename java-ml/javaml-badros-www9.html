@@ -69,24 +69,25 @@ SUP { COLOR: #0000FF; FONT-SIZE: small; }
 
 <h3><a name="abstract">Abstract</a></h3>
 
-      The classical plain-text representation of source code is convenient
-      for programmers but requires parsing to uncover the deep structure
-      of the program.  While sophisticated software tools parse source
-      code to gain access to the program's structure, many lightweight
-      programming aids such as <code>grep</code> rely instead on only the
-      lexical structure of source code.  I describe a new XML
-      application that provides an alternative representation
-      of Java source code. This XML-based representation, called JavaML,
-      is more natural for tools and permits easy specification of
-      numerous software-engineering analyses by leveraging the abundance
-      of XML tools and techniques.  A robust converter built with the IBM
-      Jikes Java compiler framework translates from the classical Java
-      source code representation to JavaML.
+The classical plain-text representation of source code is convenient for
+programmers but requires parsing to uncover the deep structure of the
+program.  While sophisticated software tools parse source code to gain
+access to the program's structure, many lightweight programming aids
+such as <code>grep</code> rely instead on only the lexical structure of
+source code.  I describe a new XML application that provides an
+alternative representation of Java source code. This XML-based
+representation, called JavaML, is more natural for tools and permits
+easy specification of numerous software-engineering analyses by
+leveraging the abundance of XML tools and techniques.  A robust
+converter built with the Jikes Java compiler framework translates
+from the classical Java source code representation to JavaML, and an
+XSLT stylesheet converts from JavaML back into the classical textual
+form.
 
 <h3><a name="keywords">Keywords</a></h3>
 
-Java, source-code, SGML, XML, abstract syntax tree, AST, parsing,
-analysis, software-engineering, Jikes
+Java, XML, abstract syntax tree representation, software-engineering
+analysis, Jikes compiler.
 
 <h3><a name="introduction">1 - Introduction</a></h3>
 
