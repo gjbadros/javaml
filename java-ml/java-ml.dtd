@@ -64,8 +64,8 @@
     %mod-final
     id ID #REQUIRED>
 <!ELEMENT send (target,arguments)>
-<!ELEMENT target ANY>
-<!ELEMENT return ANY>
+<!ELEMENT target (%expr-elems)>
+<!ELEMENT return (%expr-elems)>
 <!ELEMENT statements (statements|local-variable|try|throw|if|loop|return|continue|break|%expr-elems)*>
 <!ELEMENT throw ANY>
 <!ELEMENT throws EMPTY>
