@@ -15,6 +15,7 @@ public abstract class ComplexApplet extends Applet {
     int i, j;
     g.drawString("Hello World", 25, 50);
     System.err.println(Math.sqrt(49));
+    System.err.println(Math.sqrt(i));
     System.err.println(r[1]);
     tgt().toString();
   }
