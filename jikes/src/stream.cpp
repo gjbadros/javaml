@@ -673,7 +673,7 @@ void LexStream::ProcessInputUnicode(const char *buffer, long filesize)
                     size_t   chl  = 2;
                     size_t   srcl = (source_ptr-source_tail)+1;
                     size_t n = iconv(control.option.converter,
-                                     &source_ptr, &srcl,
+                                     (char **)&source_ptr, &srcl,
                                      (char **)&chp, &chl
                     );
 
