@@ -29,6 +29,7 @@
 \begin{document}
 \bibliographystyle{abbrv}
 \newcommand{\smtexttt}[1]{{\small\texttt{#1}}}
+\newcommand{\ignore}[1]{}
 \newenvironment{smverbatim}{\small \begin{verbatim}}{\end{verbatim}}
 \newenvironment{shellcommand}{\begin{verbatim}}{\end{verbatim}}
 \newenvironment{shelloutput}{\begin{verbatim}}{\end{verbatim}}
@@ -120,7 +121,7 @@ into an ordinary one and result in an infinite loop:
 \end{verbatim}
 }
 
-Other, more concise, languages may suffer from far more dangerous
+\noindent Other, more concise, languages may suffer from far more dangerous
 semantic changes stemming from small syntactic errors (the Perl language
 is the infamous example).
 
@@ -339,7 +340,8 @@ with respect to the following DTD:
 
 \begin{verbatim}
 <!-- email DTD -->
-<!ENTITY % encoding-attribute "encoding (ascii|mime) #REQUIRED">
+<!ENTITY % encoding-attribute 
+  "encoding (ascii|mime) #REQUIRED">
 <!ELEMENT email (head,body)>
 <!ELEMENT head (to+,from,subject?)>
 <!ELEMENT to (#PCDATA)>
@@ -412,8 +414,8 @@ XML, in part due to its SGML heritage, is very well supported by tools
 such as Emacs editing modes, structure-based editors, DTD parsers and
 editors, validation utilities, querying systems, transformation and
 style languages, and many more tools.  Numerous other W3C
-recommendations inter-relate to XML including Cascading Style
-Sheets~\cite{CSS2}, XSL (Extensible Stylesheet Language)~\cite{XSL}, and
+recommendations relate to XML including Cascading Style
+Sheets~\cite{CSS2}, XSL (Extensible Stylesheet Language)~\cite{XSL},
 XSLT (XSL for Transformations)~\cite{XSLT}, XPath~\cite{XPath}, and DOM
 (Document Object Model)~\cite{DOM}.
 
@@ -601,6 +603,7 @@ presented visually as in figure~\ref{fig-treeview}. See
  the author's JavaML web page~\cite{Badros-javaml}
 for further examples.
 
+\ignore{
 \begin{figure*}[p]
 \begin{centering}
 \includegraphics[height=3.25in]{treeview1.eps}
@@ -612,6 +615,15 @@ XML Notepad utility~\cite{XMLNotepad}.  The left
 screenshot has all nodes but the \smtexttt{block} element expanded,
 and the right screenshot has earlier nodes collapsed to make room
 for the full expansion of that element.
+\label{fig-treeview}}
+\end{centering}
+\end{figure*}
+}
+\begin{figure*}[p]
+\begin{centering}
+\includegraphics[height=3.4in]{xml-spy-treeview.eps}
+\caption{Tree views of the JavaML representation 
+of the \smtexttt{FirstApplet} example as displayed by XML Spy~\cite{XMLSpy}.
 \label{fig-treeview}}
 \end{centering}
 \end{figure*}
@@ -718,25 +730,26 @@ classical source representation to JavaML.  Within the IBM Jikes Java
 compiler framework~\cite{Jikes}, I added an \smtexttt{XMLUnparse} method
 to each of the AST nodes. This change, along with some small additional
 code for managing the options to request the XML output, results in a
-robust and fast JavaML converter.  In total, I added about 1600
+robust and fast JavaML converter.  In total, I added about 1650
 non-comment-non-blank lines of C++ code to the Jikes framework to
-support the option.  The source code is available upon request (and will
-be made publicly available shortly after final submission of this
-paper).
+support JavaML.
+%% GJB:FIXME: included in the latest Jikes distribution.
 
-The converter has been tested by converting several sample programs, as
-well as the whole of the 4300 line Cassowary Constraint Solving
-Toolkit~\cite{CassoInI}.  The processing of all those files takes only
-about six seconds on the author's RedHat6-based dual Pentium III-450
-machine.  Each of the files converted was then validated with respect to
-the JavaML DTD using James Clark's Jade package's \smtexttt{nsgmls}
-tool~\cite{Jade}.
+The converter has been tested by converting 15,000 lines of numerous
+sample programs including the 4300 line Cassowary Constraint Solving
+Toolkit~\cite{CassoInI} and over 20 applets~\cite{SunApplets}.  Each of
+the files converted was then validated with respect to the JavaML DTD
+using James Clark's Jade package's \smtexttt{nsgmls} tool~\cite{Jade}.
+The processing of the entire regression test takes only about twelve
+seconds on the author's RedHat6-based dual Pentium III-450 machine.
 
-Also implemented is a prototype back-converter that outputs the
-classical source representation given the JavaML representation. That
-application uses the XML and DOM packages and contains about 360 lines
-of Perl.  See section~\ref{sec-future} for more details about
-back-converting possibilities.
+Also implemented is an XSLT stylesheet that outputs the
+classical source representation given the JavaML representation. The
+style sheet has been tested with XT~\cite{Clark-XT} and consists of 58
+template rules and just under 500 lines of code. 
+
+All of the source code is available from the JavaML home
+page~\cite{Badros-javaml}.
 
 \section{Leveraging XML}
 \label{sec-leveraging}
@@ -751,7 +764,7 @@ SGML and XML tools can be used, combined, and extended.  XML tools
 encompass a broad range of features that include querying and
 transformation, document differencing and merging~\cite{XMLDiffMerge},
 and simple APIs for working with the document directly.  In this paper,
-I will (for space reasons) limit discussion to uses of only three tool
+I will (for space reasons) limit discussion to uses of only four tool
 groups:
 
 \begin{itemize}
@@ -783,57 +796,57 @@ scale well.
 One common software engineering task (for better or for worse) is to
 accumulate metrics about a source code artifact.  With JavaML, the SGML
 utility \smtexttt{sgcount} does an excellent job of summarizing the
-constructs in a Java program:
+constructs in a Java program:\footnote{The output of commands has been
+  pruned and slightly edited for presentation.}
 
+
+%% sgcount Hangman.java.xml | awk '{$NF=""; print $1"\t"$2}' |expand -t22
 %% ShellCommand
 {\bfseries
 \begin{verbatim}
-% sgcount Set.java.xml
+% sgcount Hangman.java.xml
 \end{verbatim}
 }
+\noindent\emph{outputs:}
 {\small
 \begin{verbatim}
-new                    5  
-method                 9  
-lvalue                 4  
-if                     1  
-var-set                4  
-literal-true           2  
-assignment-expr        4  
-loop                   1  
-formal-argument        7  
-package-decl           1  
-local-variable         2  
-literal-null           2  
-target                 18 
-cast-expr              1  
-constructor            4  
-arguments              23 
-import                 1  
-send                   18 
-return                 8  
-test                   2  
-formal-arguments       13 
-class                  1  
-java-source-program    1  
-true-case              1  
-type                   25 
-conditional-expr       2  
-var-ref                25 
-literal-false          2  
-statements             25 
-literal-string         3  
-binary-expr            3  
-field                  1  
-*Total*                219 
+arguments             103
+array-initializer     4
+assignment-expr       60
+catch                 3
+class                 1
+if                    27
+true-case             27
+false-case            7
+field                 28
+field-access          18
+import                5
+java-source-program   1
+literal-char          5
+literal-false         1
+literal-null          5
+literal-number        127
+literal-string        61
+literal-true          4
+local-variable        23
+loop                  13
+method                18
+new                   4
+new-array             5
+return                5
+send                  99
+type                  96
+var-ref               262
+var-set               52
+...
 \end{verbatim}
 }
 
 In the above output, each row lists an element class and the number of
 times that that element appeared in the document.  Thus, we can easily
-see that there are 9 \smtexttt{method} elements, thus there are 9
+see that there are 18 \smtexttt{method} elements, thus there are 18
 method definitions.  Similarly, we can see that there is 1 class
-definition, 25 variable references, 18 message sends, and 3 string
+definition, 262 variable references, 99 message sends, and 61 string
 literals.  This summary is far more indicative of the content of a
 program than a typical lexical measure such as the number of lines of
 code.
@@ -844,16 +857,20 @@ representation of the program:
 
 \begin{verbatim}
 % sggrep '.*/literal-string' \
-           < Set.java.xml
+           < Hangman.java.xml
 \end{verbatim}
 
+\noindent\emph{outputs:}
 {\small
 \begin{verbatim}
-<?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE java-source-program SYSTEM "java-ml.dtd" >
-<literal-string length='2'>{ </literal-string>
-<literal-string length='2'>, </literal-string>
-<literal-string length='4'> }\n</literal-string>
+<literal-string>audio/dance.au</..>
+<literal-string>images/dancing-duke/T</..>
+<literal-string>.gif</..>
+<literal-string>images/hanging-duke/h</..>
+<literal-string>.gif</..>
+<literal-string>Courier</..>
+<literal-string>Courier</..>
+...
 \end{verbatim}
 }
 
@@ -865,33 +882,48 @@ run \smtexttt{stripsgml} on the output of the above query:
 
 \begin{verbatim}
 % sggrep '.*/literal-string' \
-           < Set.java.xml | stripsgml
+           < Hangman.java.xml | stripsgml
 \end{verbatim}
 
+\noindent\emph{outputs:}
 \begin{verbatim}
-{ 
-, 
- }\n
+audio/dance.au
+images/dancing-duke/T
+.gif
+images/hanging-duke/h
+.gif
+Courier
+Courier
+...
 \end{verbatim}
 
 We can also query the JavaML source for elements based on values of
 their attributes.  For example, if we wish to find all sends of the
-message \smtexttt{clone} we can do so easily and reliably:
+message \smtexttt{setFont} we can do so easily and reliably:
 
 \begin{verbatim}
-% sggrep '.*/send[message=clone]' \
-                      < Set.java.xml 
+% sggrep '.*/send[message=setFont]' \
+                      < Hangman.java.xml 
 \end{verbatim}
 
+\noindent\emph{outputs:}
 {\small
 \begin{verbatim}
-<?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE java-source-program SYSTEM "java-ml.dtd" >
-<send message='clone'>
+<send message='setFont'>
 <target>
-<var-ref name='hash'/>
+<var-ref name='g' idref='frmarg-212'/>
 </target>
-<arguments/>
+<arguments>
+<var-ref name='font' idref='locvar-611'/>
+</arguments>
+</send>
+<send message='setFont'>
+<target>
+<var-ref name='g' idref='frmarg-212'/>
+</target>
+<arguments>
+<var-ref name='wordFont'/>
+</arguments>
 </send>
 \end{verbatim}
 }
@@ -906,7 +938,7 @@ for concrete (i.e., not abstract) classes that contain an abstract method:
 \begin{verbatim}
 % sggrep -q '.*/class[abstract!=true]/\
                 method[abstract=true]' \
-                          < Set.java.xml
+                      < Hangman.java.xml
 \end{verbatim}
 }
 
@@ -924,11 +956,11 @@ trivial thanks to the JavaML representation:
 {\small
 \begin{verbatim}
 % sggrep -q '.*/if/test/assignment-expr' \
-                            < Set.java.xml
+                        < Hangman.java.xml
 \end{verbatim}
 }
 
-\noindent The \smtexttt{sgrpg} (SGML RePort Generator) program permits combining a
+The \smtexttt{sgrpg} (SGML RePort Generator) program permits combining a
 top-level query with a restriction on the children and an output format
 for the results (a common paradigm for querying tools~\cite{XMLQL-EnE}).
 For example:
@@ -936,20 +968,22 @@ For example:
 {\small
 \begin{verbatim}
 % sgrpg '.*/method' \
-        '.*/send[message=hasMoreElements]' \
+        '.*/send[message=drawLine]' \
         '' '%s %s 
-' visibility name < Set.java.xml
+' visibility name < Hangman.java.xml
 \end{verbatim}
 
+\noindent\emph{outputs:}
 \begin{verbatim}
-public toString
+public paint
 \end{verbatim}
 }
 
 \noindent searches for method definitions that contain message sends of the
 message \smtexttt{hasMoreElements}.  It then outputs the
 \smtexttt{visibility} and \smtexttt{name} attributes of the matched
-elements as shown above.
+elements as shown above, confirming our intuition that the
+\smtexttt{paint()} method is the only function that invoked \smtexttt{drawLine}.
 
 A wide variety of analyses are possible just using the querying
 capabilities provided by standard XML tools.  Other things we can find
@@ -962,37 +996,60 @@ evolving software artifacts.  Obviously, querying tools can only prune
 elements from the source document or combine elements from multiple
 documents.  More powerful transformations are possible using
 XSLT~\cite{XSLT}, DSSSL~\cite{DSSSL}, or directly manipulating the
-document using a DOM (Document Object Model)~\cite{DOM} interface.  For
-example, we can rename methods named \smtexttt{isBall} to
-\smtexttt{FIsBall} using the Perl package \smtexttt{XML::DOM} and the
-following in the \smtexttt{start\_tag} subroutine:
+document using a DOM (Document Object Model)~\cite{DOM} interface
+accessible from numerous languages including Perl, Python, Java, and
+C++.  For example, we can rename all methods named \smtexttt{isBall} to
+\smtexttt{FIsBall} using a straightforward XSLT stylesheet:
+
+{ \small
+\begin{verbatim}
+<xsl:stylesheet ...>xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+
+<xsl:param name="oldname"/>
+<xsl:param name="newname"/>
+
+<!-- mostly do an identity transform -->
+<xsl:template match="*|@*|text()">
+  <xsl:copy>
+    <xsl:apply-templates select="*|@*|text()"/>
+  </xsl:copy>
+</xsl:template>
+
+<xsl:template match="method[@name=$oldname]">
+  <method name="{$newname}">
+    <xsl:apply-templates/>
+  </method>
+</xsl:template>
+
+<xsl:template match="send[@message=$oldname]">
+  <send message="{$newname}">
+    <xsl:apply-templates/>
+  </send>
+</xsl:template>
+
+</xsl:stylesheet>
+\end{verbatim}
+}
+
+\noindent and executing it like so:
 
 \begin{verbatim}
-sub start_tag { 
-  my ($this,$tag,$attr_spec) = @_;
-  my $from = "isBall";
-  my $to = "FIsBall";
-  my %attrs = 
-     SGMLparse_attr_spec($attr_spec);
-  # ...
-  if ($tag eq "method") {
-    if ($attrs{name} eq $from) {
-      $attrs{name} = $to;
-    }
-  } elsif ($tag eq "send") {
-    if ($attrs{message} eq $from) {
-      $attrs{message} = $to;
-    }
-  }
-  # ...
-}
+xt source.java.xml method-rename.xsl \
+       oldname=isBall newname=FIsBall
 \end{verbatim}
 
+While a similar textual transformation could be performed using a text
+editor or Sed, those tools will over-aggressively change all occurrences
+of the six character sequence \smtexttt{isBall}: variable names, literal
+strings, comments, and packages might incorrectly be affected by the
+text-based transformation. This is a key benefit of the JavaML
+representation: we have more fine-grained, semantically-based control
+over the affected constructs.
+
 Other possibilities for transformations include using a style sheet to
-convert from JavaML back into the classical source representation or a
-PostScript text representation with nice syntax highlighting.  Adding
-debug or instrumentation code at entry and exit to and from functions is
-also straightforward.
+output a browesable HTML representation of the program or
+syntax-highlighted PostScript.  Adding debug or instrumentation code at
+entry and exit to and from functions is also straightforward.
 
 \section{Related work}
 \label{sec-related}
