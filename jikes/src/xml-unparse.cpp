@@ -694,7 +694,7 @@ void AstModifier::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstEmptyDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstEmptyDeclaration:#" << this-> id << "*/";
-    assert(!"AstEmptyDeclaration is not handled");
+    //    assert(!"AstEmptyDeclaration is not handled");
     if (Ast::debug_unparse) os << "/*:AstEmptyDeclaration#" << this-> id << "*/";
 }
 
