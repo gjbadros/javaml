@@ -1,5 +1,5 @@
 JavaML: A Markup Language for Java Source Code 
-Copyright (C) 2000  Greg J. Badros
+Copyright (C) 2000  Greg J. Badros, <gjb@cs.washington.edu>
 Distributed under the LGPL
 
 See: http://www.cs.washington.edu/homes/gjb/papers/javaml/javaml.html
@@ -21,7 +21,12 @@ representation to JavaML.
 
 
 I've added an XML unparser to Jikes to support the DTD (document
-type definition) described in java-ml.dtd.
+type definition) described in java-ml.dtd.  You need to configure
+with --enable-debug:
+
+./configure --enable-debug
+
+and then use the +ux option to the resulting binary.
 
 To get started, try:
 
@@ -39,3 +44,80 @@ nsgmls-xml is just:
 
 #!/bin/sh -
 nsgmls -c/usr/doc/jade-1.2.1/pubtext/xml.soc -wxml "$@"
+
+
+------------
+Install instructions:
+
+ftp.cs.washington.edu:/homes/gjb/code/jikes-gjb-xml-unparse-4-feb-2000.tar.gz
+
+Just grab the file, then do:
+
+cd ..../jikes/src
+tar xvzf ...../jikes-latest/src/jikes-gjb-xml-unparse-4-feb-2000.tar.gz
+patch <gjb-xml-unparse-4-feb-2000.patch 
+./configure --enable-debug   
+make all
+
+
+The draft of the paper describing this is still at:
+
+http://www.cs.washington.edu/homes/gjb/papers/javaml/javaml.html
+
+Here's a small example to give you the basic jist of what XML unparsing
+results in.  Consider the below, FirstApplet.java:
+
+import java.applet.*;   // do not forget this import statement!
+import java.awt.*;      // Or this one for the graphics!
+
+
+public class FirstApplet extends Applet {
+  // this method displays the applet.
+  // the Graphics class is how you do all the drawing in Java
+  public void paint(Graphics g) {
+    g.drawString("Hello World", 25, 50);
+  }
+}
+
+
+when you run:
+
+./jikes +ux FirstApplet.java
+
+not only does FirstApplet.class get created, but the new +ux option
+tells jikes to create xml-unparsed/FirstApplet.java.xml.  That file
+looks like (after indenting using Emacs's psgml-mode):
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE java-source-program SYSTEM "java-ml.dtd">
+
+<java-source-program name="FirstApplet.java">
+  <import module="java.applet.*"/>
+  <import module="java.awt.*"/>
+  <class name="FirstApplet" visibility="public">
+    <superclass class="Applet"/>
+    <method name="paint" visibility="public" id="meth-15">
+      <type name="void" primitive="true"/>
+      <formal-arguments>
+	<formal-argument name="g" id="frmarg-13"><type name="Graphics"/></formal-argument>
+      </formal-arguments>
+      <statements>
+	  <send message="drawString">
+	    <target><var-ref name="g" idref="frmarg-13"/></target>
+	    <arguments><literal-string length="11">Hello World</literal-string><literal-number kind="integer" value="25"/><literal-number kind="integer" value="50"/></arguments>
+	  </send>
+      </statements>
+    </method>
+  </class>
+</java-source-program>
+
+
+This then lets you do all sorts of nifty static software-engineering
+analyses and transformations using all of the XML and SGML tools out
+there.  See the paper for more details.
+
+Thanks,
+Greg J. Badros
+gjb@cs.washington.edu
+Seattle, WA  USA
+http://www.cs.washington.edu/homes/gjb
