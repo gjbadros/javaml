@@ -1,0 +1,132 @@
+
+<html>
+    <head>
+        <META http-equiv="Content-Type" content="text/html; charset=utf-8">
+    
+        <title>SimpAnim.java</title>
+    </head>
+    <body>
+        <h1>Method index:</h1>
+        <A HREF="#meth-10">run
+            <br>
+        </A>
+        <h1>Source code:</h1>
+        <em>
+            <font color="blue">import </font>
+        </em>
+        <strong>java.awt.*</strong>;
+        <br>
+
+        <em>
+            <font color="purple">public</font>
+        </em> 
+        <em>
+            <font color="blue">class </font>
+        </em>
+        <strong>SimpAnim</strong>
+        <em>
+            <font color="green"> extends </font>
+        </em>
+        <strong>Applet</strong>
+        <br>
+
+        <em>
+            <font color="blue">implements </font>
+        </em>
+        <strong>Runnable</strong>, 
+        <strong>MouseListener</strong> 
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;
+{
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;
+
+        <em>
+            <font color="purple">public</font>
+        </em> 
+        <strong>
+            <font color="olive">void</font>
+        </strong> 
+        <A NAME="meth-10">
+            <strong>run</strong>
+        </A>() 
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+{
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+        <em>
+            <font color="blue">try </font>
+        </em>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+{
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+        <em>
+            <font color="blue">while </font>
+        </em> (
+        <strong>
+            <font color="green">engine</font>
+        </strong> 
+        <font color="blue">==</font> 
+        <strong>
+            <font color="green">me</font>
+        </strong>) 
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+{
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+        <strong>repaint</strong>();
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+        <em>
+            <font color="blue">finally </font>
+        </em>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+{
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+        <strong>
+            <font color="olive">int</font>
+        </strong> 
+        <strong>i</strong> = 1;
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+        <em>
+            <font color="blue">synchronized </font>
+        </em>(
+        <em>
+            <font color="blue">this</font>
+        </em>) 
+        <em>
+            <font color="blue">if</font>
+        </em> (
+        <strong>
+            <font color="green">engine</font>
+        </strong> 
+        <font color="blue">==</font> 
+        <strong>
+            <font color="green">me</font>
+        </strong>) 
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+{
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+        <strong>
+            <strong>
+                <font color="green">animation</font>
+            </strong>
+        </strong>.
+        <strong>stopPlaying</strong>();
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;
+}
+        <br>
+</body>
+</html>
