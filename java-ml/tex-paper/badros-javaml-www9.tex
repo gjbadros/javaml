@@ -1163,11 +1163,13 @@ the software-engineering applications for which JavaML is designed.
 
 The Software Development Foundation~\cite{SDS} is an embryonic open
 architecture based on XML designed for developing tools for software
-environments.  That project is concerned more with language-independent
-representations of ``interesting information'' about source code in a
-format called CSF---code structure format.  The architects of the
-Software Development Foundation are currently considering integrating
-JavaML into their system.
+environments.  That project deals only with language-independent
+representations of relationships.  An XML database format called
+CSF---code structure format---stores ther relationships, but includes no
+details about the computation performed.  Chava~\cite{Chava} takes a
+similar approach, but is based on the C Program Database~\cite{Chen89}.
+Chava also permits interrogating Java code via reverse
+engineering the byte-codes.
 
 CCEL~\cite{CCEL92} provides a metalanguage for expressing non-linguistic
 intentions (i.e., ones that cannot be expressed in the language) about
@@ -1212,11 +1214,15 @@ attach a given comment.  Although this is a hard problem, the JavaDoc
 conventions for documenting source code will simplify properly attaching
 a large fraction of the comments.
 
-Another useful extension to the current transformation system is to do
-more cross-linking of elements.  Type elements could reference their
-defining classes in other JavaML documents.  Import declarations could
-reference the top-level documentation for the imported package.  Many
-more possibilities are feasible.
+Another problem with JavaML stems from a lacking in XML querying tools.
+Unfortunately most XML querying tools respond only with the matched
+sub-document---they do not provide any context information about where
+in the document the results were found.  Although this behaviour is
+appropriate when treating an XML file strictly as a database, when using 
+JavaML the software engineer may want to map the results back into
+positions in the source document for editing or viewing by hand.  This
+difficulty will be less of an issue as more sophisticated environments
+are developed.
 
 Although this paper has presented a markup language for Java, the same
 basic approach can be applied to other programming languages, or even to
@@ -1234,6 +1240,12 @@ processing to permit abstractions that cannot otherwise be expressed in
 the core C++ language.  These abstractions are often very important to
 the understandability and maintainability of the code, but do not
 interact well with parsing techniques~\cite{ErnstBadrosNotkin00,Badros00-spe}.
+
+A useful extension to the current transformation system is to do
+more cross-linking of elements.  Type elements could reference their
+defining classes in other JavaML documents.  Import declarations could
+reference the top-level documentation for the imported package.  Many
+more possibilities are feasible.
 
 The current converter that translates back from JavaML to the classical
 source representation is based on XSLT.  It would be useful to add a
@@ -1259,16 +1271,16 @@ straightforward queries (such as some of those described earlier in
 section~\ref{sec-leveraging}).
 
 Because the concise textual representation of source code is nicely
-suited to expert programmers, it's unlikely that they will be interested
+suited to human programmers, it is unlikely that they will be interested
 in discarding their favourite text editor anytime soon.  It will be
 useful to investigate better ways to convert interactively and
 incrementally between the classical source representation and JavaML.
 The capabilities could then be used to transparently support interactive
 editing of XML representations using plain-text format to which human
-engineers are accustomed.  The work on structured text editors is highly
-relevant and may finally achieve acceptance give the incredible
-resources that will now be thrown at the problem given the growing
-commercial importance of XML technology.
+engineers are accustomed.  The considerable work on structured text
+editors~\cite{Miller99} is highly relevant and may finally achieve acceptance give the
+incredible resources that will now be thrown at the problem given the
+growing commercial importance of XML technology.
 
 \section{Conclusion}
 \label{sec-conclusion}
