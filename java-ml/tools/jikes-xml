@@ -1,0 +1,12 @@
+#!/bin/sh -
+# $Id$
+# Copyright (C) 2000 Greg J. Badros, <gjb@cs.washington.edu>
+# http://www.cs.washington.edu/homes/gjb/JavaML
+#
+# Simple script to convert classical Java source code into JavaML
+# using Jikes java compiler
+#
+# +c preserves comments in the JavaML representation
+# +ulx unparses to xml-unpased/*.java.xml w/ location information
+# (use +ux instead to not output plaintext source-code location information)
+exec jikes -nowrite +B +c +ulx "$@"
