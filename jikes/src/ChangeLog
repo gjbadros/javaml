@@ -1,3 +1,21 @@
+Thu Nov 11 14:14:52 1999  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* Makefile.in: Added xml-unparse.o file w/ dep rules.
+
+	* unparse.cpp: bugfix of missing "}"
+
+	* option.h: Added debug_xml_unparse_ast variable.
+
+	* option.cpp: Handle new +ux, +udx options.
+
+	* control.cpp: Call XMLUnparse if the options are so set.
+
+	* ast.h: Added XMLUnparse prototypes for all the kinds of AST
+	nodes. 
+
+	* xml-unparse.cpp: Added;  initial code for doing the XML
+	unparsing. 
+
 1999-11-03    <shields@jikes.watson.ibm.com>
 
 	--- Release v1.10 ---
