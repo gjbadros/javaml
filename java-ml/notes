@@ -12,16 +12,23 @@ Possible Analyses:
 * etags
 * list functions that do not call a function
 * enforce hungarian naming convention
+* metrics:
+  -> sgcount xml-unparsed/ClSimplexSolver.java.xml
+
+
 
 XML DTD Stuff:
 
-If an attribute is specified to be entry, then when the tag
-is used it should be <foo>, not <foo/>
+For SGML, If an attribute is specified to be empty, then when the tag is
+used it should be <foo>, not <foo/> like it needs to be for XML.  The -c
+option can be given to nsgmls to make it work for XML (see my nsgmls-xml 
+script).
 
 
-Duplicate attribute values not allowed:
+Duplicate attribute values not allowed in SGML:
 http://www.oasis-open.org/cover/duplTokens.html
 
+Perhaps this will be (or is) revised for XML? 
 
 
 /////// If
