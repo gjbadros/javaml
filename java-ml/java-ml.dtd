@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+<!-- java-ml.dtd 0.9 -->
+<!-- Copyright (C) 2000, Greg J. Badros <gjb@cs.washington.edu> -->
+<!-- A DTD for JavaML, an XML representation of Java Source Code -->
+<!-- See: http://www.cs.washington.edu/homes/gjb/papers/javaml/javaml.html -->
 <!ENTITY % visibility-attribute "visibility (public|private|protected) #IMPLIED">
+<!ENTITY % interface-visibility-attribute "visibility (public) #IMPLIED">
 <!ENTITY % kind-attribute "kind (integer|long|real|double) #IMPLIED">
 <!ENTITY % mod-final "final CDATA #IMPLIED">
 <!ENTITY % mod-static "static CDATA #IMPLIED">
@@ -18,18 +23,20 @@
 <!ELEMENT import EMPTY>
 <!ATTLIST import
     module CDATA #REQUIRED>
-<!ELEMENT class ((implement)*, (constructor|method|field)*) >
+<!ELEMENT class (superclass?, implement*, (constructor|method|field)*) >
 <!ATTLIST class
     name CDATA #REQUIRED
     %visibility-attribute;
     %mod-abstract;
     %mod-final;
-    %mod-synchronized;
-    superclass CDATA "Object">
-<!ELEMENT interface ((extend)*, method*) >
+    %mod-synchronized;>
+<!ELEMENT superclass EMPTY>
+<!ATTLIST superclass
+    class CDATA #REQUIRED>
+<!ELEMENT interface ((extend)*, (method|field)*) >
 <!ATTLIST interface
     name CDATA #REQUIRED
-    %visibility-attribute;>
+    %interface-visibility-attribute;>
 <!ELEMENT implement EMPTY>
 <!ATTLIST implement
     class CDATA #REQUIRED>
