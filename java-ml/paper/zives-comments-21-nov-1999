@@ -1,0 +1,84 @@
+From: "Zack Ives" <zives@cs.washington.edu>
+Subject: Thoughts on JavaML Paper
+To: <gjb@cs.washington.edu>
+Date: Sun, 21 Nov 1999 19:59:58 -0800
+X-From-Line: zives@cs.washington.edu  Sun Nov 21 20:01:53 1999
+Received: from mail.rdc1.wa.home.com (ha1.rdc1.wa.home.com [24.0.2.66])
+	by june.cs.washington.edu (8.9.3/8.9.3/0.3j) with ESMTP id UAA07489
+	for <gjb@cs.washington.edu>; Sun, 21 Nov 1999 20:01:52 -0800
+	(envelope-from zives@cs.washington.edu)
+Received: from c41018a ([24.0.232.196]) by mail.rdc1.wa.home.com
+          (InterMail v4.01.01.00 201-229-111) with ESMTP
+          id <19991122040151.QRVE1594.mail.rdc1.wa.home.com@c41018a>
+          for <gjb@cs.washington.edu>; Sun, 21 Nov 1999 20:01:51 -0800
+Message-ID: <000001bf349e$0ae8f6a0$c4e80018@sttln1.wa.home.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+X-Priority: 3 (Normal)
+X-MSMail-Priority: Normal
+X-Mailer: Microsoft Outlook 8.5, Build 4.71.2173.0
+Importance: Normal
+X-MimeOLE: Produced By Microsoft MimeOLE V5.00.2919.6600
+Lines: 58
+Xref: clavicle.cs.washington.edu inbox:13576
+
+Hey, Greg,
+
+
+Hope your trip was a good one.
+
+Here are a few high-level comments on your paper:
+
+- I'd slightly lessen the magnitude of some of your claims against POSR
+stuff; it sounds like hyperbole to te talking about "disastrous" semantic
+changes, infamous examples, etc.
+
+- In your XML overview, you should mention that most elements have an
+open/close syntax, but that empty tags also exist (you use these later, but
+never introduce them)
+
+- In Section 3.2, I'd mention why you give IDs new names, rather than just
+using the name attribute (the reason is obvious upon thought, but it's
+better to state it outright)
+
+- Is there a particular reason you used literal-string, literal-number with
+a "kind" attribute, etc.?  (It's not as uniform as I'd expect.)  I'd suggest
+you take a quick look at XML Schema and use the same sort of definitions as
+they do, for purposes of standardization.  I think that there's a decent
+possibility you'd like to query a document for all literals and literal
+values without having to say "literal-string | literal-number"...
+
+- I wouldn't use "continuation" as the attribute name for a second
+declaration at the same line - it has a language-related meaning that has
+nothing to do with this, and that could be confusing.
+
+- Do you think that it's best to write a research paper in first-person
+singular, even if you're the only author?
+
+- Beware, the output of sggrep *isn't* a valid or well-formed XML document.
+You need one set of open and close tags around everything for this to be
+true.
+
+- I think that showing one or two XSLT/XQL queries would be a really good
+idea, if you've got time to add them.  These are where the action is at;
+SGML is passe...  Syntax for Xpath and XQL is actually pretty close to what
+sggrep uses, so this shouldn't be too hard.
+
+For working implementations, I think I can hunt them down for you.
+Actually, IE5 has a decent implementation of a preliminary version of XSLT,
+and can do some of the stuff you'd want.
+
+- You can find lots of tools to reference from OASIS or IBM's alphaWorks.
+
+In general, the paper looks pretty good.  I think the main thing is to tie
+it in a bit more with the hot XML stuff, and you should be just about set.
+
+I'll try to get you more detailed comments tomorrow, when I can actually
+look at the paper *on paper* instead of via IE.  Let me know if you have any
+questions or want help chasing down various things.  Good luck!
+
+
+Zack
+

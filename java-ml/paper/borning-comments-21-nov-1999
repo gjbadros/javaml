@@ -1,0 +1,34 @@
+From: Alan Borning <borning@cs.washington.edu>
+Subject: Re: Draft of JavaML paper
+To: gjb@cs.washington.edu
+Date: Sun, 21 Nov 1999 21:10:30 -0800 (PST)
+X-From-Line: borning@boris.cs.washington.edu  Sun Nov 21 21:10:31 1999
+Received: from boris.cs.washington.edu (boris.cs.washington.edu [128.95.2.227])
+	by june.cs.washington.edu (8.9.3/8.9.3/0.3j) with ESMTP id VAA09429
+	for <gjb@cs.washington.edu>; Sun, 21 Nov 1999 21:10:31 -0800
+	(envelope-from borning@boris.cs.washington.edu)
+Received: (from borning@localhost)
+	by boris.cs.washington.edu (8.9.3/8.9.3/0.2) id VAA75540;
+	Sun, 21 Nov 1999 21:10:30 -0800 (PST)
+	(envelope-from borning)
+Message-Id: <199911220510.VAA75540@boris.cs.washington.edu>
+In-reply-to: <qrrpux77gfq.fsf@clavicle.cs.washington.edu>
+	(gjb@cs.washington.edu)
+Lines: 15
+Xref: clavicle.cs.washington.edu inbox:13577
+
+I read through it (somewhat quickly) and will leave a marked-up copy for
+you tomorrow.  Looks good!  In particular the design choices made in this
+paper seem like good ones.  I can see why you're in a hurry to get this
+published - if you don't do it someone will very soon.
+
+If you want to include another example, a diff one would be good - you
+could describe the advantages of doing a JavaML diff over a text one.
+
+I didn't like the POSR acronym at all.  I'd just use the phrase "text
+represention" in its place.
+
+I'd leave out the sentence about "possibility of user-defined syntactic
+extensions" - this ignores the rise and collapse of the extensible language
+movement in the 70's.
+
