@@ -9,7 +9,7 @@
 
 <xsl:template match="*|@*">
   <xsl:copy>
-    <xsl:apply-templates select="*|@*"/>
+    <xsl:apply-templates select="*|@*|text()"/>
   </xsl:copy>
 </xsl:template>
 
