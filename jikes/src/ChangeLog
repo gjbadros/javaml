@@ -1,3 +1,17 @@
+Tue Feb  8 17:30:11 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp:  Rename FXMLStatementTagNeeded to
+	FXMLBlockTagNeeded and use new global g_fRequireBlockTag to permit 
+	forcing a block tag, as req'd (e.g., the synchronized statement).
+	Output label tags inside of their block, not before them.  Added
+	newlines after close of catch, finally, try, and after open of try.
+
+Tue Feb  8 14:26:22 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Handle AstSynchronizedStatement w/ new
+	synchronized and expr elements.  Added newlines after true-case
+	and false-case for if handling.
+
 Tue Feb  8 13:54:25 2000  Greg J. Badros  <gjb@cs.washington.edu>
 
 	* xml-unparse.cpp: Clean up lots of old, irrelevant FIXMEs.  Drop
