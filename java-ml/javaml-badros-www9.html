@@ -225,33 +225,50 @@ Though an improvement, such a technique still suffers from an inability
 to separate simple tools from a complex environment and additionally
 creates a dependency on proprietary technology that may be undesirable.
 
- <h4><a name="solution">1.2 - XML as a solution</a></h4>
+ <h4><a name="solution">1.2 - A solution</a></h4>
 
-* XML is a solution
-** XML's capability to represent arbitrary nested hierarchy can
-be used to encode deep structure of a program;  language-independent
-    idea, but Java is a nice language to work with, and an important
-    language to support.
-** JavaML -- the Java Markup Language -- an XML application for
-    describing a Java class.  As with all XML applications, the data is
-    self-describing, and the DTD describes what is a valid JavaML
-    representation.
-** Shares most strengths of plain-old-source-representation (posr): nice 
-    theory, even easier to parse, still human-readable (though not as
-    concise)
-** Overcomes many weaknesses
-*** easy to extend and change
-*** more robust to superficial changes (largely due to being less
-    concise)
-*** deep-structure is readily apparent in the representation
-** Provides a single canonical representation of the deep structure of
-    the program; nice for interacting compilers, editors, other tools
-** Permits leveraging incredible wealth of tools targeting SGML/XML
-    (e.g., query and transformation tools, style sheets for presenting
-    the program, XML structure-aware editors, etc.)
-*** examples include diffing source code, code metrics, searches,
-transformations such as renaming a local variable, etc. 
-</pre>
+One of the fundamental problems underlying the above difficulties is the
+lack of a canonical representation of the structure of source code.
+What we need is a universal format for representing the structure that
+is so important to preserve, analyze, and manipulate.  The key
+observation is that XML, the eXtensible Markup Language, provides
+exactly this capability and can be used to represent source code.  
+
+<p>
+
+In this paper, I introduce the Java Markup Language, JavaML -- an XML
+application for describing Java source programs.  The JavaML document
+type definition (DTD) describes the various elements of a valid JavaML
+document.  There is an natural correspondence between the elements and
+their attributes and the programming language constructs they model.
+The structure of the source program is reflected in the nesting of
+elements in the JavaML document.  With this representation, we can then
+leverage the wealth of tools for manipulating and querying XML and SGML
+documents to provide a rich infrastructure for software engineering
+transformations and analyses on Java source code.  
+
+<p>
+
+JavaML is well-suited to be used as a canonical representation of Java
+source code.  It shares most of the strengths of the POSR and overcomes
+many weaknesses.  The <a href="#background">next section</a> describes
+relevant features of Java and XML and the <a href="#javaml">following
+section</a> details the markup language and the implementation of a
+converter from the POSR to JavaML.  <a href="#leveraging-xml">Section
+4</a> gives numerous examples of how existing XML and SGML tools can be
+exploited to perform source code analyses and transformations on the
+richer representation provided by JavaML.  Sections <a href="#related
+work">5</a> and <a href="#future-work">6</a> describe others' related
+work and suggest avenues for exciting future work, respectively.
+Finally, <a href="#conclusion">Section 7</a> concludes.
+
+<p>
+
+The full document type definition for JavaML appears in <a
+href="#javaml-dtd">Appendix 1</a> and an example of converted source code
+is given in Appendices <a href="#set.java">2a</a> and <a
+href="#set.java.xml">2b</a>.
+
 
 <p><span class="index"><a href="#top">[top]</a></span>
 
@@ -261,7 +278,14 @@ The Java Markup Language is influenced by and benefits from numerous of the
 features of the two technologies it builds a bridge between: Java and XML.
 
  <h4><a name="java">2.1 - Java</a></h4>
-    
+
+    Though the XML-based representation of programming language
+    constructs is language independent and could be applied to any of a
+    number of conventional languages, Java is an excellent candidate for 
+    experimenting with these ideas and techniques.
+
+<p>
+
     Java is a popular object-oriented programming language developed by
     Sun Microsystems in the mid-1990s.  It features a
     platform-independent execution model based on the Java Virtual
@@ -444,6 +468,20 @@ Object Model) <cite>[DOM]</cite>.
 
 
 <pre>
+** Overcomes many weaknesses
+*** easy to extend and change
+*** more robust to superficial changes (largely due to being less
+    concise)
+*** deep-structure is readily apparent in the representation
+** Provides a single canonical representation of the deep structure of
+    the program; nice for interacting compilers, editors, other tools
+** Permits leveraging incredible wealth of tools targeting SGML/XML
+    (e.g., query and transformation tools, style sheets for presenting
+    the program, XML structure-aware editors, etc.)
+*** examples include diffing source code, code metrics, searches,
+transformations such as renaming a local variable, etc. 
+
+
 give the DTD -- see appendix 1
 
 issues include loop (for/while) vs. do-loop;  var-ref, var-set; 
@@ -1046,6 +1084,7 @@ class Set {
 
 <h3><a name="references">References</a></h3>
 
+<pre>
 Java
 
 JavaNutShell
@@ -1073,6 +1112,7 @@ XML
 EvilMacros
 
 Framework for Preprocessor-aware C Source Code Analyses
+</pre>
 
 <p><span class="index"><a href="#top">[top]</a></span>
 
