@@ -1,4 +1,4 @@
 #!/uns/bin/zsh -f
 for i in *.eps.gz; do
-  gunzip -c treeview2.eps.gz > treeview2.eps
+  gunzip -c $i > ${i:r}
 done
