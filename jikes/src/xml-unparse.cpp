@@ -1537,7 +1537,7 @@ void AstStringLiteral::XMLUnparse(Ostream& os, LexStream& lex_stream)
     }
     xnm << ends;
     xml_output(os,"literal-string",
-               "length",SzNewFromLong(lex_stream.NameStringLength(string_literal_token)),
+               "length",SzNewFromLong(lex_stream.NameStringLength(string_literal_token)-2),
                NULL);
     OutputLiteralString(os,xnm.str());
     xml_close(os,"literal-string");
