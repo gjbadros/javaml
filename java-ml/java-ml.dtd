@@ -18,7 +18,7 @@
 <!ELEMENT import EMPTY>
 <!ATTLIST import
     module CDATA #REQUIRED>
-<!ELEMENT class ((implement)*, (comment|constructor|method|field)*) >
+<!ELEMENT class ((implement)*, (constructor|method|field)*) >
 <!ATTLIST class
     name CDATA #REQUIRED
     %visibility-attribute;
@@ -37,7 +37,7 @@
     %mod-static;
     %mod-volatile;
     %mod-transient;>
-<!ELEMENT constructor (comment?,formal-arguments,throws*,(super-call|this-call)?,statements)>
+<!ELEMENT constructor (formal-arguments,throws*,(super-call|this-call)?,statements)>
 <!ATTLIST constructor
     name CDATA #REQUIRED
     id ID #REQUIRED
@@ -48,7 +48,7 @@
     %mod-volatile;
     %mod-transient;
     %mod-native;>
-<!ELEMENT method (comment?,type,formal-arguments,throws*,statements?)>
+<!ELEMENT method (type,formal-arguments,throws*,statements?)>
 <!ATTLIST method 
     name CDATA #REQUIRED
     id ID #REQUIRED
@@ -60,7 +60,6 @@
     %mod-volatile;
     %mod-transient;
     %mod-native;>
-<!ELEMENT comment (#PCDATA)>
 <!ELEMENT formal-arguments (formal-argument)*>
 <!ELEMENT formal-argument (type)>
 <!ATTLIST formal-argument
