@@ -1,0 +1,13 @@
+Possible Analyses:
+* check that only abstract classes have abstract methods
+* check that all functions have only one return statement
+* changing sense of a default parameter (via overriding, since no defaults in Java)
+* renaming a method
+* search for unused variables
+
+
+XML DTD Stuff:
+
+If an attribute is specified to be entry, then when the tag
+is used it should be <foo>, not <foo/>
+
