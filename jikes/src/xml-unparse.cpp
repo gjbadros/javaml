@@ -17,6 +17,52 @@
 
 #define XML_CLOSE ((char *) 1)
 
+/* Output any prefix header for the converted XML file */
+void
+xml_prefix(Ostream &xo)
+{
+  xo << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n\n";
+}
+
+/* Output any suffix for the converted XML file */
+void
+xml_suffix(Ostream &xo)
+{
+  /* empty for now --11/12/99 gjb */
+}
+
+char *
+SzOrNullFromF(bool f)
+{
+  if (f) return "true";
+  else return NULL;
+}
+
+char *
+SzFromUnparse(LexStream &lex_stream, Ast *pnode)
+{
+  ostrstream xnm; Ostream nm(&xnm);
+  pnode -> XMLUnparse(nm, lex_stream);
+  xnm << ends;
+  return xnm.str();
+}
+
+template <class T>
+xml_unparse_throws(Ostream &xo, LexStream &lex_stream, T *pnode)
+{
+  /* GJB:FIXME:: should these be inside a "throws-list" grouping element?
+     I don't think it's necessary. --11/12/99 gjb */
+  if (pnode->NumThrows() > 0) {
+    for (int k = 0; k < pnode -> NumThrows(); k++) {
+      char *szExceptionName = SzFromUnparse(lex_stream,pnode->Throw(k));
+      xml_output(xo,"throws",
+                 "exception",szExceptionName,
+                 XML_CLOSE);
+      xml_nl(xo);
+    }
+  }
+}
+
 /* extra parameters are
    attribute/value pairs (always as char *'s).
    use final NULL/XML_CLOSE to signify end */
@@ -29,7 +75,8 @@ xml_output(Ostream &xo, char *szTag, ...)
   char *sz;
   while ((sz = va_arg(ap, char *)) != NULL && sz != XML_CLOSE) {
     char *szVal = va_arg(ap, char *);
-    xo << " " << sz << "=\"" << szVal << "\"";
+    if (szVal)
+      xo << " " << sz << "=\"" << szVal << "\"";
   }
   va_end(ap);
   if (XML_CLOSE == sz)
@@ -89,7 +136,9 @@ void AstCompilationUnit::XMLUnparse(LexStream& lex_stream, char *directory)
     abort();
   }
   Ostream os(&os_base);
+  xml_prefix(os);
   this -> XMLUnparse(os, lex_stream);
+  xml_suffix(os);
   delete[] out_file_name;
 }
 
@@ -113,6 +162,8 @@ void AstBlock::XMLUnparse(Ostream& os, LexStream& lex_stream)
                  NULL);
     }
 
+    /* GJB:FIXME:: we get extra nestings of statements
+       that'd be nice to remove */
     if ( this->NumStatements() > 0) {
       xml_output(os, "statements", NULL);
       xml_nl(os);
@@ -202,18 +253,23 @@ void AstModifier::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstEmptyDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstEmptyDeclaration:#" << this-> id << "*/";
-    os << lex_stream.NameString(semicolon_token);
-    os << "\n";
+#if 0
+    xml_output("empty-declaration",XML_CLOSE);
+#endif
     if (Ast::debug_unparse) os << "/*:AstEmptyDeclaration#" << this-> id << "*/";
 }
 
 void AstClassBody::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstClassBody:#" << this-> id << "*/";
-    os << "{\n";
+#ifdef XML_LONG_WINDED
+    xml_output(os,"class-body",NULL);
+#endif
     for (int k = 0; k < this -> NumClassBodyDeclarations(); k++)
 	this -> ClassBodyDeclaration(k) -> XMLUnparse(os, lex_stream);
-    os << "}\n\n";
+#ifdef XML_LONG_WINDED
+    xml_close(os,"class-body",true);
+#endif
     if (Ast::debug_unparse) os << "/*:AstClassBody#" << this-> id << "*/";
 }
 
@@ -223,19 +279,38 @@ void AstClassDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
     
     bool fAbstract = false;
     bool fFinal = false;
+    bool fStatic = false;
+    bool fSynchronized = false;
+    bool fVolatile = false;
+    bool fTransient = false;
+    bool fNative = false;
     char *szVisibility = NULL;
 
     for (int i = 0; i < this -> NumClassModifiers(); i++)
     {
       switch (ClassModifier(i)->kind) {
-      case Ast::ABSTRACT:
+      case Ast::ABSTRACT: /* class/methods */
         fAbstract = true; break;
-      case Ast::FINAL:
+      case Ast::FINAL: /* class/methods/fields */
         fFinal = true; break;
+      case Ast::STATIC: /* methods/fields */
+        fStatic = true; break;
+      case Ast::NATIVE:  /* methods */
+        fNative = true; break;
+      case Ast::SYNCHRONIZED: /* class/methods */
+        fSynchronized = true; break;
+      case Ast::VOLATILE: /* fields */
+        fVolatile = true; break;
+      case Ast::TRANSIENT: /* fields */
+        fTransient = true; break;
+
       case Ast::PUBLIC:
         szVisibility = "public"; break;
       case Ast::PRIVATE:
         szVisibility = "private"; break;
+      case Ast::PROTECTED:
+        szVisibility = "protected"; break;
+
       default:
         os << "<!--" << "***Can not handle class modifier "
            << lex_stream.NameString(ClassModifier(i)->modifier_kind_token)
@@ -259,9 +334,14 @@ void AstClassDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
                "name", xml_name_string(lex_stream,identifier_token),
                "visibility",szVisibility,
                "extends",szExtends,
+               "abstract",SzOrNullFromF(fAbstract),
+               "final",SzOrNullFromF(fFinal),
+               "synchronized",SzOrNullFromF(fSynchronized),
+               "",SzOrNullFromF(false),
                NULL);
     // os << ") #" << class_body -> id << "\n";
 
+    xml_nl(os);
     if (NumInterfaces() > 0)
       {
 	// os << "implements ";
@@ -279,7 +359,7 @@ void AstClassDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
       }
 
     class_body -> XMLUnparse(os, lex_stream);
-    xml_close(os,"class");
+    xml_close(os,"class",true);
     if (Ast::debug_unparse) os << "/*:AstClassDeclaration#" << this-> id << "*/";
 }
 
@@ -327,74 +407,241 @@ void AstVariableDeclarator::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstFieldDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstFieldDeclaration:#" << this-> id << "*/";
+
+
+
+    bool fFinal = false;
+    bool fStatic = false;
+    bool fVolatile = false;
+    bool fTransient = false;
+    char *szVisibility = NULL;
+#if 0
+    bool fAbstract = false;
+    bool fSynchronized = false;
+    bool fNative = false;
+#endif
+
     for (int i = 0; i < this -> NumVariableModifiers(); i++)
     {
-	os << lex_stream.NameString(this -> VariableModifier(i) -> modifier_kind_token);
-	os << " ";
+      switch (VariableModifier(i)->kind) {
+      case Ast::FINAL: /* class/methods/fields */
+        fFinal = true; break;
+      case Ast::STATIC: /* methods/fields */
+        fStatic = true; break;
+      case Ast::VOLATILE: /* fields */
+        fVolatile = true; break;
+      case Ast::TRANSIENT: /* fields */
+        fTransient = true; break;
+#if 0
+      case Ast::ABSTRACT: /* class/methods */
+        fAbstract = true; break;
+      case Ast::NATIVE:  /* methods */
+        fNative = true; break;
+      case Ast::SYNCHRONIZED: /* class/methods */
+        fSynchronized = true; break;
+#endif
+
+      case Ast::PUBLIC:
+        szVisibility = "public"; break;
+      case Ast::PRIVATE:
+        szVisibility = "private"; break;
+      case Ast::PROTECTED:
+        szVisibility = "protected"; break;
+
+      default:
+        os << "<!--" << "***Can not handle field parameter modifier "
+           << lex_stream.NameString(VariableModifier(i)->modifier_kind_token)
+           << " (#" << VariableModifier(i)->kind << ")"
+           << "-->\n";
+        break;
+      }
     }
-    type -> XMLUnparse(os, lex_stream);
-    os << " ";
+
+    char *szType = SzFromUnparse(lex_stream, type);
     for (int k = 0; k < this -> NumVariableDeclarators(); k++)
       {
-	if (k>0) os << " ,";
-	this -> VariableDeclarator(k) -> XMLUnparse(os, lex_stream);
+        char *szName = SzFromUnparse(lex_stream,VariableDeclarator(k));
+        /* GJB:FIXME:: use two elements, instance-field and class-field, instead? */
+        xml_output(os,"field",
+                   "type",szType,
+                   "name",szName,
+                   "visibility",szVisibility,
+                   "final",SzOrNullFromF(fFinal),
+                   "static",SzOrNullFromF(fStatic),
+                   "volatile",SzOrNullFromF(fVolatile),
+                   "transient",SzOrNullFromF(fTransient),
+                   XML_CLOSE);
+        xml_nl(os);
       }
-    os << ";\n";
     if (Ast::debug_unparse) os << "/*:AstFieldDeclaration#" << this-> id << "*/";
 }
 
 void AstFormalParameter::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstFormalParameter:#" << this-> id << "*/";
+
+    bool fFinal = false;
+#if 0
+    bool fAbstract = false;
+    bool fStatic = false;
+    bool fSynchronized = false;
+    bool fVolatile = false;
+    bool fTransient = false;
+    bool fNative = false;
+    char *szVisibility = NULL;
+#endif
+
     for (int i = 0; i < this -> NumParameterModifiers(); i++)
     {
-	os << lex_stream.NameString(this -> ParameterModifier(i) -> modifier_kind_token);
-	os << " ";
+      switch (ParameterModifier(i)->kind) {
+      case Ast::FINAL: /* class/methods/fields */
+        fFinal = true; break;
+#if 0
+      case Ast::ABSTRACT: /* class/methods */
+        fAbstract = true; break;
+      case Ast::STATIC: /* methods/fields */
+        fStatic = true; break;
+      case Ast::NATIVE:  /* methods */
+        fNative = true; break;
+      case Ast::SYNCHRONIZED: /* class/methods */
+        fSynchronized = true; break;
+      case Ast::VOLATILE: /* fields */
+        fVolatile = true; break;
+      case Ast::TRANSIENT: /* fields */
+        fTransient = true; break;
+
+      case Ast::PUBLIC:
+        szVisibility = "public"; break;
+      case Ast::PRIVATE:
+        szVisibility = "private"; break;
+      case Ast::PROTECTED:
+        szVisibility = "protected"; break;
+#endif
+      default:
+        os << "<!--" << "***Can not handle formal parameter modifier "
+           << lex_stream.NameString(ParameterModifier(i)->modifier_kind_token)
+           << " (#" << ParameterModifier(i)->kind << ")"
+           << "-->\n";
+        break;
+      }
     }
-    type -> XMLUnparse(os, lex_stream);
-    os << " ";
-    formal_declarator -> XMLUnparse(os, lex_stream);
+
+    char *szType = SzFromUnparse(lex_stream, type);
+    char *szName = SzFromUnparse(lex_stream,formal_declarator);
+
+    xml_output(os,"formal-argument",
+               "type",szType,
+               "name",szName,
+               "final",SzOrNullFromF(fFinal),
+               XML_CLOSE);
+
     if (Ast::debug_unparse) os << "/*:AstFormalParameter#" << this-> id << "*/";
 }
 
 void AstMethodDeclarator::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstMethodDeclarator:#" << this-> id << "*/";
-    os << lex_stream.NameString(identifier_token);
-    os << " (";
-    for (int k = 0; k < this -> NumFormalParameters(); k++)
-      {
-	if (k>0) os << ", ";
-	this -> FormalParameter(k) -> XMLUnparse(os, lex_stream);
-      }
-    os << ") ";
-    for (int i = 0; i < NumBrackets(); i++)
-	 os << "[]";
+    
+    /* the name and number of brackets is handled in Method's unparse
+       since that stuff belongs with the method tag --11/12/99 gjb */
+
+    if (this -> NumFormalParameters() == 0) {
+      xml_output(os,"formal-arguments",XML_CLOSE);
+      xml_nl(os);
+    } else {
+      xml_output(os,"formal-arguments",NULL);
+      xml_nl(os);
+      for (int k = 0; k < this -> NumFormalParameters(); k++)
+        {
+          this -> FormalParameter(k) -> XMLUnparse(os, lex_stream);
+          xml_nl(os);
+        }
+      xml_close(os,"formal-arguments",true);
+    }
+
     if (Ast::debug_unparse) os << "/*:AstMethodDeclarator#" << this-> id << "*/";
 }
 
 void AstMethodDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstMethodDeclaration:#" << this-> id << "*/";
+
+    bool fAbstract = false;
+    bool fFinal = false;
+    bool fStatic = false;
+    bool fSynchronized = false;
+    bool fVolatile = false;
+    bool fTransient = false;
+    bool fNative = false;
+    char *szVisibility = NULL;
+
     for (int i = 0; i < this -> NumMethodModifiers(); i++)
     {
-	os << lex_stream.NameString(this -> MethodModifier(i) -> modifier_kind_token);
-	os << " ";
-    }
-    type -> XMLUnparse(os, lex_stream);
-    os << " ";
-    method_declarator -> XMLUnparse(os, lex_stream);
-    if (NumThrows() > 0)
-      {
-	os << " throws ";
-	for (int k = 0; k < this -> NumThrows(); k++)
-	  {
-	    if (k>0) os << ", ";
-	    this -> Throw(k) -> XMLUnparse(os, lex_stream);
-	  }
+      switch (MethodModifier(i)->kind) {
+      case Ast::ABSTRACT: /* class/methods */
+        fAbstract = true; break;
+      case Ast::FINAL: /* class/methods/fields */
+        fFinal = true; break;
+      case Ast::STATIC: /* methods/fields */
+        fStatic = true; break;
+      case Ast::NATIVE:  /* methods */
+        fNative = true; break;
+      case Ast::SYNCHRONIZED: /* class/methods */
+        fSynchronized = true; break;
+      case Ast::VOLATILE: /* fields */
+        fVolatile = true; break;
+      case Ast::TRANSIENT: /* fields */
+        fTransient = true; break;
+
+      case Ast::PUBLIC:
+        szVisibility = "public"; break;
+      case Ast::PRIVATE:
+        szVisibility = "private"; break;
+      case Ast::PROTECTED:
+        szVisibility = "protected"; break;
+      default:
+        os << "<!--" << "***Can not handle method modifier "
+           << lex_stream.NameString(MethodModifier(i)->modifier_kind_token)
+           << " (#" << MethodModifier(i)->kind << ")"
+           << "-->\n";
+        break;
       }
+    }
+
+    ostrstream xnm;
+    Ostream nm(&xnm);
+    type -> XMLUnparse(nm, lex_stream);
+    xnm << ends;
+    char *szReturnType = xnm.str();
+
+    char *szNumBrackets = NULL;
+    if (method_declarator->NumBrackets() > 0) {
+      szNumBrackets = new char[10];
+      sprintf(szNumBrackets, "%d", method_declarator->NumBrackets());
+    }
+
+    xml_output(os,"method",
+               "name", xml_name_string(lex_stream,method_declarator->identifier_token),
+               "visibility", szVisibility,
+               "return-type", szReturnType,
+               "abstract",SzOrNullFromF(fAbstract),
+               "final",SzOrNullFromF(fFinal),
+               "static",SzOrNullFromF(fStatic),
+               "synchronized",SzOrNullFromF(fSynchronized),
+               "native",SzOrNullFromF(fNative),
+               "num-brackets", szNumBrackets,
+               NULL);
+    xml_nl(os);
+
+    delete szNumBrackets;
+
+    method_declarator -> XMLUnparse(os, lex_stream);
+
+    xml_unparse_throws(os,lex_stream,this);
+
     method_body -> XMLUnparse(os, lex_stream);
     if (Ast::debug_unparse) os << "/*:AstMethodDeclaration#" << this-> id << "*/";
+    xml_close(os,"method",true);
 }
 
 void AstStaticInitializer::XMLUnparse(Ostream& os, LexStream& lex_stream)
@@ -448,34 +695,81 @@ void AstConstructorBlock::XMLUnparse(Ostream& os, LexStream& lex_stream)
     if (Ast::debug_unparse) os << "/*AstConstructorBlock:#" << this-> id << "*/";
     if (explicit_constructor_invocation_opt)
     {
-	os << "{\n";
+#if 0 // I think this is redundant --11/12/99 gjb
+        xml_output(os,"statements",NULL);
+#endif
 	explicit_constructor_invocation_opt -> XMLUnparse(os, lex_stream);
 	// os << ";\n";
     }
     block -> XMLUnparse(os, lex_stream);
+#if 0
     if (explicit_constructor_invocation_opt)
-	os << "}\n";
+      xml_close(os,"statements",true);
+#endif
     if (Ast::debug_unparse) os << "/*:AstConstructorBlock#" << this-> id << "*/";
 }
 
 void AstConstructorDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstConstructorDeclaration:#" << this-> id << "*/";
+
+    bool fAbstract = false;
+    bool fFinal = false;
+    bool fStatic = false;
+    bool fSynchronized = false;
+    bool fVolatile = false;
+    bool fTransient = false;
+    bool fNative = false;
+    char *szVisibility = NULL;
+
     for (int i = 0; i < this -> NumConstructorModifiers(); i++)
     {
-	os << lex_stream.NameString(this -> ConstructorModifier(i) -> modifier_kind_token);
-	os << " ";
+      switch (ConstructorModifier(i)->kind) {
+      case Ast::ABSTRACT: /* class/methods */
+        fAbstract = true; break;
+      case Ast::FINAL: /* class/methods/fields */
+        fFinal = true; break;
+      case Ast::STATIC: /* methods/fields */
+        fStatic = true; break;
+      case Ast::NATIVE:  /* methods */
+        fNative = true; break;
+      case Ast::SYNCHRONIZED: /* class/methods */
+        fSynchronized = true; break;
+      case Ast::VOLATILE: /* fields */
+        fVolatile = true; break;
+      case Ast::TRANSIENT: /* fields */
+        fTransient = true; break;
+
+      case Ast::PUBLIC:
+        szVisibility = "public"; break;
+      case Ast::PRIVATE:
+        szVisibility = "private"; break;
+      case Ast::PROTECTED:
+        szVisibility = "protected"; break;
+      default:
+        os << "<!--" << "***Can not handle method modifier "
+           << lex_stream.NameString(ConstructorModifier(i)->modifier_kind_token)
+           << " (#" << ConstructorModifier(i)->kind << ")"
+           << "-->\n";
+        break;
+      }
     }
+
+    xml_output(os,"constructor",
+               "name", xml_name_string(lex_stream,constructor_declarator->identifier_token),
+               "visibility", szVisibility,
+               "abstract",SzOrNullFromF(fAbstract),
+               "final",SzOrNullFromF(fFinal),
+               "static",SzOrNullFromF(fStatic),
+               "synchronized",SzOrNullFromF(fSynchronized),
+               "native",SzOrNullFromF(fNative),
+               NULL);
+    xml_nl(os);
+
     constructor_declarator -> XMLUnparse(os, lex_stream);
-    if (NumThrows() > 0)
-    {
-	os << " throws ";
-	for (int k = 0; k < this -> NumThrows(); k++)
-	{
-	    if (k>0) os << ", ";
-	    this -> Throw(k) -> XMLUnparse(os, lex_stream);
-	}
-    }
+
+    xml_unparse_throws(os,lex_stream,this);
+
     constructor_body -> XMLUnparse(os, lex_stream);
     if (Ast::debug_unparse) os << "/*:AstConstructorDeclaration#" << this-> id << "*/";
 }
@@ -554,8 +848,10 @@ void AstIfStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstEmptyStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstEmptyStatement:#" << this-> id << "*/";
+#if 0 /* we do not need to print the semicolon */
     os << lex_stream.NameString(semicolon_token);
     os << "\n";
+#endif
     if (Ast::debug_unparse) os << "/*:AstEmptyStatement#" << this-> id << "*/";
 }
 
@@ -563,8 +859,6 @@ void AstExpressionStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstExpressionStatement:#" << this-> id << "*/";
     expression -> XMLUnparse(os, lex_stream);
-    if (semicolon_token_opt)
-	os << ";\n";
     if (Ast::debug_unparse) os << "/*:AstExpressionStatement#" << this-> id << "*/";
 }
 
@@ -706,13 +1000,14 @@ void AstReturnStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
     // Do NOT use this; when the return statement is not literally
     // present in the source, the return_token points at the next "}".
     // os << lex_stream.NameString(return_token);
-    os << "return";
-    if (expression_opt)
-      {
-	os << " ";
-	expression_opt -> XMLUnparse(os, lex_stream);
-      }
-    os << ";\n";
+    if (!expression_opt) {
+      xml_output(os,"return",XML_CLOSE);
+      xml_nl(os);
+    } else {
+      xml_output(os,"return",NULL);
+      expression_opt -> XMLUnparse(os, lex_stream);
+      xml_close(os,"return",true);
+    }
     if (Ast::debug_unparse) os << "/*:AstReturnStatement#" << this-> id << "*/";
 }
 
@@ -935,14 +1230,15 @@ void AstFieldAccess::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstMethodInvocation::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstMethodInvocation:#" << this-> id << "*/";
+    xml_output(os,"send",NULL);
     method -> XMLUnparse(os, lex_stream);
-    os << "(";
+    xml_output(os,"arguments",NULL);
     for (int i = 0; i < this -> NumArguments(); i++)
       {
-	if (i>0) os << ", ";
 	this -> Argument(i) -> XMLUnparse(os, lex_stream);
       }
-    os << ")";
+    xml_close(os,"arguments",false);
+    xml_close(os,"send",true);
     if (Ast::debug_unparse) os << "/*:AstMethodInvocation#" << this-> id << "*/";
 }
 
@@ -991,33 +1287,39 @@ void AstCastExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstBinaryExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstBinaryExpression:#" << this-> id << "*/";
+    xml_output(os,"expression",NULL);
     left_expression -> XMLUnparse(os, lex_stream);
     os << " ";
     os << lex_stream.NameString(binary_operator_token);
     os << " ";
     right_expression -> XMLUnparse(os, lex_stream);
+    xml_close(os,"expression",false);
     if (Ast::debug_unparse) os << "/*:AstBinaryExpression#" << this-> id << "*/";
 }
 
 void AstConditionalExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstConditionalExpression:#" << this-> id << "*/";
+    xml_output(os,"expression",NULL);
     test_expression -> XMLUnparse(os, lex_stream);
     os << " ? ";
     true_expression -> XMLUnparse(os, lex_stream);
     os << " : ";
     false_expression -> XMLUnparse(os, lex_stream);
+    xml_close(os,"expression",false);
     if (Ast::debug_unparse) os << "/*:AstConditionalExpression#" << this-> id << "*/";
 }
 
 void AstAssignmentExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstAssignmentExpression:#" << this-> id << "*/";
+    xml_output(os,"expression",NULL);
     left_hand_side -> XMLUnparse(os, lex_stream);
     os << " ";
     os << lex_stream.NameString(assignment_operator_token);
     os << " ";
     expression -> XMLUnparse(os, lex_stream);
+    xml_close(os,"expression",false);
     if (Ast::debug_unparse) os << "/*:AstAssignmentExpression#" << this-> id << "*/";
 }
 #endif
