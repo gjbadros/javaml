@@ -1,4 +1,4 @@
-<!--$Id$-->
+!--$Id$-->
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
@@ -45,9 +45,9 @@ SUP { COLOR: #0000FF; FONT-SIZE: small; }
 </STYLE>
 </head>
 <body>
-<h1>
+<h2>
 <a name="top">JavaML: A Markup Language for Java Source Code</a>
-</h1>
+</h2>
 <h6>Greg J. Badros<br>
 University of Washington</h6>
 
@@ -641,6 +641,8 @@ string "Hello World" is a part of the message send thus the
 
 <p>
 
+<h4><a name="design-decisions">Design decisions</a></h4>
+
 JavaML provides more than just the structure of the source program,
 though.  In the above, notice the use of the formal-argument
 <code>g</code> in the target of the message send.  The
@@ -653,6 +655,22 @@ obtain the type of the variable.  Similar linking is done for local
 locate because of their distinguishing <code>var-ref</code> tag.
 Additionally, they are disambiguated from an assignment to a variable
 which is converted into a <code>var-set</code> tag.
+
+<p>
+
+Throughout JavaML, attributes of elements are used whenever the
+structure of the value is never more complex than a simple text string.
+Attributes are used for modifiers such as <code>synchronized</code> and
+<code>final</code> and for visibility settings such as
+<code>public</code> or <code>private</code>.  Attributes are not used
+for properties such as types because they have richer structure: a type
+can consist of a base name and a number of dimensions, and could also
+reference the definition of the class that implements the type, if
+desired.  If, say, a return type were just the value of an attribute on
+the method element, the end user would unacceptably have to do string
+processing on the value <code>int[][]</code> to determine that the base
+type of a two-dimensional array was just the primitive type
+<code>int</code>.
 
 <p>
 
@@ -725,42 +743,44 @@ For contrast, consider:
 
 Here, there probably is <em>not</em> the implicit desire that the two
 variables have the same type, but instead the shorthand syntax is being
-used simply for brevity.
+used simply for brevity.  Since it is hard to automate distinguishing
+these cases, JavaML simply preserves this syntactic feature by using a
+<code>continuation="true"</code> attribute on variable declarations that
+exploit this shorthand.
 
+<h4><a name="implementation">Implementation of converter</a></h4>
+
+To experiment with the design of JavaML and gain experience in using the
+representation, it was essential to implement a converter from the Java
+plain old source representation to JavaML.  Within the IBM Jikes Java
+compiler framework <cite>[Jikes]</cite>, I added an
+<code>XMLUnparse</code> method to each of the Ast nodes. This change,
+along with some small additional code for managing the options to
+request the XML output, results in an incredibly robust and fast POSR to
+JavaML converter.  In total, I added about 1600 non-comment-non-blank
+lines of C++ code to the Jikes framework to support the option.  The
+source code is available upon request (and will be made publically
+available shortly after final submission of this paper).
+
+The converter has been tested by converting several sample programs, as
+well as the whole of the 4300 line Cassowary Constraint Solving Toolkit
+<cite>[Cassowary]</cite>.  The conversion of all those files takes only
+about six seconds on the author's RedHat6-based Pentium III-450 machine.
+Each of the files converted was then validated with respect to the
+JavaML DTD using James Clark's Jade package's <code>nsgmls</code> tool.
+The converter was debugged until all of the files were deemed valid.
+
+Also developed is a prototype back-converter that outputs the POSR given
+the JavaML representation. written in Perl using the XML and DOM
+packages.  See the <a href="#future-work">Section 6</a> for more about
+back-converting possibilities.
 
 <pre>
-** Overcomes many weaknesses
-*** easy to extend and change
+*** easy to extend and change -> future work re: IP
 *** more robust to superficial changes (largely due to being less
-    concise)
-*** deep-structure is readily apparent in the representation
-** Provides a single canonical representation of the deep structure of
-    the program; nice for interacting compilers, editors, other tools
-** Permits leveraging incredible wealth of tools targeting SGML/XML
-    (e.g., query and transformation tools, style sheets for presenting
-    the program, XML structure-aware editors, etc.)
+    concise) -> exclude this?
 *** examples include diffing source code, code metrics, searches,
-transformations such as renaming a local variable, etc. 
-
-
-Above is related to language translation issue:
-  -> move away from language-specific syntax and constructs
-  -> leads to more abstract representation
-  -> tradeoff with preserving abstractions
-
-Properties of XML that influenced DTD design:
-
-attributes are unordered, finite
- -> cannot use for arguments
-attributes are only text strings, so cannot have references
- -> e.g., types need to be encoded as elements
-    not 
-     [method return-type="boolean" ...] ... 
-    but
-    [method ...][type name="boolean" primitive="true"/] ...
-Didn't want stuff like boolean[][] since then end user
-would have to do string processing on the attribute value to
-get at the base type.
+transformations such as renaming a local variable, etc. -> leveraging 
 
 </pre>	
 
@@ -859,6 +879,7 @@ available, and thanks to Mike Ernst for helpful pointers on using it.
 
 
 <h3><a name="javaml-dtd">Appendix 1 - JavaML DTD</a></h3>
+<small>
 <pre>
 &lt;?xml version="1.0" encoding="UTF-8" ?&gt;
 &lt;!ENTITY % visibility-attribute "visibility (public|private|protected) #IMPLIED"&gt;
@@ -1029,6 +1050,7 @@ available, and thanks to Mike Ernst for helpful pointers on using it.
     targetname CDATA #IMPLIED&gt;
 &lt;!ELEMENT conditional-expr ((%expr-elems;),(%expr-elems;),(%expr-elems;))&gt;
 </pre>
+</small>
 
 <p><span class="index"><a href="#top">[top]</a></span>
 
