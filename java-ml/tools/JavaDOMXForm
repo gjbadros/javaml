@@ -26,11 +26,12 @@ for (my $i = 0; $i < $nodes->getLength(); $i++) {
 print $doc->toString;
 
 sub SendMessageBlock {
+  my ($doc,$target_var,$method_name,$data) = (@_);
   # insert, e.g:  Tracer.StartMethod("paint");
  return parseXMLFragment($doc,<<"__END_FRAGMENT__"
-<send message="StartMethod">
-  <target><var-ref name="Tracer"/></target>
-  <arguments><literal-string value="paint"/></arguments>
+<send message="$method_name">
+  <target><var-ref name="$target_var"/></target>
+  <arguments><literal-string value="$data"/></arguments>
 </send>  
 __END_FRAGMENT__
  );
