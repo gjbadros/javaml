@@ -20,53 +20,53 @@
 <!ELEMENT class ((implement)*, (comment|constructor|method|field)*) >
 <!ATTLIST class
     name CDATA #REQUIRED
-    %visibility-attribute 
-    %mod-abstract
-    %mod-final
-    %mod-synchronized
+    %visibility-attribute;
+    %mod-abstract;
+    %mod-final;
+    %mod-synchronized;
     superclass CDATA "Object">
-<!ELEMENT field (type,(%expr-elems)?)>
+<!ELEMENT field (type,(%expr-elems;)?)>
 <!ATTLIST field
     name CDATA #REQUIRED
-    %visibility-attribute
-    %mod-final
-    %mod-static
-    %mod-volatile
-    %mod-transient>
+    %visibility-attribute;
+    %mod-final;
+    %mod-static;
+    %mod-volatile;
+    %mod-transient;>
 <!ELEMENT constructor (comment?,formal-arguments,throws*,(super-call|this-call)?,statements)>
 <!ATTLIST constructor
     name CDATA #REQUIRED
     id ID #REQUIRED
-    %visibility-attribute
-    %mod-final
-    %mod-static
-    %mod-synchronized
-    %mod-volatile
-    %mod-transient
-    %mod-native>
+    %visibility-attribute;
+    %mod-final;
+    %mod-static;
+    %mod-synchronized;
+    %mod-volatile;
+    %mod-transient;
+    %mod-native;>
 <!ELEMENT method (comment?,formal-arguments,throws*,type,statements?)>
 <!ATTLIST method 
     name CDATA #REQUIRED
     id ID #REQUIRED
-    %visibility-attribute
-    %mod-abstract
-    %mod-final
-    %mod-static
-    %mod-synchronized
-    %mod-volatile
-    %mod-transient
-    %mod-native>
+    %visibility-attribute;
+    %mod-abstract;
+    %mod-final;
+    %mod-static;
+    %mod-synchronized;
+    %mod-volatile;
+    %mod-transient;
+    %mod-native;>
 <!ELEMENT comment (#PCDATA)>
 <!ELEMENT formal-arguments (formal-argument)*>
 <!ELEMENT formal-argument (type)>
 <!ATTLIST formal-argument
     name CDATA #REQUIRED
-    %mod-final
+    %mod-final;
     id ID #REQUIRED>
 <!ELEMENT send (target,arguments)>
-<!ELEMENT target (%expr-elems)>
-<!ELEMENT return (%expr-elems)>
-<!ELEMENT statements (statements|local-variable|try|throw|if|loop|return|continue|break|%expr-elems)*>
+<!ELEMENT target (%expr-elems;)>
+<!ELEMENT return (%expr-elems;)>
+<!ELEMENT statements (statements|local-variable|try|throw|if|loop|return|continue|break|%expr-elems;)*>
 <!ELEMENT throw ANY>
 <!ELEMENT throws EMPTY>
 <!ATTLIST throws
@@ -76,16 +76,16 @@
 <!ATTLIST type
     primitive CDATA #IMPLIED
     dimensions CDATA #IMPLIED>
-<!ELEMENT new-array (type,dim-expr*,(%expr-elems)?)>
+<!ELEMENT new-array (type,dim-expr*,(%expr-elems;)?)>
 <!ATTLIST new-array
     dimensions CDATA #REQUIRED>
 <!ELEMENT dim-expr ANY>
-<!ELEMENT local-variable (type,(%expr-elems)?)>
+<!ELEMENT local-variable (type,(%expr-elems;)?)>
 <!ATTLIST local-variable
     name CDATA #REQUIRED
-    %mod-final
+    %mod-final;
     id ID #IMPLIED>
-<!ELEMENT arguments (%expr-elems)*>
+<!ELEMENT arguments (%expr-elems;)*>
 <!ELEMENT literal-string EMPTY>
 <!ATTLIST literal-string
     value CDATA #REQUIRED
@@ -93,44 +93,44 @@
 <!ELEMENT literal-number EMPTY>
 <!ATTLIST literal-number
     value CDATA #REQUIRED
-    %kind-attribute
+    %kind-attribute;
     base CDATA "10">
 <!ELEMENT var-ref EMPTY>
 <!ATTLIST var-ref
     name CDATA #REQUIRED>
-<!ELEMENT field-access (%expr-elems)>
+<!ELEMENT field-access (%expr-elems;)>
 <!ATTLIST field-access
     field CDATA #REQUIRED>
 <!ELEMENT var-set EMPTY>
 <!ATTLIST var-set
     name CDATA #REQUIRED>
-<!ELEMENT field-set (%expr-elems)>
+<!ELEMENT field-set (%expr-elems;)>
 <!ATTLIST field-set
     field CDATA #REQUIRED>
 <!ELEMENT package-decl EMPTY>
 <!ATTLIST package-decl
     name CDATA #REQUIRED>
-<!ELEMENT assignment-expr (lvalue,(%expr-elems))>
-<!ELEMENT lvalue (var-set|field-set|%expr-elems)>
-<!ELEMENT binary-expr ((%expr-elems),(%expr-elems))>
+<!ELEMENT assignment-expr (lvalue,(%expr-elems;))>
+<!ELEMENT lvalue (var-set|field-set|%expr-elems;)>
+<!ELEMENT binary-expr ((%expr-elems;),(%expr-elems;))>
 <!ATTLIST binary-expr
     op CDATA #REQUIRED>
-<!ELEMENT paren (%expr-elems)>
-<!ELEMENT unary-expr (%expr-elems)>
+<!ELEMENT paren (%expr-elems;)>
+<!ELEMENT unary-expr (%expr-elems;)>
 <!ATTLIST unary-expr
     op CDATA #REQUIRED
     post (yes|no) #IMPLIED>
-<!ELEMENT cast-expr (type,(%expr-elems))>
+<!ELEMENT cast-expr (type,(%expr-elems;))>
 <!ELEMENT literal-false EMPTY>
 <!ELEMENT literal-true EMPTY>
 <!ELEMENT literal-null EMPTY>
 <!ELEMENT if (test,true-case,false-case?)>
-<!ELEMENT test (%expr-elems)>
+<!ELEMENT test (%expr-elems;)>
 <!ELEMENT true-case (statements)>
 <!ELEMENT false-case (statements)>
 <!ELEMENT array-ref (base,offset)>
-<!ELEMENT base (%expr-elems)>
-<!ELEMENT offset (%expr-elems)>
+<!ELEMENT base (%expr-elems;)>
+<!ELEMENT offset (%expr-elems;)>
 <!ELEMENT static-initializer (statements)>
 <!ELEMENT super-call (arguments)>
 <!ELEMENT this-call (arguments)>
@@ -151,4 +151,4 @@
 <!ELEMENT break EMPTY>
 <!ATTLIST break
     targetname CDATA #IMPLIED>
-<!ELEMENT conditional-expr ((%expr-elems),(%expr-elems),(%expr-elems))>
+<!ELEMENT conditional-expr ((%expr-elems;),(%expr-elems;),(%expr-elems;))>
