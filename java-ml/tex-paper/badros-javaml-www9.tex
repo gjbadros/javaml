@@ -14,14 +14,17 @@
 \usepackage{fullpage}
 \usepackage{times}
 \usepackage{url}
+\usepackage{moreverb}
 \usepackage[english]{babel}
+\usepackage{floatflt}
+\usepackage{multicol}
 
 \setlength\topmargin{-0.25in} \setlength\oddsidemargin{-0.25in}
 \setlength\textheight{9.0in} \setlength\textwidth{7.0in}
 \setlength\columnsep{0.375in}  \newlength\titlebox \setlength\titlebox{2.25in}
 \setlength\headheight{0pt}   \setlength\headsep{0pt}
 \setlength{\parskip}{2pt}
-\flushbottom \twocolumn \sloppy
+%\flushbottom \twocolumn \sloppy
 
 \begin{document}
 \bibliographystyle{plain}
@@ -31,10 +34,10 @@
 \newenvironment{shelloutput}{\begin{verbatim}}{\end{verbatim}}
 
 \title{JavaML: A Markup Language for Java Source Code}
-\author{Greg J. Badros \\
-\smtexttt{gjb@cs.washington.edu}\\
-Dept.\ of Computer Science and Engineering\\
-University of Washington, Box 352350\\
+\author{Greg J. Badros\thanks{Corresponding author: \smtexttt{gjb@cs.washington.edu}}
+\\ \small
+Dept.\ of Computer Science and Engineering, ~
+University of Washington, Box 352350, ~
 Seattle, WA ~ 98195-2350, USA}
 \date{}
 
@@ -42,6 +45,9 @@ Seattle, WA ~ 98195-2350, USA}
 
 \maketitle
 \thispagestyle{empty}
+
+%% GJB:FIXME:VISUAL
+\vspace*{-1cm}
 
 \section*{Abstract}
 The classical plain-text representation of source code is convenient for
@@ -57,9 +63,13 @@ leveraging the abundance of XML tools and techniques.  A robust
 converter built with the IBM Jikes Java compiler framework translates
 from the classical Java source code representation to JavaML.
 
-\vspace*{.3cm} \noindent \textbf{Keywords:}
+%% GJB:FIXME:VISUAL
+\vspace*{.2cm} 
+\noindent \textit{Keywords:}
 Java, source-code, SGML, XML, abstract syntax tree, AST, parsing,
 analysis, software-engineering, Jikes
+
+\begin{multicols}{2}
 
 \section{Introduction}
 \label{sec-intro}
@@ -76,7 +86,7 @@ expressions describe how individual characters combine to form tokens,
 and the grammar enumerates how higher-level constructs are composed
 recursively of other constructs and primitive tokens.  Together, these
 procedures convert from a sequence of characters into a data structure
-called an \emph{abstract syntax tree} (AST) that more directly reflects
+called an \emph{abstract syntax tree} (AST) which more directly reflects
 the structure of the source program.
 
 The textual representation of source code has several nice properties.
@@ -265,7 +275,8 @@ largely free from order-dependencies of definitions.  A method body
 of the method signature.  Additionally, Java lacks an integrated
 preprocessor.  These features combine to make Java source programs
 syntactically very clean and make Java an ideal language for
-representing using XML.
+representing using XML.\footnote{The applicability of this approach to
+  other languages is discussed further in section~\ref{sec-future}.}
 
 \subsection{XML: Extensible Markup Language}
 
@@ -289,6 +300,7 @@ angle braces.  A simple example is:
 <email>
   <head>
     <to>Mom</to>
+    <to>Dad</to>
     <from>Greg</from>
     <subject>My trip</subject>
   </head>
@@ -326,32 +338,39 @@ with respect to the following DTD:
 
 \begin{verbatim}
 <!-- email DTD -->
+<!ENTITY % encoding-attribute "encoding (ascii|mime) #REQUIRED">
 <!ELEMENT email (head,body)>
-<!ELEMENT head (to,from,subject?)>
+<!ELEMENT head (to+,from,subject?)>
 <!ELEMENT to (#PCDATA)>
 <!ELEMENT from (#PCDATA)>
 <!ELEMENT subject (#PCDATA)>
 <!ELEMENT body (#PCDATA)>
 <!ATTLIST body
-    encoding (ascii|mime) #REQUIRED>
-    encrypted (yes|no) #IMPLIED>
+    encrypted (yes|no) #IMPLIED
+    %encoding-attribute;>
 \end{verbatim}
 
 According to this DTD, there are six element types. The \smtexttt{email}
 element must contain exactly one \smtexttt{head} followed by exactly one
-\smtexttt{body} element.  The \smtexttt{head}, in turn, must contain
-\smtexttt{to} and \smtexttt{from} elements, in that order, followed by
-an optional \smtexttt{subject} element.  Each of those elements may
-contain text (also know as \emph{parsed character data} or
+\smtexttt{body} element.  The \smtexttt{head}, in turn, must contain one
+or more \smtexttt{to} elements and then a \smtexttt{from} element,
+followed by an optional \smtexttt{subject} element.  The order of the
+elements must be as specified---order \emph{does} matter. Each of those
+elements may contain text (also know as \emph{parsed character data} or
 \smtexttt{PCDATA}).  The single \smtexttt{ATTLIST} declaration in the
-DTD specifies that the \smtexttt{body} element \emph{must} specify a
-value of either \smtexttt{ascii} or \smtexttt{mime} for the
-\smtexttt{encoding} attribute, and \emph{may} specify a value for the
-\smtexttt{encrypted} attribute.  An XML document that is declared to
-adhere to this DTD is not valid if any of the above criteria are not
-met.  For example, if the \smtexttt{to} element is missing from an
-\smtexttt{email} document, that document is not valid, though it may
-still be well-formed.
+DTD specifies that the \smtexttt{body} element \emph{may} specify a
+value for the \smtexttt{encrypted} attribute, and \emph{must} specify
+either \smtexttt{ascii} or \smtexttt{mime} for the \smtexttt{encoding}
+attribute. The \smtexttt{ENTITY} declaration of the
+\smtexttt{encoding-attribute} (at the top of the DTD) is a simple way to
+factor out redundant text---the text given between the quotes is
+substituted as is into the following \smtexttt{ATTLIST} declaration
+(and, importantly, can be used in multiple \smtexttt{ATTLIST}s).
+
+An XML document that is declared to adhere to this DTD is not valid if
+any of the above criteria are not met.  For example, if the
+\smtexttt{to} element is missing from an \smtexttt{email} document, that
+document is not valid, though it may still be well-formed.
 
 When modeling data in XML, a primary design decision is choosing whether
 to nest elements or to use attributes.  In the above example, we could
@@ -537,36 +556,35 @@ appendix~\ref{app-javaml-dtd}, but is best illustrated by example.  For the
 program in JavaML as show in figure~\ref{fig-firstapplet-javaml}.
 
 \begin{figure*}[htb]
-\begin{verbatim}
-   1  <?xml version="1.0" encoding="UTF-8"?>
-   2  <!DOCTYPE java-source-program SYSTEM "java-ml.dtd">
-   3  
-   4  <java-source-program name="FirstApplet.java">
-   5    <import module="java.applet.*"/>
-   6    <import module="java.awt.*"/>
-   7    <class name="FirstApplet" visibility="public" superclass="Applet">
-   8      <method name="paint" visibility="public" id="meth-15">
-   9        <type name="void" primitive="true"/>
-  10        <formal-arguments>
-  11    <formal-argument name="g" id="frmarg-13">
-  12               <type name="Graphics"/></formal-argument>
-  13        </formal-arguments>
-  14        <statements>
-  15    <statements>
-  16      <send message="drawString">
-  17        <target><var-ref name="g" idref="frmarg-13"/></target>
-  18        <arguments>
-  19                <literal-string length="11">Hello World</literal-string>
-  20                <literal-number kind="integer" value="25"/>
-  21                <literal-number kind="integer" value="50"/>
-  22              </arguments>
-  23      </send>
-  24    </statements>
-  25        </statements>
-  26      </method>
-  27    </class>
-  28  </java-source-program>
-\end{verbatim}
+\begin{listing}{1}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE java-source-program SYSTEM "java-ml.dtd">
+
+<java-source-program name="FirstApplet.java">
+  <import module="java.applet.*"/>
+  <import module="java.awt.*"/>
+  <class name="FirstApplet" visibility="public">
+    <superclass class="Applet"/>
+    <method name="paint" visibility="public" id="meth-15">
+      <type name="void" primitive="true"/>
+      <formal-arguments>
+         <formal-argument name="g" id="frmarg-13">
+             <type name="Graphics"/></formal-argument>
+      </formal-arguments>
+      <statements>
+        <send message="drawString">
+          <target><var-ref name="g" idref="frmarg-13"/></target>
+            <arguments>
+              <literal-string length="11">Hello World</literal-string>
+              <literal-number kind="integer" value="25"/>
+              <literal-number kind="integer" value="50"/>
+            </arguments>
+        </send>
+      </statements>
+    </method>
+  </class>
+</java-source-program>
+\end{listing}
 \caption{FirstApplet.java converted to JavaML.
 \label{fig-firstapplet-javaml}}
 \end{figure*}
@@ -837,6 +855,7 @@ run \smtexttt{stripsgml} on the output of the above query:
 % sggrep '.*/literal-string' \
            < Set.java.xml | stripsgml
 \end{verbatim}
+
 \begin{verbatim}
 { 
 , 
@@ -847,12 +866,10 @@ We can also query the JavaML source for elements based on values of
 their attributes.  For example, if we wish to find all sends of the
 message \smtexttt{clone} we can do so easily and reliably:
 
-{\bfseries
 \begin{verbatim}
 % sggrep '.*/send[message=clone]' \
                       < Set.java.xml 
 \end{verbatim}
-}
 
 {\small
 \begin{verbatim}
@@ -1110,450 +1127,60 @@ of the software artifact throughout the development process.
 \section*{Acknowledgments}
 \label{sec-ack}
 
-I enthusiastically thank Zack Ives and Stefan Bjarni Sigurdsson for
-their comments, discussion, and input on this work.  I thank Corin
-Anderson and Alan Borning for much-appreciated comments on a draft of
-this paper.  I also thank Miguel Figueroa, Craig Kaplan, and Todd
-Millstein, for their helpful discussions. Thanks to IBM for constructing
-the Jikes compiler framework, and for making it publicly available, and
-thanks to Mike Ernst for helpful pointers on using it. This work was
-supported by the University of Washington Computer Science and
-Engineering Wilma Bradley fellowship and by NSF Grant No. IIS-9975990.
+I enthusiastically thank Zack Ives for his comments, discussion, and
+input on this work.  I thank Corin Anderson and Alan Borning for
+much-appreciated comments on a draft of this paper.  I also thank Miguel
+Figueroa, Craig Kaplan, and Todd Millstein, and Stefan Bjarni Sigurdsson
+for their helpful discussions. Thanks to IBM for constructing the Jikes
+compiler framework, and for making it publicly available, and thanks to
+Mike Ernst for helpful pointers on using it. This work was supported by
+the University of Washington Computer Science and Engineering Wilma
+Bradley fellowship and by NSF Grant No. IIS-9975990.
 
 \appendix
 \section{JavaML DTD}
 \label{app-javaml-dtd}
 
 {\small
-\begin{verbatim}
-<?xml version="1.0" encoding="UTF-8" ?>
-<!ENTITY % visibility-attribute "visibility (public|private|protected)
-    #IMPLIED">
-<!ENTITY % kind-attribute "kind (integer|long|real|double) #IMPLIED">
-<!ENTITY % mod-final "final CDATA #IMPLIED">
-<!ENTITY % mod-static "static CDATA #IMPLIED">
-<!ENTITY % mod-volatile "volatile CDATA #IMPLIED">
-<!ENTITY % mod-transient "transient CDATA #IMPLIED">
-<!ENTITY % mod-native "native CDATA #IMPLIED">
-<!ENTITY % mod-abstract "abstract CDATA #IMPLIED">
-<!ENTITY % mod-synchronized "synchronized CDATA #IMPLIED">
-<!ENTITY % expr-elems
-    "send|new|new-array|var-ref|field-access|array-ref|paren|assignment-expr|\
-conditional-expr|binary-expr|unary-expr|cast-expr|literal-number|literal-string|\
-literal-true|literal-false|literal-null|this|super">
-<!ELEMENT java-source-program (package-decl?,import*,(class|interface)+) >
-<!ATTLIST java-source-program name CDATA #IMPLIED version CDATA #IMPLIED>
-<!ELEMENT import EMPTY>
-<!ATTLIST import module CDATA #REQUIRED>
-<!ELEMENT class ((implement)*, (constructor|method|field)*) >
-<!ATTLIST class name CDATA #REQUIRED %visibility-attribute; %mod-abstract;
-    %mod-final; %mod-synchronized; superclass CDATA "Object">
-<!ELEMENT interface ((extend)*, method*) >
-<!ATTLIST interface name CDATA #REQUIRED %visibility-attribute;>
-<!ELEMENT implement EMPTY>
-<!ATTLIST implement class CDATA #REQUIRED>
-<!ELEMENT extend EMPTY>
-<!ATTLIST extend interface CDATA #REQUIRED>
-<!ELEMENT field (type,(%expr-elems;)?)>
-<!ATTLIST field name CDATA #REQUIRED %visibility-attribute; %mod-final;
-    %mod-static; %mod-volatile; %mod-transient;>
-<!ELEMENT constructor
-    (formal-arguments,throws*,(super-call|this-call)?,statements)>
-<!ATTLIST constructor name CDATA #REQUIRED id ID #REQUIRED
-    %visibility-attribute; %mod-final; %mod-static; %mod-synchronized;
-    %mod-volatile; %mod-transient; %mod-native;>
-<!ELEMENT method (type,formal-arguments,throws*,statements?)>
-<!ATTLIST method name CDATA #REQUIRED id ID #REQUIRED
-    %visibility-attribute; %mod-abstract; %mod-final; %mod-static;
-    %mod-synchronized; %mod-volatile; %mod-transient; %mod-native;>
-<!ELEMENT formal-arguments (formal-argument)*>
-<!ELEMENT formal-argument (type)>
-<!ATTLIST formal-argument name CDATA #REQUIRED id ID #REQUIRED
-    %mod-final;>
-<!ELEMENT send (target?,arguments)>
-<!ATTLIST send message CDATA #REQUIRED>
-<!ELEMENT target (%expr-elems;)>
-<!ELEMENT return (%expr-elems;)>
-<!ELEMENT statements
-    (statements|local-variable|try|throw|if|loop|do-loop|return|continue|break|%expr-elems;)*>
-<!ELEMENT throw (%expr-elems;)>
-<!ELEMENT throws EMPTY>
-<!ATTLIST throws exception CDATA #REQUIRED>
-<!ELEMENT new (type,arguments)>
-<!ELEMENT type EMPTY>
-<!ATTLIST type primitive CDATA #IMPLIED name CDATA #REQUIRED dimensions
-    CDATA #IMPLIED>
-<!ELEMENT new-array (type,dim-expr*,(%expr-elems;)?)>
-<!ATTLIST new-array dimensions CDATA #REQUIRED>
-<!ELEMENT dim-expr (%expr-elems;)>
-<!ELEMENT local-variable (type,(static-initializer|%expr-elems;)?)>
-<!ATTLIST local-variable name CDATA #REQUIRED id ID #REQUIRED continued
-    CDATA #IMPLIED %mod-final;>
-<!ELEMENT arguments (%expr-elems;)*>
-<!ELEMENT literal-string (#PCDATA)>
-<!ATTLIST literal-string length CDATA #REQUIRED>
-<!ELEMENT literal-number EMPTY>
-<!ATTLIST literal-number value CDATA #REQUIRED %kind-attribute; base CDATA
-    "10">
-<!ELEMENT var-ref EMPTY>
-<!ATTLIST var-ref name CDATA #REQUIRED idref IDREF #IMPLIED>
-<!ELEMENT field-access (%expr-elems;)>
-<!ATTLIST field-access field CDATA #REQUIRED>
-<!ELEMENT var-set EMPTY>
-<!ATTLIST var-set name CDATA #REQUIRED>
-<!ELEMENT field-set (%expr-elems;)>
-<!ATTLIST field-set field CDATA #REQUIRED>
-<!ELEMENT package-decl EMPTY>
-<!ATTLIST package-decl name CDATA #REQUIRED>
-<!ELEMENT assignment-expr (lvalue,(%expr-elems;))>
-<!ELEMENT lvalue (var-set|field-set|%expr-elems;)>
-<!ELEMENT binary-expr ((%expr-elems;),(%expr-elems;))>
-<!ATTLIST binary-expr op CDATA #REQUIRED>
-<!ELEMENT paren (%expr-elems;)>
-<!ELEMENT unary-expr (%expr-elems;)>
-<!ATTLIST unary-expr op CDATA #REQUIRED post (true|false) #IMPLIED>
-<!ELEMENT cast-expr (type,(%expr-elems;))>
-<!ELEMENT literal-false EMPTY>
-<!ELEMENT literal-true EMPTY>
-<!ELEMENT literal-null EMPTY>
-<!ELEMENT if (test,true-case,false-case?)>
-<!ELEMENT test (%expr-elems;)>
-<!ELEMENT true-case (statements)>
-<!ELEMENT false-case (statements)>
-<!ELEMENT array-ref (base,offset)>
-<!ELEMENT base (%expr-elems;)>
-<!ELEMENT offset (%expr-elems;)>
-<!ELEMENT static-initializer (statements)>
-<!ELEMENT super-call (arguments)>
-<!ELEMENT this-call (arguments)>
-<!ELEMENT super EMPTY>
-<!ELEMENT this EMPTY>
-<!ELEMENT loop (init*,test?,update*,statements?)>
-<!ATTLIST loop kind (for|while) #IMPLIED>
-<!ELEMENT init (local-variable|%expr-elems;)>
-<!ELEMENT update (%expr-elems;)>
-<!ELEMENT do-loop (statements?,test?)>
-<!ELEMENT try (statements,catch*,finally?)>
-<!ELEMENT catch (formal-argument,statements?)>
-<!ELEMENT finally (statements)>
-<!ELEMENT continue EMPTY>
-<!ATTLIST continue targetname CDATA #IMPLIED>
-<!ELEMENT break EMPTY>
-<!ATTLIST break targetname CDATA #IMPLIED>
-<!ELEMENT conditional-expr ((%expr-elems;),(%expr-elems;),(%expr-elems;))>
-\end{verbatim}
+\verbatiminput{java-ml.dtd-formatted}
 }
+
+\end{multicols}
 
 \section{Extended Example}
 \label{app-ext-eg}
 
 \subsection{Set.java}
 
-{\small
-\begin{verbatim}
-// Cassowary Incremental Constraint Solver
-// (C) 1998, 1999 Greg J. Badros and Alan Borning
-//
-// Set -- Encapsulate a mathematical "Set" ADT using java's
-// hash table.  Just a convenience wrapper of the java.util.Hashtable class.
-
-package EDU.Washington.grad.gjb.cassowary;
-
-import java.util.*;
-
-class Set {
-  public Set()
-    { hash = new Hashtable(); }
-
-  public Set(int i)
-    { hash = new Hashtable(i); }
-
-  public Set(int i, float f)
-    { hash = new Hashtable(i,f); }
-
-  public Set(Hashtable h) 
-    { hash = h; }
-
-  public boolean containsKey(Object o)
-    { return hash.containsKey(o); }
-
-  public boolean insert(Object o)
-    { return hash.put(o,o) == null? true: false; }
-
-  public boolean remove(Object o)
-    { return hash.remove(o) == null? true: false; }
-
-  public void clear()
-    { hash.clear(); }
-
-  public int size()
-    { return hash.size(); }
-
-  public boolean isEmpty()
-    { return hash.isEmpty(); }
-
-  public Object clone()
-    { return new Set((Hashtable) hash.clone()); }
-
-  public Enumeration elements()
-    { return hash.elements(); }
-
-  public String toString() { 
-    StringBuffer bstr = new StringBuffer("{ ");
-    Enumeration e = hash.keys();
-    if (e.hasMoreElements())
-      bstr.append(e.nextElement().toString());
-    while ( e.hasMoreElements() ) {
-      bstr.append(", " + e.nextElement());
-    }
-    bstr.append(" }\n");
-    return bstr.toString();
-  }
-  
-  private Hashtable hash;
+{\small 
+\verbatiminput{Set.java} 
 }
-\end{verbatim}
-}
+
 
 \subsection{Set.java.xml}
-
 {\small
-\begin{verbatim}
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE java-source-program SYSTEM "java-ml.dtd">
-
-<java-source-program name="Set.java">
-  <package-decl name="EDU.Washington.grad.gjb.cassowary"/>
-  <import module="java.util.*"/>
-  <class name="Set" superclass="Object">
-    <constructor name="Set" visibility="public" id="ctr-21">
-      <formal-arguments/>
-      <statements>
-        <assignment-expr><lvalue><var-set name="hash"/></lvalue><new><type name="Hashtable"/><arguments/></new>
-        </assignment-expr>
-      </statements>
-    </constructor>
-    <constructor name="Set" visibility="public" id="ctr-30">
-      <formal-arguments>
-        <formal-argument name="i" id="frmarg-26"><type name="int" primitive="true"/></formal-argument>
-      </formal-arguments>
-      <statements>
-        <assignment-expr><lvalue><var-set name="hash"/></lvalue><new><type name="Hashtable"/><arguments><var-ref name="i"/></arguments></new>
-        </assignment-expr>
-      </statements>
-    </constructor>
-    <constructor name="Set" visibility="public" id="ctr-43">
-      <formal-arguments>
-        <formal-argument name="i" id="frmarg-35"><type name="int" primitive="true"/></formal-argument>
-        <formal-argument name="f" id="frmarg-39"><type name="float" primitive="true"/></formal-argument>
-      </formal-arguments>
-      <statements>
-        <assignment-expr><lvalue><var-set name="hash"/></lvalue><new><type name="Hashtable"/><arguments><var-ref name="i"/><var-ref name="f"/></arguments></new>
-        </assignment-expr>
-      </statements>
-    </constructor>
-    <constructor name="Set" visibility="public" id="ctr-52">
-      <formal-arguments>
-        <formal-argument name="h" id="frmarg-48"><type name="Hashtable"/></formal-argument>
-      </formal-arguments>
-      <statements>
-        <assignment-expr><lvalue><var-set name="hash"/></lvalue><var-ref name="h"/></assignment-expr>
-      </statements>
-    </constructor>
-    <method name="containsKey" visibility="public" id="meth-60">
-      <type name="boolean" primitive="true"/>
-      <formal-arguments>
-        <formal-argument name="o" id="frmarg-58"><type name="Object"/></formal-argument>
-      </formal-arguments>
-      <statements>
-        <statements>
-          <return><send message="containsKey">
-              <target><var-ref name="hash"/></target>
-              <arguments><var-ref name="o" idref="frmarg-58"/></arguments>
-            </send>
-          </return>
-        </statements>
-      </statements>
-    </method>
-    <method name="insert" visibility="public" id="meth-69">
-      <type name="boolean" primitive="true"/>
-      <formal-arguments>
-        <formal-argument name="o" id="frmarg-67"><type name="Object"/></formal-argument>
-      </formal-arguments>
-      <statements>
-        <statements>
-          <return><conditional-expr><binary-expr op="=="><send message="put">
-                  <target><var-ref name="hash"/></target>
-                  <arguments><var-ref name="o" idref="frmarg-67"/><var-ref name="o" idref="frmarg-67"/></arguments>
-                </send>
-                <literal-null/></binary-expr><literal-true/><literal-false/></conditional-expr></return>
-        </statements>
-      </statements>
-    </method>
-    <method name="remove" visibility="public" id="meth-78">
-      <type name="boolean" primitive="true"/>
-      <formal-arguments>
-        <formal-argument name="o" id="frmarg-76"><type name="Object"/></formal-argument>
-      </formal-arguments>
-      <statements>
-        <statements>
-          <return><conditional-expr><binary-expr op="=="><send message="remove">
-                  <target><var-ref name="hash"/></target>
-                  <arguments><var-ref name="o" idref="frmarg-76"/></arguments>
-                </send>
-                <literal-null/></binary-expr><literal-true/><literal-false/></conditional-expr></return>
-        </statements>
-      </statements>
-    </method>
-    <method name="clear" visibility="public" id="meth-82">
-      <type name="void" primitive="true"/>
-      <formal-arguments/>
-      <statements>
-        <statements>
-          <send message="clear">
-            <target><var-ref name="hash"/></target>
-            <arguments/>
-          </send>
-        </statements>
-      </statements>
-    </method>
-    <method name="size" visibility="public" id="meth-88">
-      <type name="int" primitive="true"/>
-      <formal-arguments/>
-      <statements>
-        <statements>
-          <return><send message="size">
-              <target><var-ref name="hash"/></target>
-              <arguments/>
-            </send>
-          </return>
-        </statements>
-      </statements>
-    </method>
-    <method name="isEmpty" visibility="public" id="meth-93">
-      <type name="boolean" primitive="true"/>
-      <formal-arguments/>
-      <statements>
-        <statements>
-          <return><send message="isEmpty">
-              <target><var-ref name="hash"/></target>
-              <arguments/>
-            </send>
-          </return>
-        </statements>
-      </statements>
-    </method>
-    <method name="clone" visibility="public" id="meth-98">
-      <type name="Object"/>
-      <formal-arguments/>
-      <statements>
-        <statements>
-          <return><new><type name="Set"/><arguments><cast-expr><type name="Hashtable"/><send message="clone">
-                    <target><var-ref name="hash"/></target>
-                    <arguments/>
-                  </send>
-                </cast-expr></arguments></new>
-          </return>
-        </statements>
-      </statements>
-    </method>
-    <method name="elements" visibility="public" id="meth-103">
-      <type name="Enumeration"/>
-      <formal-arguments/>
-      <statements>
-        <statements>
-          <return><send message="elements">
-              <target><var-ref name="hash"/></target>
-              <arguments/>
-            </send>
-          </return>
-        </statements>
-      </statements>
-    </method>
-    <method name="toString" visibility="public" id="meth-108">
-      <type name="String"/>
-      <formal-arguments/>
-      <statements>
-        <statements>
-          <local-variable name="bstr" id="locvar-216">
-               <type name="StringBuffer"/>
-               <new><type name="StringBuffer"/>
-                 <arguments><literal-string length="2">{ </literal-string></arguments></new>
-          </local-variable>
-          <local-variable name="e" id="locvar-223"><type name="Enumeration"/><send message="keys">
-              <target><var-ref name="hash"/></target>
-              <arguments/>
-            </send>
-          </local-variable>
-          <if><test><send message="hasMoreElements">
-                <target><var-ref name="e" idref="locvar-223"/></target>
-                <arguments/>
-              </send>
-            </test>
-            <true-case><statements>
-                <send message="append">
-                  <target><var-ref name="bstr"/></target>
-                  <arguments><send message="toString">
-                      <target><send message="nextElement">
-                          <target><var-ref name="e"/></target>
-                          <arguments/>
-                        </send>
-                      </target>
-                      <arguments/>
-                    </send>
-                  </arguments>
-                </send>
-              </statements>
-            </true-case>
-          </if>
-          <statements>
-            <loop kind="while"><test><send message="hasMoreElements">
-                  <target><var-ref name="e"/></target>
-                  <arguments/>
-                </send>
-              </test><statements>
-                <send message="append">
-                  <target><var-ref name="bstr"/></target>
-                  <arguments><binary-expr op="+"><literal-string length="2">, </literal-string><send message="nextElement">
-                        <target><var-ref name="e"/></target>
-                        <arguments/>
-                      </send>
-                    </binary-expr></arguments>
-                </send>
-              </statements>
-            </loop>
-          </statements>
-          <send message="append">
-            <target><var-ref name="bstr" idref="locvar-216"/></target>
-            <arguments><literal-string length="4"> }\n</literal-string></arguments>
-          </send>
-          <return><send message="toString">
-              <target><var-ref name="bstr" idref="locvar-216"/></target>
-              <arguments/>
-            </send>
-          </return>
-        </statements>
-      </statements>
-    </method>
-    <field name="hash" visibility="private"><type name="Hashtable"/></field>
-  </class>
-</java-source-program>
-\end{verbatim}
+\verbatiminput{Set.java.xml} 
 }
+
+\begin{multicols}{2}
 
 {\small
 \bibliography{library,articles,applications} %style plain, from above.
 }
 
+%% GJB:FIXME:VISUAL
+%\vspace{2in}
+
 \section*{Vitae}
-\begin{figure}[ht]
-\includegraphics[width=1.5in]{gjb-face.eps}
-\end{figure}
+\begin{floatingfigure}[l]{.9in}
+\hspace*{-.6cm}
+\includegraphics[width=1in]{gjb-face.eps}
+\end{floatingfigure}
 %%<a href="http://www.cs.washington.edu/homes/gjb">
 \textbf{Greg J. Badros} is a final-year Ph.D. candidate at the
 %% <a href="http://www.cs.washington.edu">
-University of Washington in Seattle, Washington where he earned his
-M.Sc. degree in 1998.  He graduated \textit{magna cum laude} with a B.S.
+University of Washington in Seattle, USA where he earned his
+M.Sc.\  degree in 1998.  He graduated \textit{magna cum laude} with a B.S.
 degree in Mathematics and Computer Science from
 %% <a href="http://www.math.duke.edu">
 %% <a href="http://www.cs.duke.edu">
@@ -1564,7 +1191,9 @@ Scheme Constraints Window Manager and the
 %% <a href="http://www.cs.washington.edu/research/constraints/cassowary/">
 Cassowary Constraint Solving Toolkit.  His research interests include
 constraint technology, software engineering, languages, and the
-internet.
+Internet.
+\end{multicols}
+
 
 \end{document}
 
