@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!-- java-ml.dtd 0.94 -->
+<!-- java-ml.dtd 0.95 -->
 
 <!ENTITY % visibility-attribute 
     "visibility (public|private|\
@@ -128,7 +127,8 @@
     %mod-final;>
 <!ELEMENT send (target?,arguments)>
 <!ATTLIST send
-    message CDATA #REQUIRED>
+    message CDATA #REQUIRED
+    idref IDREF #IMPLIED>
 <!ELEMENT block (label*,(%stmt-elems;)*)>
 <!ELEMENT label EMPTY>
 <!ATTLIST label
@@ -145,7 +145,8 @@
 <!ATTLIST type
     primitive CDATA #IMPLIED
     name CDATA #REQUIRED
-    dimensions CDATA #IMPLIED>
+    dimensions CDATA #IMPLIED
+    idref IDREF #IMPLIED>
 <!ELEMENT new-array 
     (type,dim-expr*,array-initializer?)>
 <!ATTLIST new-array
