@@ -1,0 +1,83 @@
+<!-- $Id$ -->
+<!-- From p. 129 in Java in a Nutshell 2nd. 
+
+import java.applet.*;   // do not forget this import statement!
+import java.awt.*;      // Or this one for the graphics!
+
+
+public class FirstApplet extends Applet {
+  // this method displays the applet.
+  // the Graphics class is how you do all the drawing in Java
+  public void paint(Graphics g) {
+    g.drawString("Hello World", 25, 50);
+  }
+}
+
+-->
+
+<?xml version=1.0" encoding="UTF-8" ?>
+<!DOCTYPE java-source-program [
+   <!ENTITY % visibility-attribute "visibility (public|private|protected) #IMPLIED">
+   <!ENTITY % kind-attribute "kind (integer|real|double) #IMPLIED">
+   <!ELEMENT java-source-program (import|class)* >
+   <!ATTLIST java-source-program
+       version CDATA #IMPLIED>
+   <!ELEMENT import EMPTY>
+   <!ATTLIST import
+       module CDATA #REQUIRED>
+   <!ELEMENT class ((implement)*, (comment|method)*) >
+   <!ATTLIST class
+       name CDATA #REQUIRED
+       %visibility-attribute 
+       superclass CDATA "Object">
+   <!ELEMENT method (comment,formal-arguments,code)>
+   <!ATTLIST method 
+       name CDATA #REQUIRED
+       id ID #REQUIRED
+       %visibility-attribute
+       return-type CDATA #REQUIRED>
+   <!ELEMENT comment (#PCDATA)>
+   <!ELEMENT formal-arguments (formal-argument)*>
+   <!ELEMENT formal-argument EMPTY>
+   <!ATTLIST formal-argument
+       type CDATA #REQUIRED
+       name CDATA #REQUIRED
+       id ID #REQUIRED>
+   <!ELEMENT send (arguments)>
+   <!ATTLIST send
+       target IDREF #REQUIRED
+       targetname CDATA #REQUIRED
+       message CDATA #REQUIRED>
+   <!ELEMENT code (send|var-decl|condition|loop|return)*>
+   <!ELEMENT arguments (literal-string|literal-number)*>
+   <!ELEMENT literal-string EMPTY>
+   <!ATTLIST literal-string
+       value CDATA #REQUIRED>
+   <!ELEMENT literal-number EMPTY>
+   <!ATTLIST literal-number
+       value CDATA #REQUIRED
+       %kind-attribute
+       base CDATA "10">
+]>
+<java-source-program version="1.2">
+<import module="java.applet.*">
+<import module="java.awt.*">
+<class name="FirstApplet" visibility="public" superclass="Applet">
+  <method name="paint" visibility="public" return-type="void" id="FirstApplet-paint">
+    <comment>This method displays the applet.
+             The Graphics class is how you do all drawing in Java.</comment>
+    <formal-arguments>
+      <formal-argument type="Graphics" name="g" id="FirstApplet-paint-g">
+    </formal-arguments>
+    <code>
+       <send target="FirstApplet-paint-g" targetname="g" message="drawString">
+          <arguments>
+             <literal-string value="Hello World">
+             <literal-number kind="integer" value="25">
+             <literal-number kind="integer" value="50">
+          </arguments>
+       </send>
+    </code>
+  </method>
+</class>
+</java-source-program>
