@@ -1,3 +1,8 @@
+http://papers.www9.org:8027/www9/x/menu
+
+http://papers.www9.org:8027/x/dbn/edit/user/gjb
+gjb,mywww9pass
+
 Possible Analyses:
 * check that only abstract classes have abstract methods
 * check that all functions have only one return statement
@@ -15,3 +20,17 @@ is used it should be <foo>, not <foo/>
 
 Duplicate attribute values not allowed:
 http://www.oasis-open.org/cover/duplTokens.html
+
+
+
+
+    if ( !TimerIsRunning )                            // Normal case
+      return (double) ElapsedMs/1000;
+    else
+      return (double) (ElapsedMs + System.currentTimeMillis() - StartReading)/1000;
+
+
+<if><test>!TimerIsRunning</test>
+  <true-case><return>...</return></true-case>
+  <false-case><return>...</return></false-case>
+</if>
