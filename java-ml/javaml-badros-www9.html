@@ -238,8 +238,8 @@ exactly this capability and can be used to represent source code.
 
 In this paper, I introduce the Java Markup Language, JavaML -- an XML
 application for describing Java source programs.  The JavaML document
-type definition (DTD) describes the various elements of a valid JavaML
-document.  There is an natural correspondence between the elements and
+type definition (DTD) specifies the various elements of a valid JavaML
+document.  There is a natural correspondence between the elements and
 their attributes and the programming language constructs they model.
 The structure of the source program is reflected in the nesting of
 elements in the JavaML document.  With this representation, we can then
@@ -465,6 +465,267 @@ Object Model) <cite>[DOM]</cite>.
 
 <h3><a name="javaml">3 - JavaML: The Java Markup Language</a></h3>
 
+The Java Markup Language provides a complete self-describing
+representation of Java source code.  Unlike the conventional
+character-based representation of programs, JavaML reflects the
+structure of the software artifact directly in the nesting of elements
+in the XML-based syntax.  Since XML is a text-based representation, many
+of the advantages of the plain old source representation remain. Since
+JavaML is an XML application, JavaML is incredibly easy to parse, and
+all existing tools for working with XML can be applied to Java source
+code in its JavaML representation.  Future JavaML tools can leverage the
+existing infrastructure while exploiting the canonical representation to
+improve interoperability.
+
+<p>
+
+Though the basic approach of using an XML application to model source
+code is fairly straightforward, there is a large design space of
+possible markup language.  The most obvious possibility is to simply use
+XML as a textual dump format of a typical abstract syntax tree derived
+from parsing source code.  Consider the simple Java program:
+
+<code>
+<pre>
+import java.applet.*;
+import java.awt.*;
+
+public class FirstApplet extends Applet {
+  public void paint(Graphics g) {
+    g.drawString("Hello World", 25, 50);
+  }
+}
+</pre>
+</code>
+
+Performing the obvious (but very unsatisfying) translation from the AST
+of the above might result in the below <em>for just the first line of code</em>:
+
+<code>
+<pre>
+&lt;compilation-unit&gt;
+ &lt;ImportDeclarationsopt&gt;
+  &lt;ImportDeclarations&gt;
+   &lt;ImportDeclaration&gt;
+    &lt;TypeImportOnDemandDeclaration&gt;
+      import
+      &lt;Name&gt;
+       &lt;QualifiedName&gt;
+        &lt;Name&gt;
+         &lt;SimpleName&gt; java &lt;/SimpleName&gt;
+        &lt;/Name&gt;
+        .
+        &lt;Name&gt;
+         &lt;SimpleName&gt; applet &lt;/SimpleName&gt;
+        &lt;/Name&gt;
+       &lt;QualifiedName&gt;
+      &lt;/Name&gt;
+       . * ;
+    &lt;/TypeImportOnDemandDeclaration&gt;
+   &lt;/ImportDeclaration&gt;
+  &lt;/ImportDeclarations&gt;
+ &lt;/ImportDeclarationsopt&gt;
+...
+&lt;compilation-unit&gt;
+</pre>
+</code>
+
+Certainly this is far from ideal.  It is unacceptably verbose, exposes
+numerous details of the underlying grammar that was used to do the
+initial parse from the POSR, and would be difficult to work with because
+of the excessive number of nodes.
+
+<p>
+
+An alternate possibility is to literally mark-up the Java source program
+to add value to the basic sequence of characters.  This approach might
+convert the <code>FirstApplet.java</code> implementation to:
+
+<code>
+<pre>
+&lt;java-source-program&gt;
+&lt;import-declaration&gt;import java.applet.*;&lt;/import-declaration&gt;
+&lt;import-declaration&gt;import java.awt.*;&lt;/import-declaration&gt;
+
+&lt;class-declaration&gt;
+&lt;modifiers&gt;public&lt;/modifiers&gt; class 
+   &lt;class-name&gt;FirstApplet&lt;/class-name&gt; 
+     extends &lt;superclass&gt;Applet&lt;/superclass&gt; {
+ &lt;method-definition&gt;
+  &lt;modifiers&gt;public&lt;/modifiers&gt; &lt;return-type&gt;void&lt;/return-type&gt; 
+    &lt;method-name&gt;paint&lt;/method-name&gt;
+      (&lt;formal-arguments&gt;&lt;type&gt;Graphics&lt;/type&gt; 
+             &lt;name&gt;g&lt;/name&gt;&lt;/formal-arguments&gt;) 
+    &lt;statements&gt;{
+    g.drawString("Hello World", 25, 50);
+  } &lt;/statements&gt;
+ &lt;/method-definition&gt;
+}
+&lt;/class-declaration&gt;
+&lt;/java-source-program&gt;
+</pre>
+</code>
+
+This is a huge step forward.  We have definitely added value to the
+representation, and it is trivial to convert back to the POSR: we simply
+remove all tags and leave the content of the elements behind (this is
+exactly what the <code>stripsgml</code> <cite>[PerlSGML]</cite> utility
+does).  Though this representation seems useful for many tasks, it still
+has some problems.  First, many of the details of the code are included
+in the textual content of elements.  If we want to determine what
+packages are being imported, our XML query would need to lexically
+analyze the content of the import-declaration elements.  This is
+inconvenient and is not making the most of the capabilities that XML
+provides.  Perhaps more significantly, the above XML representation
+retains artifacts from the POSR that another representation might permit
+us to abstract away from and free ourselves of those syntactic burdens
+altogether.
+
+<h4><a name="our-representation">Our JavaML representation</a></h4>
+
+The prototype JavaML representation we have chosen aims to model the
+programming language constructs of Java (and, indeed, similar
+object-oriented programming languages) independently of the specific
+syntax of the language.  One can easily imagine a SmalltalkML that would 
+be significantly the same, and even an OOML that could be converted into 
+both Java POSR or Smalltalk file-out format.  With this goal in mind,
+JavaML was designed from first principles of the constructs and
+iteratively refined based on complexity of conversion and usefullness
+and readability of the resulting markup langauge.
+
+<p>
+
+For the example <code>FirstApplet.java</code> listed above, we represent 
+the program in JavaML as:
+
+<code>
+<pre>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!DOCTYPE java-source-program SYSTEM "java-ml.dtd"&gt;
+
+&lt;java-source-program name="FirstApplet.java"&gt;
+  &lt;import module="java.applet.*"/&gt;
+  &lt;import module="java.awt.*"/&gt;
+  &lt;class name="FirstApplet" visibility="public" superclass="Applet"&gt;
+    &lt;method name="paint" visibility="public" id="meth-15"&gt;
+      &lt;type name="void" primitive="true"/&gt;
+      &lt;formal-arguments&gt;
+	&lt;formal-argument name="g" id="frmarg-13"&gt;&lt;type name="Graphics"/&gt;&lt;/formal-argument&gt;
+      &lt;/formal-arguments&gt;
+      &lt;statements&gt;
+	&lt;statements&gt;
+	  &lt;send message="drawString"&gt;
+	    &lt;target&gt;&lt;var-ref name="g" idref="frmarg-13"/&gt;&lt;/target&gt;
+	    &lt;arguments&gt;
+              &lt;literal-string length="13"&gt;Hello World&lt;/literal-string&gt;
+              &lt;literal-number kind="integer" value="25"/&gt;
+              &lt;literal-number kind="integer" value="50"/&gt;
+            &lt;/arguments&gt;
+	  &lt;/send&gt;
+	&lt;/statements&gt;
+      &lt;/statements&gt;
+    &lt;/method&gt;
+  &lt;/class&gt;
+&lt;/java-source-program&gt;
+</pre>
+</code>
+
+In the above, concepts such as methods, superclasses, message sends, and
+literal numbers are all directly represented in the elements and
+attributes of the representation.  The structure of the programming
+languages is reflected in the nesting of the elements: the literal
+string "Hello World" is a part of the message send thus the
+<code>literal-string</code> element is nested inside the
+<code>send</code> element.  See <a href="javaml.dtd">Appendix 1</a> for
+    the complete document type definition of JavaML.
+
+<p>
+
+JavaML provides more than just the structure of the source program,
+though.  In the above, notice the use of the formal-argument
+<code>g</code> in the target of the message send.  The
+<code>idref</code> attribute of that <code>var-ref</code> tag points
+back at the referenced <code>formal-argument</code> element (through its
+<code>id</code> attribute).  This linking is standard XML, thus XML
+tools are able to trace from a variable use to its definition to, e.g.,
+obtain the type of the variable.  Similar linking is done for local
+(block-declared) variables.  In JavaML, variable references are easy to
+locate because of their distinguishing <code>var-ref</code> tag.
+Additionally, they are disambiguated from an assignment to a variable
+which is converted into a <code>var-set</code> tag.
+
+<p>
+
+In JavaML, important characteristics of elements are stressed over less
+important features, but those less important distinctions are preserved.
+For example, <code>45</code> and <code>3.2</code> are represented as:
+<code>&lt;literal-number kind="integer" value="45"&gt;</code> and
+<code>&lt;literal-number kind="float" value="3.2"&gt;</code>,
+respectively.  An alternate possible markup is:
+<code>&lt;literal-integer value="45"&gt;</code> and
+<code>&lt;literal-float value="3.2"&gt;</code> but using separate
+element classes eliminates the tight relationship that both values are
+numbers and can complicate using the representation.  By instead
+disambiguating these literals based on a kind attribute, we can still
+tell the difference between a floating point literal and an integer
+literal, but in the common case we gain the same flexibility of numeric
+types that the Java language has.
+
+<p>
+
+Another place where we generalized language constructs when designing
+JavaML is in loops.  Both <code>for</code> and <code>while</code> loops
+can be viewed as general looping constructs with 0 or more initializers,
+a guarding test that occurs before each iteration, 0 or more update
+operations, and a body of statements that comprise the looped-over
+instructions.  Thus, instead of using two classes of elements,
+<code>for-loop</code> and <code>while-loop</code>, JavaML uses a single
+<code>loop</code> element that has a <code>kind</code> attribute with
+value either <code>for</code> or <code>while</code>.  When a
+<code>while</code> loop is converted, it will have no initializer and
+update children, yet a <code>for</code> loop code potentially multiple
+of each.  In contrast <code>do-loop</code> elements are used for
+<code>do</code> loops which have their test performed at the end of the
+loop, instead of at the start.
+
+  <!--Talk about unparsing loops kind="while" w/ initializer? [as result
+  of transformation, say] We definitely can do it, and it's pretty cool
+  -->
+      
+<p>
+
+As yet another example, we represent both instance and class (i.e.,
+static) fields as <code>field</code> elements with a <code>static</code>
+attribute used to disambiguate.  Though there are more substantial
+differences between these two concepts than between <code>while</code>
+and <code>for</code> loops, it still seems beneficial to use a single
+element class for both concepts.
+
+<p>
+
+Local variable declarations provide a syntactic shorthand that raises an
+interesting question about their underlying representation.  The code
+segment:
+
+<code>
+<pre>
+  int x, y;
+</pre>
+</code>
+
+defines two variables both of type <code>int</code>, but with perhaps a
+subtle additional intention: that the two variables have the same type.
+For contrast, consider:
+
+<code>
+<pre>
+  int weight, i;
+</pre>
+</code>
+
+Here, there probably is <em>not</em> the implicit desire that the two
+variables have the same type, but instead the shorthand syntax is being
+used simply for brevity.
 
 
 <pre>
@@ -481,16 +742,6 @@ Object Model) <cite>[DOM]</cite>.
 *** examples include diffing source code, code metrics, searches,
 transformations such as renaming a local variable, etc. 
 
-
-give the DTD -- see appendix 1
-
-issues include loop (for/while) vs. do-loop;  var-ref, var-set; 
-field/method element w/ "static" attribute, or two kinds of field/method elements:
-instance-field, class-field? 
-High level question: language-independence good or bad?  I lose
-the single variable type + multiple variable declarations abstraction -- 
-but it's really more than a syntactic artifact. (Maybe I shouldn't -- 
-add a continued-decl="true" attribute?).
 
 Above is related to language translation issue:
   -> move away from language-specific syntax and constructs
@@ -541,6 +792,11 @@ Structured Editors
 <h3><a name="future-work">6 - Future work</a></h3>
 <pre>
 
+Not tied to Java-- could be used w/ other languages, or to translate
+between languages, or to interact w/ graphical tools, etc.
+-> C++ has difficulties because of cpp
+
+
 Comments need to be preserved;  attaching them may be a bit tricky, but
     is helped by JavaDoc conventions.
 
@@ -569,8 +825,6 @@ New abstractions?  Define a JavaML++ DTD w/ that abstraction, and
 
 XML editors that display and let edit on the
 	plain-old-source-representation.
-
-Other languages: C++ has difficulties because of cpp
 
 Issue:
   -> mangling for id/idrefs
@@ -705,6 +959,7 @@ available, and thanks to Mike Ernst for helpful pointers on using it.
 &lt;!ATTLIST local-variable
     name CDATA #REQUIRED
     id ID #REQUIRED
+    continuation CDATA #IMPLIED
     %mod-final;&gt;
 &lt;!ELEMENT arguments (%expr-elems;)*&gt;
 &lt;!ELEMENT literal-string (#PCDATA)&gt;
@@ -781,17 +1036,10 @@ available, and thanks to Mike Ernst for helpful pointers on using it.
 <h3><a name="set.java">Appendix 2a - Extended Example, <strong>Set.java</strong></a></h3>
 <small>
 <pre>
-// $Id$
-//
 // Cassowary Incremental Constraint Solver
-// Original Smalltalk Implementation by Alan Borning
-// This Java Implementation by Greg J. Badros, &lt;gjb@cs.washington.edu&gt;
-// http://www.cs.washington.edu/homes/gjb
 // (C) 1998, 1999 Greg J. Badros and Alan Borning
-// See ../LICENSE for legal details regarding this software
 //
-// Set
-// Encapsulate a mathematical "Set" ADT using java's
+// Set -- Encapsulate a mathematical "Set" ADT using java's
 // hash table.  Just a convenience wrapper of the java.util.Hashtable class.
 
 package EDU.Washington.grad.gjb.cassowary;
