@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!-- java-ml.dtd 0.9 -->
+<!-- java-ml.dtd 0.91 -->
 <!-- Copyright (C) 2000, Greg J. Badros <gjb@cs.washington.edu> -->
 <!-- A DTD for JavaML, an XML representation of Java Source Code -->
 <!-- http://www.cs.washington.edu/homes/gjb/papers/javaml/javaml.html -->
@@ -46,7 +46,7 @@
     %interface-visibility-attribute;>
 <!ELEMENT implement EMPTY>
 <!ATTLIST implement
-    class CDATA #REQUIRED>
+    interface CDATA #REQUIRED>
 <!ELEMENT extend EMPTY>
 <!ATTLIST extend
     interface CDATA #REQUIRED>
