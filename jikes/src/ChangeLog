@@ -1,3 +1,14 @@
+Mon Dec 20 16:43:33 1999  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Subtract off 2 when giving the length of a
+	literal string.  Old change that I forgot to commit, it seems. 
+
+Sun Nov 21 20:27:59 1999  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp (XMLUnparse): Use `continued=' not
+	`continuation=' for continued var decl lines to avoid confusion w/ 
+	Scheme's langauge-level construct.
+
 Wed Nov 17 17:24:19 1999  Greg J. Badros  <gjb@cs.washington.edu>
 
 	* xml-unparse.cpp: Added continuation="true" attr/value to
