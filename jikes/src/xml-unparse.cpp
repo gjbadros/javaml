@@ -807,20 +807,73 @@ void AstInterfaceDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstLocalVariableDeclarationStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstLocalVariableDeclarationStatement:#" << this-> id << "*/";
+
+
+
+    bool fFinal = false;
+    bool fStatic = false;
+    bool fVolatile = false;
+    bool fTransient = false;
+    char *szVisibility = NULL;
+#if 0
+    bool fAbstract = false;
+    bool fSynchronized = false;
+    bool fNative = false;
+#endif
+
     for (int i = 0; i < this -> NumLocalModifiers(); i++)
     {
-	os << lex_stream.NameString(this -> LocalModifier(i) -> modifier_kind_token);
-	os << " ";
+      switch (LocalModifier(i)->kind) {
+      case Ast::FINAL: /* class/methods/fields */
+        fFinal = true; break;
+      case Ast::STATIC: /* methods/fields */
+        fStatic = true; break;
+      case Ast::VOLATILE: /* fields */
+        fVolatile = true; break;
+      case Ast::TRANSIENT: /* fields */
+        fTransient = true; break;
+#if 0
+      case Ast::ABSTRACT: /* class/methods */
+        fAbstract = true; break;
+      case Ast::NATIVE:  /* methods */
+        fNative = true; break;
+      case Ast::SYNCHRONIZED: /* class/methods */
+        fSynchronized = true; break;
+#endif
+
+      case Ast::PUBLIC:
+        szVisibility = "public"; break;
+      case Ast::PRIVATE:
+        szVisibility = "private"; break;
+      case Ast::PROTECTED:
+        szVisibility = "protected"; break;
+
+      default:
+        os << "<!--" << "***Can not handle local variable modifier "
+           << lex_stream.NameString(LocalModifier(i)->modifier_kind_token)
+           << " (#" << LocalModifier(i)->kind << ")"
+           << "-->\n";
+        break;
+      }
     }
-    type -> XMLUnparse(os, lex_stream);
-    os << " ";
+
+    char *szType = SzFromUnparse(lex_stream, type);
     for (int k = 0; k < this -> NumVariableDeclarators(); k++)
       {
-	if (k>0) os << ",";
-	this -> VariableDeclarator(k) -> XMLUnparse(os, lex_stream);
+        char *szName = SzFromUnparse(lex_stream,VariableDeclarator(k));
+        /* GJB:FIXME:: use two elements, instance-field and class-field, instead? */
+        xml_output(os,"local-variable",
+                   "type",szType,
+                   "name",szName,
+                   "visibility",szVisibility,
+                   "final",SzOrNullFromF(fFinal),
+                   "static",SzOrNullFromF(fStatic),
+                   "volatile",SzOrNullFromF(fVolatile),
+                   "transient",SzOrNullFromF(fTransient),
+                   XML_CLOSE);
+        xml_nl(os);
       }
-    if (semicolon_token_opt)
-	os << ";\n";
+    
     if (Ast::debug_unparse) os << "/*:AstLocalVariableDeclarationStatement#" << this-> id << "*/";
 }
 
@@ -1231,13 +1284,19 @@ void AstMethodInvocation::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstMethodInvocation:#" << this-> id << "*/";
     xml_output(os,"send",NULL);
+    xml_output(os,"target",NULL);
     method -> XMLUnparse(os, lex_stream);
-    xml_output(os,"arguments",NULL);
-    for (int i = 0; i < this -> NumArguments(); i++)
-      {
-	this -> Argument(i) -> XMLUnparse(os, lex_stream);
-      }
-    xml_close(os,"arguments",false);
+    xml_close(os,"target",false);
+    if (NumArguments() > 0) {
+      xml_output(os,"arguments",NULL);
+      for (int i = 0; i < this -> NumArguments(); i++)
+        {
+          this -> Argument(i) -> XMLUnparse(os, lex_stream);
+        }
+      xml_close(os,"arguments",false);
+    } else {
+      xml_output(os,"arguments",XML_CLOSE);
+    }
     xml_close(os,"send",true);
     if (Ast::debug_unparse) os << "/*:AstMethodInvocation#" << this-> id << "*/";
 }
