@@ -98,7 +98,7 @@ computation.  Over the years, techniques have been developed that
 largely mechanize the front-end of compilers &#151; the part that performs the lexical
 analysis and parsing necessary to uncover the structure of programming
 language constructs represented as plain text.  Tools such as Lex/Flex
-and Yacc/Bison <tt>[42]</tt> automate these tedious tasks by using
+and Yacc/Bison <tt><a href="#ref-42">[42]</a></tt> automate these tedious tasks by using
 well-founded concepts of regular expressions and grammars. Regular
 expressions describe how individual characters combine to form tokens,
 and the grammar enumerates how higher-level constructs are composed
@@ -182,7 +182,7 @@ sacrifices flexibility.  IDEs generally provide only a limited set of
 capabilities and extending those is hard.  Additionally, analyses and
 transformation on source code are often hard to automate or perform in
 batch using existing interactive environments.  Some more advanced IDEs,
-such as IBM VisualAge for C++ <tt>[48]</tt>, expose an application
+such as IBM VisualAge for C++ <tt><a href="#ref-48">[48]</a></tt>, expose an application
 programming interface to the representation of the program.  Although an
 improvement, this technique still suffers from an inability to separate
 simple tools from a complex environment and additionally creates a
@@ -197,7 +197,7 @@ One of the fundamental issues underlying the above problems is the
 lack of a canonical structured representation of the source code.  We
 need a universal format for directly representing program structure that
 software tools can easily analyze and manipulate.  The key observation
-is that XML, the eXtensible Markup Language <tt>[9]</tt>, provides exactly
+is that XML, the eXtensible Markup Language <tt><a href="#ref-9">[9]</a></tt>, provides exactly
 this capability and is an incredibly empowering complementary
 representation for source code.
 </p><p>
@@ -230,7 +230,7 @@ and
 exciting future work, and <a href="#conclusion">section 7</a> concludes.  The
 full document type definition (DTD) for JavaML appears in
 <a href="#javaml-dtd">appendix A</a> and further examples of converted source
-code are available from the author's <a href="http://www.cs.washington.edu/homes/gjb/JavaML/">JavaML web page</a> <tt>[4]</tt>.
+code are available from the author's <a href="http://www.cs.washington.edu/homes/gjb/JavaML/">JavaML web page</a> <tt><a href="#ref-4">[4]</a></tt>.
 
 <p><span class="index"><a href="#top">[top]</a></span>
 
@@ -247,13 +247,13 @@ is language independent, Java is an excellent candidate for experimenting with t
 ideas and techniques.
 </p><p>
 Java is a popular object-oriented programming language developed by Sun
-Microsystems in the mid-1990s <tt>[3,25]</tt>.  It features a
+Microsystems in the mid-1990s <tt><a href="#ref-3">[3]</a><a href="#ref-25">[25]</a></tt>.  It features a
 platform-independent execution model based on the Java Virtual Machine
 (JVM) and owes its quick acceptance to its use as a programming language
 for World Wide Web applications.  Java combines a simple object model
-reminiscent of Smalltalk <tt>[26]</tt> with Algol block structure, a
-C++-like <tt>[49]</tt> syntax, a static type system, and a package system
-inspired by Modula-2 <tt>[10]</tt>.
+reminiscent of Smalltalk <tt><a href="#ref-26">[26]</a></tt> with Algol block structure, a
+C++-like <tt><a href="#ref-49">[49]</a></tt> syntax, a static type system, and a package system
+inspired by Modula-2 <tt><a href="#ref-10">[10]</a></tt>.
 </p><p>
 As in most other object-oriented (OO) languages, the primary unit of
 decomposition in Java is a <em>class</em> which specifies the behaviour of
@@ -289,8 +289,8 @@ other languages is discussed further in <a href="#future-work">section 6</a>.)
 
   <h4><a name="xml">2.2 - XML: Extensible Markup Language</a></h4>
 <p>
-XML is a standardized eXtensible Markup Language <tt>[9]</tt> that is a
-subset of SGML, the Standard Generalized Markup Language <tt>[37]</tt>.
+XML is a standardized eXtensible Markup Language <tt><a href="#ref-9">[9]</a></tt> that is a
+subset of SGML, the Standard Generalized Markup Language <tt><a href="#ref-37">[37]</a></tt>.
 The World Wide Web Consortium (W3C) designed XML to be lightweight and
 simple, while retaining compatibility with SGML.  Although HTML
 (HyperText Markup Language) is currently the standard web document
@@ -298,7 +298,7 @@ language, the W3C is positioning XML to be its replacement.  While HTML
 permits authors to use only a pre-determined fixed set of tags in
 marking up their document, XML allows easy specification of user-defined
 markup tags adapted to the document and data at
-hand <tt>[27,28]</tt>.
+hand <tt><a href="#ref-27">[27]</a><a href="#ref-28">[28]</a></tt>.
 </p><p>
 An XML document consists simply of text marked up with tags enclosed in
 angle braces.  A simple example is:
@@ -430,9 +430,9 @@ such as Emacs editing modes, structure-based editors, DTD parsers and
 editors, validation utilities, querying systems, transformation and
 style languages, and many more tools.  Numerous other W3C
 recommendations relate to XML including Cascading Style
-Sheets <tt>[8]</tt>, XSL (Extensible Stylesheet Language) <tt>[19]</tt>,
-XSLT (XSL for Transformations) <tt>[14]</tt>, XPath <tt>[16]</tt>, and DOM
-(Document Object Model) <tt>[2]</tt>.
+Sheets <tt><a href="#ref-8">[8]</a></tt>, XSL (Extensible Stylesheet Language) <tt><a href="#ref-19">[19]</a></tt>,
+XSLT (XSL for Transformations) <tt><a href="#ref-14">[14]</a></tt>, XPath <tt><a href="#ref-16">[16]</a></tt>, and DOM
+(Document Object Model) <tt><a href="#ref-2">[2]</a></tt>.
 </p>
 
 <p><span class="index"><a href="#top">[top]</a>
@@ -557,7 +557,7 @@ This format is a huge step towards a more useful markup language.  We
 have definitely added value to the source code and it is trivial to
 convert back to the classical representation: we simply remove all tags
 and leave the content of the elements behind (this removal of markup is
-exactly what the <code>stripsgml</code> <tt>[31]</tt> utility does).
+exactly what the <code>stripsgml</code> <tt><a href="#ref-31">[31]</a></tt> utility does).
 Although this representation seems useful for many tasks, it still has
 some problems.  First, many of the details of the code are included in
 the textual content of elements.  If we want to determine what packages
@@ -630,7 +630,7 @@ For example, the literal string <code>"FirstApplet"</code> is a part of the mess
 send, thus the <code>literal-string</code> element is nested inside the
 <code>send</code> element.  This nesting is even more apparent when
 presented visually as in figures <a href="#fig2a">1a</a> and <a href="#fig2b">1b</a>.
-See the author's <a href="http://www.cs.washington.edu/homes/gjb/JavaML">JavaML</a> web page <tt>[4]</tt>
+See the author's <a href="http://www.cs.washington.edu/homes/gjb/JavaML">JavaML web page </a><tt><a href="#ref-4">[4]</a></tt>
 for further examples.
 </p><p>
 The careful reader will observe that the JavaML representation is about
@@ -645,12 +645,13 @@ accessible to and directly readable by developers.
 </p>
 
 <p class="caption">
-<a name="fig2a"><IMG ALT="XML Notepad's Tree view of FirstApplet's JavaML Representation." SRC="./treevw1.gif"><br></a>
-<a name="fig2b"><IMG ALT="XML Spy's Tree view of FirstApplet's JavaML Representation." SRC="./treevw2.gif"></a>
+<a name="fig2a"><IMG ALT="XML Notepad's Tree view of FirstApplet's JavaML Representation." SRC="./treevw1.gif" ALIGN="bottom"></a>
+<a name="fig2b"><IMG ALT="XML Spy's Tree view of FirstApplet's JavaML Representation." SRC="./treevw2.gif" ALIGN="bottom"></a><br>
+
 <strong>Figure 2</strong> &#151; Tree views of the JavaML representation 
 of the <code>FirstApplet</code> example as displayed by the 
-XML Notepad utility <tt>[44]</tt> (on the left) and XML Spy <tt>[36]</tt> (on the 
-right)
+XML Notepad utility <tt><a href="#ref-44">[44]</a></tt> (on the left/above) and XML Spy <tt><a href="#ref-36">[36]</a></tt> (on the 
+right/below)
 </p>
 
 
@@ -753,7 +754,7 @@ JavaML representation as parsed character data interspersed with the
 normal structure, thus leaving the semantic inference problem to another
 tool.  Unfortunately, this would force various elements to have "mixed
 content" which reduces the validation capabilities when checking for
-DTD conformance.  Using XML Schema <tt>[51]</tt> instead of DTDs may
+DTD conformance.  Using XML Schema <tt><a href="#ref-51">[51]</a></tt> instead of DTDs may
 make this approach more useful.
 </p>
 
@@ -764,7 +765,7 @@ make this approach more useful.
 To experiment with the design of JavaML and gain experience in using the
 representation, it was essential to implement a converter from the Java
 classical source representation to JavaML.  Within the IBM Jikes Java
-compiler framework <tt>[32]</tt>, I added an <code>XMLUnparse</code> method
+compiler framework <tt><a href="#ref-32">[32]</a></tt>, I added an <code>XMLUnparse</code> method
 to each of the AST nodes. This change, along with some small additional
 code for managing the options to request the XML output, results in a
 robust and fast JavaML converter.  In total, I added about 1650
@@ -773,22 +774,22 @@ support JavaML.
 </p><p>
 The converter has been tested by converting 15,000 lines of numerous
 sample programs including the 4300 line Cassowary Constraint Solving
-Toolkit <tt>[5]</tt> and over twenty diverse applets <tt>[50]</tt>.  Each of
+Toolkit <tt><a href="#ref-5">[5]</a></tt> and over twenty diverse applets <tt><a href="#ref-50">[50]</a></tt>.  Each of
 the files converted was then validated with respect to the JavaML DTD
-using James Clark's Jade package's <code>nsgmls</code> tool <tt>[12]</tt>.
+using James Clark's Jade package's <code>nsgmls</code> tool <tt><a href="#ref-12">[12]</a></tt>.
 The processing of the entire regression test takes only about twelve
 seconds on the author's RedHat6-based dual Pentium III-450 machine.
 </p><p>
 Also implemented is an XSLT stylesheet that outputs the classical source
 representation given the JavaML representation. The style sheet consists
 of 65 template rules and just under 600 lines of code.  It was tested
-(using both Saxon <tt>[39]</tt> and XT <tt>[15]</tt>) on numerous programs
+(using both Saxon <tt><a href="#ref-39">[39]</a></tt> and XT <tt><a href="#ref-15">[15]</a></tt>) on numerous programs
 by processing a file to JavaML, back-converting it, and then
 re-converting to JavaML: no differences should exist between the result
 and the originally-converted JavaML file.
 </p><p>
 All of the source code is available from the JavaML home
-page <tt>[4]</tt>.
+page <tt><a href="#ref-4">[4]</a></tt>.
 </p>
 
 <p><span class="index"><a href="#top">[top]</a></span></p>
@@ -804,30 +805,30 @@ Instead of building analysis and transformation tools from scratch to
 work on a proprietary binary structured format for a program, existing
 SGML and XML tools can be used, combined, and extended.  XML tools
 encompass a broad range of features that include querying and
-transformation, document differencing and merging <tt>[33]</tt>,
+transformation, document differencing and merging <tt><a href="#ref-33">[33]</a></tt>,
 and simple APIs for working with the document directly.  In this paper,
 I will (for space reasons) limit discussion to uses of only three tool
 groups:
 </p>
 
 <ul>
-<li> the XML toolbox (ltxml) from Edinburgh University <tt>[52]</tt>
+<li> the XML toolbox (ltxml) from Edinburgh University <tt><a href="#ref-52">[52]</a></tt>
 which contains <code>sgcount</code>,
 <code>sgrpg</code>, <code>sggrep</code>, and more;
 
-<li> XSLT <tt>[14]</tt> processors (e.g., XT <tt>[15]</tt> and Saxon <tt>[39]</tt>)
-      and the XML parser XP <tt>[13]</tt>;
+<li> XSLT <tt><a href="#ref-14">[14]</a></tt> processors (e.g., XT <tt><a href="#ref-15">[15]</a></tt> and Saxon <tt><a href="#ref-39">[39]</a></tt>)
+      and the XML parser XP <tt><a href="#ref-13">[13]</a></tt>;
 
-<li> the Perl XML::DOM package <tt>[20]</tt> which exposes a
-DOM level 1 <tt>[2]</tt> interface to an XML tree.
+<li> the Perl XML::DOM package <tt><a href="#ref-20">[20]</a></tt> which exposes a
+DOM level 1 <tt><a href="#ref-2">[2]</a></tt> interface to an XML tree.
 </ul>
 
 <p>
 These are just a very small subset of the tools that prove useful when
 working with JavaML.  In the following examples, we will query
 <code>Hangman.java.xml</code>, the JavaML representation of the Hangman
-applet available at Sun Microsystems' applet page <tt>[50]</tt> and
-also at the JavaML home page <tt>[4]</tt>.  Although these examples
+applet available at Sun Microsystems' applet page <tt><a href="#ref-50">[50]</a></tt> and
+also at the JavaML home page <tt><a href="#ref-4">[4]</a></tt>.  Although these examples
 are small by real-world standards, XML and SGML tools target documents
 ranging up through lengthy books so the implementations are designed to
 scale well.
@@ -999,7 +1000,7 @@ trivial thanks to the JavaML representation:
 <p>
 The <code>sgrpg</code> (SGML RePort Generator) program permits combining a
 top-level query with a restriction on the children and an output format
-for the results (a common paradigm for querying tools <tt>[24]</tt>).
+for the results (a common paradigm for querying tools <tt><a href="#ref-24">[24]</a></tt>).
 For example:
 
 <pre>
@@ -1042,8 +1043,8 @@ code are very useful when modifying and
 evolving software artifacts.  Querying tools generally only prune
 elements from the source document or combine elements from multiple
 documents.  More powerful transformations are possible using
-XSLT <tt>[14]</tt>, DSSSL <tt>[38]</tt>, or directly manipulating the
-document using a DOM (Document Object Model) <tt>[2]</tt> interface
+XSLT <tt><a href="#ref-14">[14]</a></tt>, DSSSL <tt><a href="#ref-38">[38]</a></tt>, or directly manipulating the
+document using a DOM (Document Object Model) <tt><a href="#ref-2">[2]</a></tt> interface
 accessible from numerous languages including Perl, Python, Java, and
 C++.  For example, we can rename all methods named <code>isBall</code> to
 <code>FIsBall</code> using a straightforward XSLT stylesheet:
@@ -1150,8 +1151,8 @@ sub SendMessageBlock {
 Perl program to instrument every method of a Java class with invocations of
   <code>Tracer.StartMethod(<em>method_name</em>)</code> and
   <code>Tracer.ExitMethod(<em>method_name</em>)</code>.  The
-  program uses the Document Object Model (DOM) <tt>[2]</tt> Perl
-  module <tt>[20]</tt>.
+  program uses the Document Object Model (DOM) <tt><a href="#ref-2">[2]</a></tt> Perl
+  module <tt><a href="#ref-20">[20]</a></tt>.
 </p>
 
 
@@ -1166,12 +1167,12 @@ in the previous section.  Various researchers have similarly approached
 the problem of improving software engineering and development tools with
 varying degrees of success.
 </p><p>
-TAWK <tt>[29]</tt> extends the AWK <tt>[21]</tt> paradigm by matching
+TAWK <tt><a href="#ref-29">[29]</a></tt> extends the AWK <tt><a href="#ref-21">[21]</a></tt> paradigm by matching
 patterns in the AST of a C program.  Numerous XML querying tools provide
 this same functionality for JavaML, and the event-action framework is
-similar to that used by SAX (Simple API for XML) <tt>[43]</tt>.
+similar to that used by SAX (Simple API for XML) <tt><a href="#ref-43">[43]</a></tt>.
 </p><p>
-ASTLog <tt>[18]</tt> extends the Prolog <tt>[17]</tt> logic programming
+ASTLog <tt><a href="#ref-18">[18]</a></tt> extends the Prolog <tt><a href="#ref-17">[17]</a></tt> logic programming
 language with the ability to reason about an external database that
 models the AST.  Unlike Prolog, ASTLog statements are evaluated with
 respect to a current object.  The approach that Crew uses may be
@@ -1179,29 +1180,29 @@ interesting to apply to the XML world, but the numerous XML tools
 already provide comparable functionality through a more conventional (if
 perhaps less convenient) framework.
 </p><p>
-GRAS <tt>[40]</tt> is a graph-oriented database system for software engineering
+GRAS <tt><a href="#ref-40">[40]</a></tt> is a graph-oriented database system for software engineering
 environments.  Front-ends are available for integrating source-code from
 ordinary representation of C, Modula-3, and Modula-2 into the database.  The database 
 approach may prove useful for storing XML, especially in the context of
 the software-engineering applications for which JavaML is designed.
 </p><p>
-The Software Development Foundation <tt>[46]</tt> is an open
+The Software Development Foundation <tt><a href="#ref-46">[46]</a></tt> is an open
 architecture based on XML designed for developing tools for programming
 environments.  An XML database format called
 CSF &#151; code structure format &#151; stores relationships, but includes no
-details about the computation performed.  Chava <tt>[41]</tt> takes a
-similar approach, but is based on the C Program Database <tt>[11]</tt>.
+details about the computation performed.  Chava <tt><a href="#ref-41">[41]</a></tt> takes a
+similar approach, but is based on the C Program Database <tt><a href="#ref-11">[11]</a></tt>.
 Chava also permits interrogating Java code via reverse
 engineering the byte-codes.
 </p><p>
-CCEL <tt>[22]</tt> provides a metalanguage for expressing non-linguistic
+CCEL <tt><a href="#ref-22">[22]</a></tt> provides a metalanguage for expressing non-linguistic
 intentions (i.e., ones that cannot be expressed in the language) about
 software artifacts written in C++.  JavaML can provide a similar
 capability by simply writing queries that search for violations of the
 intended invariants and reporting them as part of the edit, build, or
 regression-test procedure throughout the development cycle.
 </p><p>
-Microsoft's Intentional Programming group <tt>[47]</tt> has long been
+Microsoft's Intentional Programming group <tt><a href="#ref-47">[47]</a></tt> has long been
 working on a more abstract representation of computation that is
 syntax-independent.  Their goal appears to be to permit developers to
 describe new abstractions along with techniques to reduce those
@@ -1215,7 +1216,7 @@ must simply write a transformation from Java++ML to JavaML.  Because
 DTDs are exceptionally easy to extend, this approach is tenable and
 likely a fruitful avenue for future work.  There are several utilities
 for documenting and comparing DTDs (e.g., <code>dtd2html</code> and
-<code>dtddiff</code> of the perlSGML package <tt>[31]</tt>) that would
+<code>dtddiff</code> of the perlSGML package <tt><a href="#ref-31">[31]</a></tt>) that would
 be helpful when applying this technique.
 </p>
 
@@ -1229,7 +1230,7 @@ basic approach can be applied to other programming languages, or even to
 translate among languages.  To the extent that the representation
 abstracts away syntax, JavaML may also prove useful in permitting the
 import of visual representations such as Unified Modeling Language
-diagrams <tt>[1,35]</tt>.  Certainly generating visual
+diagrams <tt><a href="#ref-1">[1]</a><a href="#ref-35">[35]</a></tt>.  Certainly generating visual
 representations of important properties of software artifacts is on the
 immediate horizon given the capabilities of XSL and DSSSL.
 </p><p>
@@ -1239,7 +1240,7 @@ preprocessor.  The C preprocessor provides a first pass of textual
 processing to permit abstractions that cannot otherwise be expressed in
 the core C++ language.  These abstractions are often very important to
 the understandability and maintainability of the code, but do not
-interact well with parsing techniques <tt>[23,6]</tt>.
+interact well with parsing techniques <tt><a href="#ref-23">[23]</a><a href="#ref-6">[6]</a></tt>.
 </p><p>
 A useful extension to the current transformation system is to do
 more cross-linking of elements.  Type elements could reference their
@@ -1251,7 +1252,7 @@ The current converter that translates back from JavaML to the classical
 source representation is based on XSLT.  Adding a
 Jikes front-end would permit the compiler to read JavaML directly.
 Such an implementation would use an XML parser (e.g.,
-XML4C++ <tt>[34]</tt>) to construct the XML DOM from the JavaML source,
+XML4C++ <tt><a href="#ref-34">[34]</a></tt>) to construct the XML DOM from the JavaML source,
 then simply recursively build the Jikes internal AST using the DOM API.
 Back-conversion to the plain source code could then be done using
 Jikes's pre-existing conventional unparser.
@@ -1262,7 +1263,7 @@ Some semantic analyses can be removed from the compiler once it knows
 that the input is a valid JavaML document.  It will be useful to
 characterize which semantic errors are provably impossible to encounter
 given that precondition.  Because XML
-Schema <tt>[51,7]</tt> provide an even finer-grained
+Schema <tt><a href="#ref-51">[51]</a><a href="#ref-7">[7]</a></tt> provide an even finer-grained
 specification of validity for XML documents, it is likely beneficial to
 migrate JavaML to use an them instead of a DTD after the working drafts
 are finalized.  Additionally, more semantic analyses can be moved into
@@ -1278,7 +1279,7 @@ between the classical source representation and JavaML.  The
 capabilities could then be used to transparently support interactive
 editing of XML representations using plain-text format to which human
 engineers are accustomed.  The considerable work on structured text
-editors <tt>[30,45]</tt> is highly relevant and may finally
+editors <tt><a href="#ref-30">[30]</a><a href="#ref-45">[45]</a></tt> is highly relevant and may finally
 achieve acceptance give the incredible resources that will now be thrown
 at the problem given the growing commercial importance of XML
 technology.
@@ -1328,7 +1329,7 @@ Grant No. IIS-9975990.
 <h3><a name="javaml-dtd">Appendix A - JavaML DTD</a></h3>
 <small>
 <pre>
-&lt;!-- java-ml.dtd 0.96 --&gt;
+&lt;!-- <a href="http://www.cs.washington.edu/homes/gjb/JavaML/untar/JavaML/java-ml.dtd">java-ml.dtd</a> 0.96 --&gt;
 &lt;!-- Copyright (C) 2000, Greg J. Badros &lt;gjb@cs.washington.edu&gt; --&gt;
 &lt;!-- A DTD for JavaML, an XML representation of Java Source Code --&gt;
 &lt;!-- <a href="http://www.cs.washington.edu/homes/gjb/papers/javaml/javaml.html">http://www.cs.washington.edu/homes/gjb/papers/javaml/javaml.html</a> --&gt;
@@ -1555,30 +1556,29 @@ Grant No. IIS-9975990.
 
 <h3><a name="references">References</a></h3>
 
-<P>
-<A NAME="UMLNutshell"><strong>[1]</strong></A>
+<P><A NAME="ref-1"><strong>[1]</strong></A>
 S. S. Alhir.
 <EM>UML in a Nutshell</EM>.
 O'Reilly &amp; Associates, Inc., 1998.
 
-<P><A NAME="DOM"><strong>[2]</strong></A>
+<P><A NAME="ref-2"><strong>[2]</strong></A>
 V. Apparao, S. Byrne, M. Champion, S. Isaacs, I. Jacobs, A. L. Hors, G. Nicol,
   J. Robie, R. Sutor, C. Wilson, and L. Wood.
 Document object model (DOM) level 1.
 W3C Recommendation, October 1998.
 <a href="http://www.w3.org/TR/REC-DOM-Level-1">http://www.w3.org/TR/REC-DOM-Level-1</a>.
 
-<P><A NAME="Arnold98"><strong>[3]</strong></A>
+<P><A NAME="ref-3"><strong>[3]</strong></A>
 K. Arnold and J. Gosling.
 <EM>The Java Programming Language</EM>.
 Addison-Wesley, Reading, Massachusetts, 1998.
 
-<P><A NAME="Badros-javaml"><strong>[4]</strong></A>
+<P><A NAME="ref-4"><strong>[4]</strong></A>
 G. J. Badros.
 JavaML Home Page.
 <a href="http://www.cs.washington.edu/homes/gjb/JavaML">http://www.cs.washington.edu/homes/gjb/JavaML</a>.
 
-<P><A NAME="CassoInI"><strong>[5]</strong></A>
+<P><A NAME="ref-5"><strong>[5]</strong></A>
 G. J. Badros and A. Borning.
 The Cassowary linear arithmetic constraint solving algorithm:
   Interface and implementation.
@@ -1587,258 +1587,258 @@ Technical Report UW-CSE-98-06-04, University of Washington, Seattle,
 
   <a href="http://www.cs.washington.edu/research/constraints/cassowary/cassowary-tr.pdf">http://www.cs.washington.edu/research/constraints/cassowary/cassowary-tr.pdf</a>.
 
-<P><A NAME="Badros00-spe"><strong>[6]</strong></A>
+<P><A NAME="ref-6"><strong>[6]</strong></A>
 G. J. Badros and D. Notkin.
 A framework for preprocessor-aware C source code analyses.
 <EM>Software &#151; Practice and Experience</EM>, 2000.
 To appear.
 
-<P><A NAME="XMLSchema2"><strong>[7]</strong></A>
+<P><A NAME="ref-7"><strong>[7]</strong></A>
 P. V. Biron and A. Malhotra.
 Xml scheme part 2: Datatypes.
 W3C Working Draft, November 1999.
 <a href="http://www.w3.org/TR/xmlschema-2">http://www.w3.org/TR/xmlschema-2</a>.
 
-<P><A NAME="CSS2"><strong>[8]</strong></A>
+<P><A NAME="ref-8"><strong>[8]</strong></A>
 B. Bos, H. W. Lie, C. Lilley, and I. Jacobs.
 Cascading style sheets, level 2.
 W3C Working Draft, Jan. 1998.
 <a href="http://www.w3.org/TR/WD-css2/">http://www.w3.org/TR/WD-css2/</a>.
 
-<P><A NAME="XML"><strong>[9]</strong></A>
+<P><A NAME="ref-9"><strong>[9]</strong></A>
 T. Bray, J. Paoli, and C. M. Sperberg-McQueen.
 Extensible markup language (XML) 1.0.
 W3C Recommendation, February 1998.
 <a href="http://www.w3.org/TR/REC-xml">http://www.w3.org/TR/REC-xml</a>.
 
-<P><A NAME="Modula2"><strong>[10]</strong></A>
+<P><A NAME="ref-10"><strong>[10]</strong></A>
 British Standards Institution.
 Modula-2 draft international standard, iso-94, June 1994.
 
-<P><A NAME="Chen89"><strong>[11]</strong></A>
+<P><A NAME="ref-11"><strong>[11]</strong></A>
 Y.-F. Chen.
 The c program database and its applications.
 In <EM>Proceedings of the Summer 1989 USENIX Conference</EM>, pages
   157-171, Baltimore, 1989.
 
-<P><A NAME="Jade"><strong>[12]</strong></A>
+<P><A NAME="ref-12"><strong>[12]</strong></A>
 J. Clark.
 James' DSSSL engine (JADE).
 <a href="http://www.jclark.com/jade">http://www.jclark.com/jade</a>.
 
-<P><A NAME="Clark-XP"><strong>[13]</strong></A>
+<P><A NAME="ref-13"><strong>[13]</strong></A>
 J. Clark.
 XP version 0.5, 1998.
 <a href="http://www.jclark.com/xml/xp">http://www.jclark.com/xml/xp</a>.
 
-<P><A NAME="XSLT"><strong>[14]</strong></A>
+<P><A NAME="ref-14"><strong>[14]</strong></A>
 J. Clark.
 XSL transformations.
 W3C Recommendation, November 1999.
 <a href="http://www.w3.org/TR/xslt">http://www.w3.org/TR/xslt</a>.
 
-<P><A NAME="Clark-XT"><strong>[15]</strong></A>
+<P><A NAME="ref-15"><strong>[15]</strong></A>
 J. Clark.
 XT version 19991105, November 1999.
 <a href="http://www.jclark.com/xml/xt.html">http://www.jclark.com/xml/xt.html</a>.
 
-<P><A NAME="XPath"><strong>[16]</strong></A>
+<P><A NAME="ref-16"><strong>[16]</strong></A>
 J. Clark and S. DeRose.
 XML path language (xpath) version 1.0.
 W3C Recommendation, November 1999.
 <a href="http://www.w3.org/TR/xpath">http://www.w3.org/TR/xpath</a>.
 
-<P><A NAME="Clock94"><strong>[17]</strong></A>
+<P><A NAME="ref-17"><strong>[17]</strong></A>
 W. F. Clocksin and C. S. Mellish.
 <EM>Programming in Prolog</EM>.
 Springer-Verlag, Berlin, fourth edition, 1994.
 
-<P><A NAME="Crew97"><strong>[18]</strong></A>
+<P><A NAME="ref-18"><strong>[18]</strong></A>
 R. F. Crew.
 ASTLOG: A language for examining abstract syntax trees.
 In <EM>Proceedings of the USENIX Conference on Domain-Specific
   Languages</EM>, Santa Barbara, CA, October 1997.
 
-<P><A NAME="XSL"><strong>[19]</strong></A>
+<P><A NAME="ref-19"><strong>[19]</strong></A>
 S. Deach.
 Extensible stylesheet language (xsl) specification.
 W3C Working Draft, January 2000.
 <a href="http://www.w3.org/TR/WD-xsl">http://www.w3.org/TR/WD-xsl</a>.
 
-<P><A NAME="perlDOM"><strong>[20]</strong></A>
+<P><A NAME="ref-20"><strong>[20]</strong></A>
 E. Derksen and C. Cooper.
 Perl XML::DOM module.
 <a href="http://users.erols.com/enno/dom">http://users.erols.com/enno/dom</a>.
 
-<P><A NAME="Dougherty90"><strong>[21]</strong></A>
+<P><A NAME="ref-21"><strong>[21]</strong></A>
 D. Dougherty.
 <EM>Sed and Awk</EM>.
 O'Reilly &amp; Associates, Inc., Sebastopol, California, 1990.
 
-<P><A NAME="CCEL92"><strong>[22]</strong></A>
+<P><A NAME="ref-22"><strong>[22]</strong></A>
 C. K. Duby, S. Meyers, and S. P. Reiss.
 CCEL: A metalanguage for C++.
 In <EM>Proceedings of the USENIX 1992 C++ Conference</EM>, Portland,
   Oregon, August 1992.
 
-<P><A NAME="ErnstBadrosNotkin00"><strong>[23]</strong></A>
+<P><A NAME="ref-23"><strong>[23]</strong></A>
 M. Ernst, G. J. Badros, and D. Notkin.
 An empirical analysis of C preprocessor use.
 <EM>IEEE Transactions on Software Engineering</EM>, 2000.
 To appear.
 
-<P><A NAME="XMLQL-EnE"><strong>[24]</strong></A>
+<P><A NAME="ref-24"><strong>[24]</strong></A>
 M. Fernandez, J. Sim&#233;on, and P. Wadler.
 XML query language: Experiences and exemplars, 1999.
 <a href="http://www-db.research.bell-labs.com/user/simeon/xquery.html">http://www-db.research.bell-labs.com/user/simeon/xquery.html</a>.
 
-<P><A NAME="Flanagan97"><strong>[25]</strong></A>
+<P><A NAME="ref-25"><strong>[25]</strong></A>
 D. Flanagan.
 <EM>Java in a Nutshell</EM>.
 O'Reilly &amp; Associates, Inc., Sebastopol, California, 2nd edition,
   1997.
 
-<P><A NAME="Goldberg89"><strong>[26]</strong></A>
+<P><A NAME="ref-26"><strong>[26]</strong></A>
 A. Goldberg and D. Robson.
 <EM>Smalltalk-80: The Language</EM>.
 Addison-Wesley, Reading, Massachusetts, 1989.
 
-<P><A NAME="Goldfarb98"><strong>[27]</strong></A>
+<P><A NAME="ref-27"><strong>[27]</strong></A>
 C. F. Goldfarb and P. Prescod.
 <EM>The XML Handbook</EM>.
 Prentice Hall PTR, 1998.
 
-<P><A NAME="Goosens99"><strong>[28]</strong></A>
+<P><A NAME="ref-28"><strong>[28]</strong></A>
 M. Goosens and S. Rahtz.
 <EM>The LaTeX Web Companion</EM>.
 Addison Wesley Longman, 1999.
 
-<P><A NAME="Griswold96"><strong>[29]</strong></A>
+<P><A NAME="ref-29"><strong>[29]</strong></A>
 W. G. Griswold, D. C. Atkinson, and C. McCurdy.
 Fast, flexible syntactic pattern matching and processing.
 In <EM>Proceedings of the IEEE 1996 Workshop on Program
   Comprehension</EM>, March 1996.
 
-<P><A NAME="Habermann86"><strong>[30]</strong></A>
+<P><A NAME="ref-30"><strong>[30]</strong></A>
 A. N. Habermann and D. Notkin.
 Gandalf: Software development environments.
 <EM>IEEE Transactions on Software Engineering</EM>, pages
   pp. 1117-1127, 1986.
 
-<P><A NAME="perlSGML"><strong>[31]</strong></A>
+<P><A NAME="ref-31"><strong>[31]</strong></A>
 E. Hood.
 perlSGML library.
 <a href="http://www.oac.uci.edu/indiv/ehood/perlSGML.html">http://www.oac.uci.edu/indiv/ehood/perlSGML.html</a>.
 
-<P><A NAME="Jikes"><strong>[32]</strong></A>
+<P><A NAME="ref-32"><strong>[32]</strong></A>
 IBM.
 Jikes java compiler.
 <a href="http://www.alphaworks.ibm.com/tech/Jikes">http://www.alphaworks.ibm.com/tech/Jikes</a>.
 
-<P><A NAME="XMLDiffMerge"><strong>[33]</strong></A>
+<P><A NAME="ref-33"><strong>[33]</strong></A>
 IBM AlphaWorks.
 XML diff and merge tool.
 <a href="http://www.alphaworks.ibm.com/tech/xmldiffmerge">http://www.alphaworks.ibm.com/tech/xmldiffmerge</a>.
 
-<P><A NAME="XML4C++"><strong>[34]</strong></A>
+<P><A NAME="ref-34"><strong>[34]</strong></A>
 IBM AlphaWorks.
 XML for C++.
 <a href="http://www.alphaworks.ibm.com/tech/xml4c">http://www.alphaworks.ibm.com/tech/xml4c</a>.
 
-<P><A NAME="XMI"><strong>[35]</strong></A>
+<P><A NAME="ref-35"><strong>[35]</strong></A>
 IBM AlphaWorks.
 XML metadata interchange (XMI) toolkit.
 <a href="http://www.alphaworks.ibm.com/tech/xmitoolkit">http://www.alphaworks.ibm.com/tech/xmitoolkit</a>.
 
-<P><A NAME="XMLSpy"><strong>[36]</strong></A>
+<P><A NAME="ref-36"><strong>[36]</strong></A>
 Icon I.S.
 XML spy 3.0beta2.
 <a href="http://www.xmlspy.com">http://www.xmlspy.com</a>.
 
-<P><A NAME="SGML"><strong>[37]</strong></A>
+<P><A NAME="ref-37"><strong>[37]</strong></A>
 ISO.
 Standard generalized markup language (SGML).
 ISO 8879, 1986.
 <a href="http://www.iso.ch/cate/d16387.html">http://www.iso.ch/cate/d16387.html</a>.
 
-<P><A NAME="DSSSL"><strong>[38]</strong></A>
+<P><A NAME="ref-38"><strong>[38]</strong></A>
 ISO/IEC.
 Document style semantics and specification language (DSSSL).
 ISO/IEC 10179, 1996.
 
-<P><A NAME="Saxon"><strong>[39]</strong></A>
+<P><A NAME="ref-39"><strong>[39]</strong></A>
 M. H. Kay.
 <EM>SAXON</EM>.
 <a href="http://users.iclway.co.uk/mhkay/saxon/">http://users.iclway.co.uk/mhkay/saxon/</a>.
 
-<P><A NAME="Kiesel95"><strong>[40]</strong></A>
+<P><A NAME="ref-40"><strong>[40]</strong></A>
 N. Kiesel, A. Sch&#252;rr, and B. Westfechtel.
 GRAS, a graph-oriented (software) engineering database system.
 <EM>Information Systems</EM>, 20(1):21-52, 1995.
 Oxford: Pergamon Press.
 
-<P><A NAME="Chava"><strong>[41]</strong></A>
+<P><A NAME="ref-41"><strong>[41]</strong></A>
 J. Korn, Y. Chen, and E. Koutsofios.
 Chava: Reverse engineering and tracking of java applets.
 In <EM>Proceedings of the Sixth Working Conference on Reverse
   Engineering</EM>, pages 314-325, October 1999.
 
-<P><A NAME="Levine92"><strong>[42]</strong></A>
+<P><A NAME="ref-42"><strong>[42]</strong></A>
 J. R. Levine.
 <EM>Lex &amp; Yacc</EM>.
 O'Reilly &amp; Associates, Inc., Sebastopol, California, 2nd edition,
   1992.
 
-<P><A NAME="SAX"><strong>[43]</strong></A>
+<P><A NAME="ref-43"><strong>[43]</strong></A>
 Megginson Technologies.
 SAX 1.0: The simple API for XML.
 Web document, 1999.
 <a href="http://www.megginson.com/SAX">http://www.megginson.com/SAX</a>.
 
-<P><A NAME="XMLNotepad"><strong>[44]</strong></A>
+<P><A NAME="ref-44"><strong>[44]</strong></A>
 Microsoft.
 XML Notepad Beta 1.5.
 <a href="http://msdn.microsoft.com/xml/notepad/">http://msdn.microsoft.com/xml/notepad</a>.
 
-<P><A NAME="Miller99"><strong>[45]</strong></A>
+<P><A NAME="ref-45"><strong>[45]</strong></A>
 R. C. Miller and B. A. Myers.
 Lightweight structured text processing.
 In <EM>Proceedings of USENIX 1999</EM>, Monterey, CA, 1999.
 
-<P><A NAME="SDS"><strong>[46]</strong></A>
+<P><A NAME="ref-46"><strong>[46]</strong></A>
 S. E. Sand&#248;and K.-T. Kalleberg.
 Software development foundation, February 2000.
 <a href="http://sds.yi.org">http://sds.yi.org</a>.
 
-<P><A NAME="Simonyi96"><strong>[47]</strong></A>
+<P><A NAME="ref-47"><strong>[47]</strong></A>
 C. Simonyi.
 Intentional programming - innovation in the legacy age.
 International Federation for Information Processing WG 2.1 meeting,
   June 1996.
 
-<P><A NAME="Soroker97"><strong>[48]</strong></A>
+<P><A NAME="ref-48"><strong>[48]</strong></A>
 D. Soroker, M. Karasick, J. Barton, and D. Streeter.
 Extension mechanisms in montana.
 In <EM>Proceedings of 8th Israeli Conference on Computer-Based
   Systems and Software Engineering</EM>, June 1997.
 
-<P><A NAME="Stroustrup97"><strong>[49]</strong></A>
+<P><A NAME="ref-49"><strong>[49]</strong></A>
 B. Stroustrup.
 <EM>The C++ Programming Language</EM>.
 Addison-Wesley, Reading, Massachusetts, 3rd edition, 1997.
 
-<P><A NAME="SunApplets"><strong>[50]</strong></A>
+<P><A NAME="ref-50"><strong>[50]</strong></A>
 Sun Microsystems.
 Applet resources, February 2000.
 <a href="http://java.sun.com/applets/">http://java.sun.com/applets/</a>.
 
-<P><A NAME="XMLSchema1"><strong>[51]</strong></A>
+<P><A NAME="ref-51"><strong>[51]</strong></A>
 H. S. Thompson, D. Beech, M. Maloney, and N. Mendelsohn.
 Xml scheme part 1: Structures.
 W3C Working Draft, November 1999.
 <a href="http://www.w3.org/TR/xmlschema-1">http://www.w3.org/TR/xmlschema-1</a>.
 
-<P><A NAME="ltxml"><strong>[52]</strong></A>
+<P><A NAME="ref-52"><strong>[52]</strong></A>
 University of Edinburgh Language Technology Group.
 LT XML vesion 1.1.
 <a href="http://www.ltg.ed.ac.uk/software/xml">http://www.ltg.ed.ac.uk/software/xml</a>.
