@@ -1344,14 +1344,14 @@ void AstDefaultLabel::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstSwitchBlockStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstSwitchBlockStatement:#" << this-> id << "*/";
+    xml_open(os, "switch-block");
     for (int j = 0; j < NumSwitchLabels(); j++) {
       this -> SwitchLabel(j) -> XMLUnparse(os, lex_stream);
     }
-    xml_open(os, "block");
     for (int l = 0; l < NumStatements(); l++) {
       this -> Statement(l) -> XMLUnparse(os, lex_stream);
     }
-    xml_close(os,"block", true);
+    xml_close(os,"switch-block", true);
     if (Ast::debug_unparse) os << "/*:AstSwitchBlockStatement#" << this-> id << "*/";
 }
 
@@ -1362,6 +1362,7 @@ void AstSwitchStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
     xml_open(os, "switch"); xml_nl(os);
     AstParenthesizedExpression *parenth = expression -> ParenthesizedExpressionCast();
     xml_unparse_maybe_var_ref(os,lex_stream,expression);
+    xml_nl(os);
     switch_block -> XMLUnparse(os, lex_stream);
     // what about switch_labels_opt?
     xml_close(os, "switch", true);
