@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!-- java-ml.dtd 0.91 -->
+<!-- java-ml.dtd 0.92 -->
 <!-- Copyright (C) 2000, Greg J. Badros <gjb@cs.washington.edu> -->
 <!-- A DTD for JavaML, an XML representation of Java Source Code -->
 <!-- http://www.cs.washington.edu/homes/gjb/papers/javaml/javaml.html -->
@@ -16,7 +16,7 @@
 <!ENTITY % mod-synchronized "synchronized CDATA #IMPLIED">
 
 <!ENTITY % expr-elems "send|new|new-array|var-ref|field-access|array-ref|paren|assignment-expr|conditional-expr|binary-expr|unary-expr|cast-expr|instanceof-test|literal-number|literal-string|literal-char|literal-true|literal-false|literal-null|this|super">
-<!ENTITY % stmt-elems "statements|local-variable|try|throw|if|switch|loop|do-loop|return|continue|break|%expr-elems;">
+<!ENTITY % stmt-elems "block|local-variable|try|throw|if|switch|loop|do-loop|return|continue|break|%expr-elems;">
 
 <!ELEMENT java-source-program (package-decl?,import*,(class|interface)+) >
 <!ATTLIST java-source-program
@@ -40,7 +40,7 @@
     %mod-synchronized;>
 <!ELEMENT superclass EMPTY>
 <!ATTLIST superclass
-    class CDATA #REQUIRED>
+    name CDATA #REQUIRED>
 <!ELEMENT interface (extend*, (method|field)*) >
 <!ATTLIST interface
     name CDATA #REQUIRED
@@ -91,7 +91,7 @@
 <!ELEMENT send (target?,arguments)>
 <!ATTLIST send
     message CDATA #REQUIRED>
-<!ELEMENT statements (%stmt-elems;)*>
+<!ELEMENT block (%stmt-elems;)*>
 <!ELEMENT target (%expr-elems;)>
 <!ELEMENT return (%expr-elems;)?>
 <!ELEMENT throw (%expr-elems;)>
