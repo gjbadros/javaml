@@ -30,6 +30,7 @@
 <xsl:param name="clr-false">red</xsl:param>
 <xsl:param name="clr-null">red</xsl:param>
 <xsl:param name="clr-this">blue</xsl:param>
+<xsl:param name="clr-super">blue</xsl:param>
 <xsl:param name="clr-new">blue</xsl:param>
 <xsl:param name="clr-var-ref">green</xsl:param>
 <xsl:param name="clr-var-set">fuchsia</xsl:param>
@@ -45,6 +46,12 @@
 <xsl:param name="clr-for">blue</xsl:param>
 <xsl:param name="clr-else">blue</xsl:param>
 <xsl:param name="clr-binary-operator">blue</xsl:param>
+<xsl:param name="clr-synchronized-stmt">blue</xsl:param>
+<xsl:param name="clr-super-call">blue</xsl:param>
+<xsl:param name="clr-this-call">blue</xsl:param>
+<xsl:param name="clr-field-set-field">blue</xsl:param>
+<xsl:param name="clr-finally">blue</xsl:param>
+<xsl:param name="clr-instanceof">blue</xsl:param>
 
 <xsl:variable name="cchIndent" select="0"/>
 
@@ -212,10 +219,21 @@
 
 <xsl:template match="block">
   <xsl:call-template name="open-brace-newline"/>
+  <xsl:choose>
+    <xsl:when test="preceding-sibling::super-call">
+      <em><font color="{$clr-super-call}"><xsl:text>super-call</xsl:text></font></em>
+      <xsl:apply-templates select="preceding-sibling::super-call/arguments"/>
+      <xsl:call-template name="semicolon-newline"/>
+    </xsl:when>
+    <xsl:when test="preceding-sibling::this-call">
+      <em><font color="{$clr-this-call}"><xsl:text>this</xsl:text></font></em>
+      <xsl:apply-templates select="preceding-sibling::this-call/arguments"/>
+    </xsl:when>
+  </xsl:choose>
   <xsl:for-each select="*">
     <xsl:apply-templates select="."/>
     <xsl:choose>
-      <xsl:when test="if|true-case|false-case|loop|block"/>
+      <xsl:when test="if|true-case|false-case|loop|block|catch"/>
       <xsl:when test="following-sibling::local-variable[@continued and position()=1]">
         <xsl:value-of select="following-sibling"/>
       </xsl:when>
@@ -268,6 +286,12 @@
   <xsl:apply-templates/>
   <xsl:text>.</xsl:text>
   <strong><xsl:value-of select="@field"/></strong>
+</xsl:template>
+
+<xsl:template match="field-set">
+  <xsl:apply-templates/>
+  <xsl:text>.</xsl:text>
+  <em><font color="{$clr-field-set-field}"><xsl:value-of select="@field"/></font></em>
 </xsl:template>
 
 <xsl:template match="array-ref">
@@ -370,6 +394,10 @@
   <em><font color="{$clr-this}"><xsl:text>this</xsl:text></font></em>
 </xsl:template>
 
+<xsl:template match="super">
+  <em><font color="{$clr-super}"><xsl:text>super</xsl:text></font></em>
+</xsl:template>
+
 <xsl:template match="new">
   <em><font color="{$clr-new}"><xsl:text>new </xsl:text></font></em>
   <xsl:apply-templates/>
@@ -455,6 +483,11 @@
   <xsl:apply-templates select="*[position() > 1]"/>
 </xsl:template>
 
+<xsl:template match="instanceof-test">
+  <xsl:apply-templates select="*[1]"/>
+  <em><font color="{$clr-instanceof}"><xsl:text> instanceof </xsl:text></font></em>
+  <xsl:apply-templates select="*[2]"/>
+</xsl:template>
 
 <xsl:template match="return">
   <xsl:text>return </xsl:text>
@@ -518,7 +551,23 @@
   <xsl:if test="not(block)">
     <xsl:text>{} </xsl:text>
   </xsl:if>
-  <xsl:call-template name="semicolon-newline"/>
+</xsl:template>
+
+<xsl:template match="finally">
+  <em><font color="{$clr-finally}"><xsl:text>finally </xsl:text></font></em>
+  <xsl:apply-templates/>
+</xsl:template>
+
+<xsl:template match="synchronized">
+  <em><font color="{$clr-synchronized-stmt}"><xsl:text>synchronized </xsl:text></font></em>
+  <xsl:apply-templates select="expr"/>
+  <xsl:apply-templates select="block"/>
+</xsl:template>
+
+<xsl:template match="expr">
+  <xsl:text>(</xsl:text>
+  <xsl:apply-templates/>
+  <xsl:text>)</xsl:text>
 </xsl:template>
 
 <xsl:template match="break">

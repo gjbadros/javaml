@@ -152,10 +152,21 @@
 
 <xsl:template match="block">
   <xsl:call-template name="open-brace-newline"/>
+  <xsl:choose>
+    <xsl:when test="preceding-sibling::super-call">
+      <xsl:text>super</xsl:text>
+      <xsl:apply-templates select="preceding-sibling::super-call/arguments"/>
+      <xsl:call-template name="semicolon-newline"/>
+    </xsl:when>
+    <xsl:when test="preceding-sibling::this-call">
+      <xsl:text>this</xsl:text>
+      <xsl:apply-templates select="preceding-sibling::this-call/arguments"/>
+    </xsl:when>
+  </xsl:choose>
   <xsl:for-each select="*">
     <xsl:apply-templates select="."/>
     <xsl:choose>
-      <xsl:when test="if|true-case|false-case|loop|block"/>
+      <xsl:when test="if|true-case|false-case|loop|block|catch"/>
       <xsl:when test="following-sibling::local-variable[@continued and position()=1]">
         <xsl:value-of select="following-sibling"/>
       </xsl:when>
@@ -205,6 +216,12 @@
 </xsl:template>
 
 <xsl:template match="field-access">
+  <xsl:apply-templates/>
+  <xsl:text>.</xsl:text>
+  <xsl:value-of select="@field"/>
+</xsl:template>
+
+<xsl:template match="field-set">
   <xsl:apply-templates/>
   <xsl:text>.</xsl:text>
   <xsl:value-of select="@field"/>
@@ -310,6 +327,10 @@
   <xsl:text>this</xsl:text>
 </xsl:template>
 
+<xsl:template match="super">
+  <xsl:text>super</xsl:text>
+</xsl:template>
+
 <xsl:template match="new">
   <xsl:text>new </xsl:text>
   <xsl:apply-templates/>
@@ -395,6 +416,11 @@
   <xsl:apply-templates select="*[position() > 1]"/>
 </xsl:template>
 
+<xsl:template match="instanceof-test">
+  <xsl:apply-templates select="*[1]"/>
+  <xsl:text> instanceof </xsl:text>
+  <xsl:apply-templates select="*[2]"/>
+</xsl:template>
 
 <xsl:template match="return">
   <xsl:text>return </xsl:text>
@@ -458,7 +484,23 @@
   <xsl:if test="not(block)">
     <xsl:text>{} </xsl:text>
   </xsl:if>
-  <xsl:call-template name="semicolon-newline"/>
+</xsl:template>
+
+<xsl:template match="finally">
+  <xsl:text>finally </xsl:text>
+  <xsl:apply-templates/>
+</xsl:template>
+
+<xsl:template match="synchronized">
+  <xsl:text>synchronized </xsl:text>
+  <xsl:apply-templates select="expr"/>
+  <xsl:apply-templates select="block"/>
+</xsl:template>
+
+<xsl:template match="expr">
+  <xsl:text>(</xsl:text>
+  <xsl:apply-templates/>
+  <xsl:text>)</xsl:text>
 </xsl:template>
 
 <xsl:template match="break">
