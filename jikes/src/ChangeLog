@@ -1,3 +1,18 @@
+Wed Feb 16 17:57:35 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Use new switch-block element, added a newline
+	after the switch expression is printed.
+
+Wed Feb 16 11:24:21 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp:  Added outer java-source-program element, and
+	make old java-source-program into java-class-file;  supports
+	pseudo-catting together of various .xml files into a bigger
+	database of code.  Handle instance-initializers by checking for
+	top-level blocks even w/ field- and method- declarations when
+	unparsing AstClassBody.  Thanks Stig E. Sando!  Added newlines
+	after static-initializer and this-call close elements.
+
 Tue Feb 15 10:43:29 2000  Greg J. Badros  <gjb@cs.washington.edu>
 
 	* xml-unparse.cpp: Replace attribute "class" w/ "name" in 2nd use
