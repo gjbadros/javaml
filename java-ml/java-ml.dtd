@@ -16,6 +16,7 @@
 <!ENTITY % mod-synchronized "synchronized CDATA #IMPLIED">
 
 <!ENTITY % expr-elems "send|new|new-array|var-ref|field-access|array-ref|paren|assignment-expr|conditional-expr|binary-expr|unary-expr|cast-expr|literal-number|literal-string|literal-char|literal-true|literal-false|literal-null|this|super">
+<!ENTITY % stmt-elems "statements|local-variable|try|throw|if|switch|loop|do-loop|return|continue|break|%expr-elems;">
 
 <!ELEMENT java-source-program (package-decl?,import*,(class|interface)+) >
 <!ATTLIST java-source-program
@@ -58,7 +59,7 @@
     %mod-static;
     %mod-volatile;
     %mod-transient;>
-<!ELEMENT constructor (formal-arguments,throws*,(super-call|this-call)?,statements)>
+<!ELEMENT constructor (formal-arguments,throws*,(super-call|this-call)?,(%stmt-elems;))>
 <!ATTLIST constructor
     name CDATA #REQUIRED
     id ID #REQUIRED
@@ -69,7 +70,7 @@
     %mod-volatile;
     %mod-transient;
     %mod-native;>
-<!ELEMENT method (type,formal-arguments,throws*,statements?)>
+<!ELEMENT method (type,formal-arguments,throws*,(%stmt-elems;)?)>
 <!ATTLIST method 
     name CDATA #REQUIRED
     id ID #REQUIRED
@@ -90,9 +91,9 @@
 <!ELEMENT send (target?,arguments)>
 <!ATTLIST send
     message CDATA #REQUIRED>
+<!ELEMENT statements (%stmt-elems;)*>
 <!ELEMENT target (%expr-elems;)>
-<!ELEMENT return (%expr-elems;)>
-<!ELEMENT statements (statements|local-variable|try|throw|if|switch|loop|do-loop|return|continue|break|%expr-elems;)*>
+<!ELEMENT return (%expr-elems;)?>
 <!ELEMENT throw (%expr-elems;)>
 <!ELEMENT throws EMPTY>
 <!ATTLIST throws
@@ -140,6 +141,8 @@
 <!ATTLIST package-decl
     name CDATA #REQUIRED>
 <!ELEMENT assignment-expr (lvalue,(%expr-elems;))>
+<!ATTLIST assignment-expr
+    op CDATA #REQUIRED>
 <!ELEMENT lvalue (var-set|field-set|%expr-elems;)>
 <!ELEMENT binary-expr ((%expr-elems;),(%expr-elems;))>
 <!ATTLIST binary-expr
@@ -155,25 +158,25 @@
 <!ELEMENT literal-null EMPTY>
 <!ELEMENT if (test,true-case,false-case?)>
 <!ELEMENT test (%expr-elems;)>
-<!ELEMENT true-case (statements)>
-<!ELEMENT false-case (statements)>
+<!ELEMENT true-case (%stmt-elems;)>
+<!ELEMENT false-case (%stmt-elems;)>
 <!ELEMENT array-ref (base,offset)>
 <!ELEMENT base (%expr-elems;)>
 <!ELEMENT offset (%expr-elems;)>
-<!ELEMENT static-initializer (statements)>
+<!ELEMENT static-initializer (%stmt-elems;)>
 <!ELEMENT super-call (arguments)>
 <!ELEMENT this-call (arguments)>
 <!ELEMENT super EMPTY>
 <!ELEMENT this EMPTY>
-<!ELEMENT loop (init*,test?,update*,statements?)>
+<!ELEMENT loop (init*,test?,update*,(%stmt-elems;)?)>
 <!ATTLIST loop
     kind (for|while) #IMPLIED>
 <!ELEMENT init (local-variable|%expr-elems;)>
 <!ELEMENT update (%expr-elems;)>
-<!ELEMENT do-loop (statements?,test?)>
-<!ELEMENT try (statements,catch*,finally?)>
-<!ELEMENT catch (formal-argument,statements?)>
-<!ELEMENT finally (statements)>
+<!ELEMENT do-loop ((%stmt-elems;)?,test?)>
+<!ELEMENT try ((%stmt-elems;),catch*,finally?)>
+<!ELEMENT catch (formal-argument,(%stmt-elems;)?)>
+<!ELEMENT finally (%stmt-elems;)>
 <!ELEMENT continue EMPTY>
 <!ATTLIST continue
     targetname CDATA #IMPLIED>
@@ -181,6 +184,6 @@
 <!ATTLIST break
     targetname CDATA #IMPLIED>
 <!ELEMENT conditional-expr ((%expr-elems;),(%expr-elems;),(%expr-elems;))>
-<!ELEMENT switch ((%expr-elems;),((case|default-case)+,statements)+)>
+<!ELEMENT switch ((%expr-elems;),((case|default-case)+,(%stmt-elems;))+)>
 <!ELEMENT case (%expr-elems;)>
 <!ELEMENT default-case EMPTY>
