@@ -6,6 +6,13 @@ Wed Nov 17 17:24:19 1999  Greg J. Badros  <gjb@cs.washington.edu>
 	possible intention that two (or more) variables should have the
 	same type.
 
+Wed Nov 17 07:35:13 1999    <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Added xml_unhandled() for cases not yet
+	handled.  Unparse implement decls using SzFromUnparse, not
+	ostrstream technique.  Convert ArrayInitializer, Brackets,
+	Interfaces, and Extends nodes (untested!  FIXME comments abound).
+
 Tue Nov 16 16:34:01 1999  Greg J. Badros  <gjb@cs.washington.edu>
 
 	* xml-unparse.cpp (SzIdFromFormalArgument): Hack so idref/id of
@@ -552,7 +559,6 @@ that
 	* Makefile.in (LIBS): added LIBS variable to link with extra libraries (detected by autoconf).
 	* configure.in (LDFLAGS): Added checks for "IBM Classes for Unicode" library.
 
-=======
 1990-10-09  Dave Shields  <shields@watson.ibm.com>
 	* Makefile.in:
 	* code.cpp 
@@ -615,7 +621,6 @@ that
 	unified block stack. This version is known to fail some tests; we are
 	working on this.
 
->>>>>>> 1.89
 1999-09-17    <shields@jikes.watson.ibm.com>
 
 	* jikes.cpp:
