@@ -1,0 +1,12 @@
+#!/bin/sh -
+FNAME=tmp-jtps-$$.xml
+needremoving=false
+if [ x"-" = x"$1" -o x"" = x"$1" ]; then
+  cat > $FNAME
+  needremoving=true
+else
+  FNAME=$1
+fi
+saxon $FNAME `dirname $0`/javaml-to-html.xsl || exit $?
+$needremoving && rm $FNAME
+exit 0
