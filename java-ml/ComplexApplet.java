@@ -12,7 +12,7 @@ public abstract class ComplexApplet extends Applet {
   // this method displays the applet.
   // the Graphics class is how you do all the drawing in Java
   public void paint(Graphics g) {
-    int i, j;
+    int i = 64, j;
     g.drawString("Hello World", 25, 50);
     System.err.println(Math.sqrt(49));
     System.err.println(Math.sqrt(i));
@@ -22,6 +22,10 @@ public abstract class ComplexApplet extends Applet {
   public abstract int foo(Graphics g);
 
   public Object tgt() {
+    for (int i = 0; i < 10; ++i);
+    for (int i = 0; i < 10; ++i) {
+      System.out.println(i);
+    }
     return o;
   }
 
