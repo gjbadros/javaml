@@ -8,8 +8,8 @@ cd back-converted
 print -u2 "Making back-converted/xml-unparsed/$f.xml"
 jikes +ux $f
 print -u2 "Comparing the two (canonicalized) JavaML files..."
-diff -u =(perl -pe 's/locvar-\d+/locvar/g' ../xml-unparsed/$f.xml) \
-        =(perl -pe 's/locvar-\d+/locvar/g' xml-unparsed/$f.xml)  && \
+diff -u =(perl -pe 's/(locvar|frmarg|meth)-\d+/$1/g' ../xml-unparsed/$f.xml) \
+        =(perl -pe 's/(locvar|frmarg|meth)-\d+/$1/g' xml-unparsed/$f.xml)  && \
    echo "Success! No differences found."
 
 
