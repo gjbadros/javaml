@@ -1,0 +1,126 @@
+Sender: gjb@clavicle.cs.washington.edu
+To: "Kastelein, Jan (ELS)" <J.Kastelein@elsevier.nl>
+Subject: Re: COMPNW 2291
+References: <4FAD455E0BA3D31196270008C784DAE2C80C1F@elsamssonyx.elsevier.nl>
+bcc: gjb
+From: "Greg J. Badros" <gjb@cs.washington.edu>
+Date: 03 Apr 2000 09:50:11 -0700
+In-Reply-To: "Kastelein, Jan's message of "Mon, 3 Apr 2000 07:16:58 +0200"
+Message-ID: <qrrhfdjnn7g.fsf@clavicle.cs.washington.edu>
+Lines: 114
+X-Mailer: Gnus v5.6.45/XEmacs 21.1 - "20 Minutes to Nikko"
+---------------------------------------------------------------------
+"Kastelein, Jan (ELS)" <J.Kastelein@elsevier.nl> writes:
+
+> Re: "JavaML: A markup language for Java source code"
+> Our ref. COMPNW 2291  (Ed. nr: #342)
+> 
+> Dear Dr. Badros,
+> 
+> Attached you'll find a PDF file with the page proofs of your WWW9 paper.
+> Would you please check them. We'll need your comments -- by E-mail -- on
+> short notice (ultimately April 5) to be able to meet the Conference
+> deadline. In case your comments do not reach us in time, we will proceed
+> without them.
+> 
+> With kind regards
+> 
+> Jan Kastelein
+
+It *looks* nice, but several mistakes have been introduced in the proof
+that were not in my final submission.  Please have these corrections
+made and forward me another proof so we can work together to be sure
+that the paper is of the highest quality.
+
+Thanks,
+Greg
+
+
+Page 4, right column, 2nd line:
+The XSL comment has been mangled into
+  <!- email DTD ->
+instead of:
+  <!-- email DTD -->
+    ^^           ^^
+The two consecutive hyphens at both the start and the end are necesarry
+for the example to be correct.
+
+Page 4, right column, 4th line:
+The text:
+  "encoding ..."
+is not indented, and it needs to be.  The double-quote should be
+indented as far as the "e" and "%" of the last two lines of that 12
+line example (i.e., under the "T" of "ENTITY" as it currently is, but
+all of the indentations could be reduced to three spaces if needed).
+
+Page 10, right column, about 1/3 down:
+  % sggrep '.*/literal-string' }
+The last character is a typo and needs to be a backslash instead:
+  % sggrep '.*/literal-string' \
+
+Page 10, right column, about 1/2 down:
+All of the literal-string lines that wrapped the "value=" to another
+line need to have that second line indented 3 or 4 spaces.  (There are
+three such lines.)
+
+Page 11, left column, about 1/2 down:
+All of the var-ref lines that wrapped the "idref=" to another line need
+to have that "idref=" line up with the "name=" from the preceding line
+so that the "i" is under the "n".   (There are three such lines.)
+
+Page 11, right column, about 1/2 down:
+The line:
+  % sggrep -q 
+needs a "\" (backslash) added to the end (because the remainder of the
+line got wrapped to the next line.  That remainder of the line should
+get indented so that the "'" (apostrophe) is as close to possible as
+being under the "-" of "-q".
+
+Page 11, right column, about 4/5 down:
+  the two consecutive apostrophes on the third line of the
+
+  % sgrpg '.*/method' \
+          '.*/send[message=drawLine]' \
+          '' '%s %s
+          ^^ these apostrophes
+
+are way to close and they look like a double-quote, not two consecutive
+' characters.
+
+Page 12, left column, about 4/5 down:
+The XSL comment has again been mangled into:
+  <!- mostly do an identity transform ->
+instead of:
+  <!-- mostly do an identity transform -->
+    ^^                                 ^^
+
+The two consecutive hyphens at both the start and the end are necesarry
+for the example to be correct.
+
+
+Page 12, left column, bottom 1/3 of column:
+
+The whole example is missing the indentation that my final submission
+had-- the indentation is extremely helpful to understanding the
+example.  Please see my final submission to correct this.
+
+
+Page 14, figure 4, just over 1/2 down the figure:
+
+  return parseXMLFragment($doc,<<"__END_FRAGMENT__"
+
+should be indented so that the "r" in "return" is under the "#" above it.
+
+Also, the two consecutive "<"s (less-thans) in the above "return..."
+line have been turned into an open French quotation marks -- they must
+be separate "<" characters.
+
+
+Page 19, vitae:
+
+The image of my face does not get rendered properly by Acroread-- I see
+the image appear, but then the mask outline is drawn on top with the
+supposed-to-show-through part drawn in opaque white instead of being
+transparent.  (This may be a bug in Acroread, but please confirm that it 
+prints properly on the device you're doing final typesetting with.)
+
