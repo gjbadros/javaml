@@ -3,6 +3,6 @@ setopt extendedglob
 
 for i in *.java~out.java; do
    print -u2 $i
-   $HOME/jikes-gjb-dev/src/jikes +ux $i
+   jikes +ux $i
    nsgmls-xml -s xml-unparsed/$i.xml
 done
