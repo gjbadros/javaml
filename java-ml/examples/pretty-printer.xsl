@@ -35,6 +35,9 @@
   <xsl:if test="@static">
     <xsl:text>static </xsl:text>
   </xsl:if>
+  <xsl:if test="@final">
+    <xsl:text>final </xsl:text>
+  </xsl:if>
   <xsl:if test="@synchronized">
     <xsl:text>synchronized </xsl:text>
   </xsl:if>
@@ -42,17 +45,16 @@
   <xsl:value-of select="@name"/>
   <xsl:apply-templates select="superclass"/>
   <xsl:if test="count(implement)">
-    <xsl:text> implements </xsl:text>
+    <xsl:text>&#xA;implements </xsl:text>
     <xsl:for-each select="implement">
       <xsl:value-of select="@interface"/>
+      <xsl:if test="not(position()=last())">
+        <xsl:text>, </xsl:text>
+      </xsl:if>
     </xsl:for-each>
   </xsl:if>
   <xsl:text> {&#xa;</xsl:text>
-  <xsl:apply-templates select="interface"/>
-  <xsl:apply-templates select="class"/>
-  <xsl:apply-templates select="constructor"/>
-  <xsl:apply-templates select="method"/>
-  <xsl:apply-templates select="field"/>
+  <xsl:apply-templates select="interface|class|constructor|method|field"/>
   <xsl:text>}&#xa;</xsl:text>
 </xsl:template>
 
@@ -62,22 +64,7 @@
 </xsl:template>
 
 <xsl:template match="field">
-  <xsl:if test="@visibility">
-    <xsl:value-of select="@visibility"/>
-    <xsl:text> </xsl:text>
-  </xsl:if>
-  <xsl:if test="@abstract">
-    <xsl:text>abstract </xsl:text>
-  </xsl:if>
-  <xsl:if test="@static">
-    <xsl:text>static </xsl:text>
-  </xsl:if>
-  <xsl:if test="@synchronized">
-    <xsl:text>synchronized </xsl:text>
-  </xsl:if>
-  <xsl:apply-templates select="type"/>
-  <xsl:text> </xsl:text>
-  <xsl:value-of select="@name"/>
+  <xsl:call-template name="local-variable-or-field"/>
   <xsl:text>;&#xA;</xsl:text>
 </xsl:template>
 
@@ -223,7 +210,9 @@
 
 <xsl:template match="assignment-expr">
   <xsl:apply-templates select="*[1]"/>
-  <xsl:text> = </xsl:text>
+  <xsl:text> </xsl:text>
+  <xsl:value-of select="@op"/>
+  <xsl:text> </xsl:text>
   <xsl:apply-templates select="*[position() > 1]"/>
 </xsl:template>
 
@@ -231,31 +220,48 @@
   <xsl:apply-templates/>
 </xsl:template>
 
-<xsl:template match="local-variable">
+<xsl:template match="local-variable" name="local-variable-or-field">
   <xsl:choose>
     <xsl:when test="not(@FIXMEGJB-continued)">
-    <xsl:if test="@visibility">
-    <xsl:value-of select="@visibility"/>
-    <xsl:text> </xsl:text>
-    </xsl:if>
-    <xsl:if test="@abstract">
-    <xsl:text>abstract </xsl:text>
-    </xsl:if>
-    <xsl:if test="@static">
-    <xsl:text>static </xsl:text>
-    </xsl:if>
-    <xsl:if test="@synchronized">
-    <xsl:text>synchronized </xsl:text>
-    </xsl:if>
-    <xsl:apply-templates select="*[position() = 1]"/>
-    <xsl:text> </xsl:text>
+     <xsl:if test="@visibility">
+      <xsl:value-of select="@visibility"/>
+      <xsl:text> </xsl:text>
+     </xsl:if>
+     <xsl:if test="@abstract">
+      <xsl:text>abstract </xsl:text>
+     </xsl:if>
+     <xsl:if test="@static">
+      <xsl:text>static </xsl:text>
+     </xsl:if>
+     <xsl:if test="@final">
+      <xsl:text>final </xsl:text>
+     </xsl:if>
+     <xsl:if test="@synchronized">
+      <xsl:text>synchronized </xsl:text>
+     </xsl:if>
+     <xsl:apply-templates select="*[position() = 1]"/>
+     <xsl:text> </xsl:text>
     </xsl:when>
   <xsl:otherwise><xsl:text>, </xsl:text></xsl:otherwise>
   </xsl:choose>
   <xsl:value-of select="@name"/>
   <xsl:if test="*[position() > 1]">
     <xsl:text> = </xsl:text>
-    <xsl:apply-templates select="*[position() > 1]"/>
+    <xsl:choose>
+      <xsl:when test="*[last() - position() > 2]">
+  	<xsl:text>{</xsl:text>
+  	<xsl:for-each select="*[position() > 1]">
+  	  <xsl:apply-templates select="."/>
+  	  <xsl:if test="not(position()=last())">
+  	    <xsl:text>, </xsl:text>
+  	  </xsl:if>
+  	</xsl:for-each>
+  	<xsl:text>}</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates select="*[position() > 1]"/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:if>
 </xsl:template>
 
@@ -263,6 +269,10 @@
   <xsl:text>"</xsl:text>
   <xsl:value-of select="."/>
   <xsl:text>"</xsl:text>
+</xsl:template>
+
+<xsl:template match="literal-char">
+  <xsl:value-of select="."/>
 </xsl:template>
 
 <xsl:template match="literal-number">
@@ -281,9 +291,24 @@
   <xsl:text>null</xsl:text>
 </xsl:template>
 
+<xsl:template match="this">
+  <xsl:text>this</xsl:text>
+</xsl:template>
+
 <xsl:template match="new">
   <xsl:text>new </xsl:text>
   <xsl:apply-templates/>
+</xsl:template>
+
+<xsl:template match="new-array">
+  <xsl:text>new </xsl:text>
+  <xsl:apply-templates/>
+</xsl:template>
+
+<xsl:template match="dim-expr">
+  <xsl:text>[</xsl:text>
+  <xsl:apply-templates/>
+  <xsl:text>]</xsl:text>
 </xsl:template>
 
 <xsl:template match="if">
@@ -303,11 +328,23 @@
 
 <xsl:template match="true-case">
   <xsl:apply-templates/>
+  <xsl:if test="not(.//statements)">
+    <xsl:text>;&#xA;</xsl:text>
+  </xsl:if>
 </xsl:template>
 
 <xsl:template match="false-case">
   <xsl:text> else </xsl:text>
   <xsl:apply-templates/>
+  <xsl:if test="not(.//statements)">
+    <xsl:text>;&#xA;</xsl:text>
+  </xsl:if>
+</xsl:template>
+
+<xsl:template match="paren">
+  <xsl:text>(</xsl:text>
+  <xsl:apply-templates/>
+  <xsl:text>)</xsl:text>
 </xsl:template>
 
 <xsl:template match="binary-expr">
@@ -328,6 +365,14 @@
   </xsl:if>
 </xsl:template>
 
+<xsl:template match="cast-expr">
+  <xsl:text>(</xsl:text>
+  <xsl:apply-templates select="type"/>
+  <xsl:text>)</xsl:text>
+  <xsl:apply-templates select="*[position() > 1]"/>
+</xsl:template>
+
+
 <xsl:template match="return">
   <xsl:text>return </xsl:text>
   <xsl:apply-templates/>
@@ -346,11 +391,49 @@
   <xsl:text>; </xsl:text>
   <xsl:apply-templates select="update"/>
   <xsl:text>) </xsl:text>
-  <xsl:apply-templates select="statements"/>
+  <xsl:apply-templates select="*[position() > 3]"/>
+  <xsl:if test="not(.//statements)">
+    <xsl:text>;&#xA;</xsl:text>
+  </xsl:if>
+</xsl:template>
+
+<xsl:template match="loop[@kind='while']">
+  <xsl:text>while </xsl:text>
+  <xsl:apply-templates/>
+  <xsl:if test="not(.//statements)">
+    <xsl:text>;&#xA;</xsl:text>
+  </xsl:if>
+</xsl:template>
+
+<xsl:template match="do-loop">
+  <xsl:text>do </xsl:text>
+  <xsl:apply-templates select="*[last() - position() > 1]"/>
+  <xsl:if test="not(statements)">
+    <xsl:text>{} </xsl:text>
+  </xsl:if>
+  <xsl:text>while </xsl:text>
+  <xsl:apply-templates select="test"/>
 </xsl:template>
 
 <xsl:template match="init|update">
   <xsl:apply-templates/>
 </xsl:template>
+
+<xsl:template match="try">
+  <xsl:text>try </xsl:text>
+  <xsl:apply-templates/>
+</xsl:template>
+
+<xsl:template match="catch">
+  <xsl:text>catch (</xsl:text>
+  <xsl:apply-templates select="formal-argument"/>
+  <xsl:text>)</xsl:text>
+  <xsl:apply-templates select="*[position() > 1]"/>
+  <xsl:if test="not(statements)">
+    <xsl:text>{} </xsl:text>
+  </xsl:if>
+  <xsl:text>&#xa;</xsl:text>
+</xsl:template>
+
 
 </xsl:stylesheet>
