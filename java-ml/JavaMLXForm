@@ -8,7 +8,7 @@
 # target, though it could
 # --11/15/99 gjb
 
-package JavaMLParser;
+package JavaMLXForm;
 use SGML::Parser;
 use SGML::Util;
 @ISA = qw( SGML::Parser );
@@ -61,5 +61,5 @@ sub end_tag {
 #sub parm_entity_ref { }
 #sub error { }
 
-$javaml_parser = new JavaMLParser;
+$javaml_parser = new JavaMLXForm;
 $javaml_parser->parse_data(\*STDIN);
