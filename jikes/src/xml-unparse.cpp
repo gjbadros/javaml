@@ -1600,10 +1600,8 @@ void AstStringLiteral::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstStringLiteral:#" << this-> id << "*/";
     ostrstream xnm; Ostream nm(&xnm);
-    { /* scope */
-      nm.SetExpandWchar(true);
-      nm << lex_stream.NameString(string_literal_token), lex_stream.NameStringLength(string_literal_token);
-    }
+    nm.SetExpandWchar(true);
+    nm << lex_stream.NameString(string_literal_token), lex_stream.NameStringLength(string_literal_token);
     xnm << ends;
     char *szLen = SzNewFromLong(lex_stream.NameStringLength(string_literal_token)-2);
     xml_output(os,"literal-string",
@@ -1618,18 +1616,13 @@ void AstStringLiteral::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstCharacterLiteral::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstCharacterLiteral:#" << this-> id << "*/";
-    {
-      xml_open(os,"literal-char");
-      bool old_expand = os.ExpandWchar();
-#if 0 /* GJB:FIXME:: what is this all about? */
-      os.SetExpandWchar(true);
-      os << lex_stream.NameString(character_literal_token), lex_stream.NameStringLength(character_literal_token);
-      os.SetExpandWchar(old_expand);
-#else
-      os << xml_name_string(lex_stream,character_literal_token);
-#endif
-      xml_close(os, "literal-char", false);
-    }
+    xml_open(os,"literal-char");
+    ostrstream xnm; Ostream nm(&xnm);
+    nm.SetExpandWchar(true);
+    nm << lex_stream.NameString(character_literal_token), lex_stream.NameStringLength(character_literal_token);
+    xnm << ends;
+    OutputLiteralString(os,xnm.str());
+    xml_close(os, "literal-char", false);
     if (Ast::debug_unparse) os << "/*:AstCharacterLiteral#" << this-> id << "*/";
 }
 
