@@ -1,3 +1,134 @@
+Sat Feb 19 13:03:55 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Added SzIdFor() and wrote SzIdFrom*()s in terms 
+	of it.  Have SzIdFor() prepend the filename so that the cat-javaml 
+	script can safely combine multiple .java.xml files into one big
+	database w/o id collisions.
+
+Fri Feb 18 23:24:18 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Permit SzNewEscapedLiteralString() to take NULL 
+	and return NULL.  Add fIgnoreFirstAndLast argument to let it
+	escape comments where the first and last characters *should* be
+	included. (xml_output_with_location): Simplify this proc's 
+	displaying of location information.  Display comments using
+	comment="..." attribute, instead of as PCDATA since DTD's can't
+	verify order of sub-elements for mixed-content elements.
+
+Fri Feb 18 20:54:11 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Include comments as text nodes in the output!
+	Improve comment about FieldDeclaration location unparsing.
+
+	* stream.h, stream.cpp: Added FirstCommentSince() to be less picky 
+	about which comment to return, so I can get at the comment nodes.
+	Make FirstComment() work in terms of FirstCommentSince().
+
+	* jikes.cpp: Mention in the help text that +c also chooses not to
+ 	discard comments in JavaML output.
+
+	* control.cpp: Call SetUpComments() if +c is given before xml unparsing.
+
+Fri Feb 18 16:57:43 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Added xml_output_with_location() and output the
+ 	location information if debug_xml_unparse_ast_show_locations
+ 	option was selected. drop xml_location_element().  Drop
+	xml_unhandled, and use asserts instead. Added location information 
+	to elements: block, method, class, anonymous-class, field,
+	interface, constructor, loop.
+
+	* stream.h: Make control field public so I can look at
+ 	options.debug_xml_unparse_ast_show_locations in XMLUnparse.
+
+	* stream.cpp: get column information if
+	debug_xml_unparse_ast_show_locations is set, as well as if
+	dump_errors is set.
+
+	* option.h, option.cpp, jikes.cpp: Added
+	debug_xml_unparse_ast_show_locations, handle it, document it.
+
+Fri Feb 18 15:57:17 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Make SzIdFrom*() use Ast *pnode instead of a
+	bunch of const char *'s.  This is to be more flexible w.r.t. how
+	the skolem function is mangled together.  Added
+	xml_location_element() and call it to add location sub-elements to 
+	various important elements.  I'm going to switch to using location 
+	attributes on nearly all elements instead, but since this is
+	working now, I want to commit before making those changes.
+
+Wed Feb 16 17:57:35 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Use new switch-block element, added a newline
+	after the switch expression is printed.
+
+Wed Feb 16 11:24:21 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp:  Added outer java-source-program element, and
+	make old java-source-program into java-class-file;  supports
+	pseudo-catting together of various .xml files into a bigger
+	database of code.  Handle instance-initializers by checking for
+	top-level blocks even w/ field- and method- declarations when
+	unparsing AstClassBody.  Thanks Stig E. Sando!  Added newlines
+	after static-initializer and this-call close elements.
+
+Tue Feb 15 10:43:29 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Replace attribute "class" w/ "name" in 2nd use
+	of "superclass" tag that I missed before.
+
+Fri Feb 11 09:06:38 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Replace OutputLiteralString() with
+ 	SzNewEscapedLiteralString() and use the latter to output
+ 	value="..." attributes for literal-string and literal-char
+ 	elements.  Output true/false as literal-boolean w/ value="true" or
+ 	"false" (instead of as separate <literal-true/> and
+ 	<literal-false/> elements.
+
+Tue Feb  8 17:30:11 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp:  Rename FXMLStatementTagNeeded to
+	FXMLBlockTagNeeded and use new global g_fRequireBlockTag to permit 
+	forcing a block tag, as req'd (e.g., the synchronized statement).
+	Output label tags inside of their block, not before them.  Added
+	newlines after close of catch, finally, try, and after open of try.
+
+Tue Feb  8 14:26:22 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Handle AstSynchronizedStatement w/ new
+	synchronized and expr elements.  Added newlines after true-case
+	and false-case for if handling.
+
+Tue Feb  8 13:54:25 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Clean up lots of old, irrelevant FIXMEs.  Drop
+ 	XML_MANGLE_FOR_IDS cond. case. Make SzIdFromMethod always use
+ 	frmarg, and just make sure that catch's formal arguments are id'd
+ 	as local variables.
+
+Mon Feb  7 14:18:10 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Produce nicely-indented XML output using new
+	xml_handle_indent and a couple of global variables.  Just update
+	the indent count in xml_output and xml_close, and set g_fNewline
+	when outputting a newline in xml_nl.  Then print the indent chars
+	if about to open or close a tag and g_fNewline is set.
+
+Sun Feb  6 18:21:31 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Output literal-char using OutputLiteralString
+	routine, expanding wide characters appropriately.  This avoids
+	using ''s and so is more consistent with literal-string's not
+	outputting ""s.
+
+Sun Feb  6 13:30:58 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Use "block" instead of "statements".  Added
+ 	output of array-initializer tag.  Fix memory leak in
+ 	AstStringLiteral.
+
 Sun Feb  6 10:56:08 2000  Greg J. Badros  <gjb@cs.washington.edu>
 
 	* xml-unparse.cpp (xml_name_string): convert < and & on a
