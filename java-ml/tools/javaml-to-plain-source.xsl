@@ -1,9 +1,11 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:xt="http://www.jclark.com/xt"
                 xmlns:saxon="http://icl.com/saxon"
+                xmlns:cvs="http://www.cs.washington.edu/cvs"
                 saxon:trace="no"
                 version="1.0"
-                extension-element-prefixes="saxon xt">
+                extension-element-prefixes="saxon xt"
+		cvs:version="$Id$">
 <!-- javaml-to-plain-source.xsl
      Copyright (C) 2000 by Greg J. Badros <gjb@cs.washington.edu> -->
 
@@ -13,7 +15,7 @@
 
 <xsl:param name="annotate-var-refs-with-type"/>
 
-<xsl:variable name="cchIndent" select="0"/>
+<xsl:variable name="cchIndent" select="0" saxon:assignable="yes"/>
 
 <xsl:output method="text"/>
 
