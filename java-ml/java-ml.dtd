@@ -13,6 +13,9 @@
 <!ENTITY % mod-native "native CDATA #IMPLIED">
 <!ENTITY % mod-abstract "abstract CDATA #IMPLIED">
 <!ENTITY % mod-synchronized "synchronized CDATA #IMPLIED">
+<!ENTITY % location-info 
+	"line CDATA #IMPLIED col CDATA #IMPLIED 
+         end-line CDATA #IMPLIED end-col CDATA #IMPLIED">
 
 <!ENTITY % expr-elems "send|new|new-array|var-ref|field-access|array-ref|paren|assignment-expr|conditional-expr|binary-expr|unary-expr|cast-expr|instanceof-test|literal-number|literal-string|literal-char|literal-boolean|literal-null|this|super">
 <!ENTITY % stmt-elems "block|local-variable|try|throw|if|switch|loop|do-loop|return|continue|break|synchronized|%expr-elems;">
@@ -34,19 +37,22 @@
     %mod-static;
     %mod-abstract;
     %mod-final;
-    %mod-synchronized;>
+    %mod-synchronized;
+    %location-info;>
 <!ELEMENT anonymous-class (superclass?, implement*, (constructor|method|field|instance-initializer)*) >
 <!ATTLIST anonymous-class
     %mod-abstract;
     %mod-final;
-    %mod-synchronized;>
+    %mod-synchronized;
+    %location-info;>
 <!ELEMENT superclass EMPTY>
 <!ATTLIST superclass
     name CDATA #REQUIRED>
 <!ELEMENT interface (extend*, (method|field)*) >
 <!ATTLIST interface
     name CDATA #REQUIRED
-    %interface-visibility-attribute;>
+    %interface-visibility-attribute;
+    %location-info;>
 <!ELEMENT implement EMPTY>
 <!ATTLIST implement
     interface CDATA #REQUIRED>
@@ -60,8 +66,9 @@
     %mod-final;
     %mod-static;
     %mod-volatile;
-    %mod-transient;>
-<!ELEMENT constructor (formal-arguments,throws*,(super-call|this-call)?,(%stmt-elems;))>
+    %mod-transient;
+    %location-info;>
+<!ELEMENT constructor (formal-arguments,throws*,(super-call|this-call)?,(%stmt-elems;)?)>
 <!ATTLIST constructor
     name CDATA #REQUIRED
     id ID #REQUIRED
@@ -71,7 +78,8 @@
     %mod-synchronized;
     %mod-volatile;
     %mod-transient;
-    %mod-native;>
+    %mod-native;
+    %location-info;>
 <!ELEMENT method (type,formal-arguments,throws*,(%stmt-elems;)?)>
 <!ATTLIST method 
     name CDATA #REQUIRED
@@ -83,7 +91,8 @@
     %mod-synchronized;
     %mod-volatile;
     %mod-transient;
-    %mod-native;>
+    %mod-native;
+    %location-info;>
 <!ELEMENT formal-arguments (formal-argument)*>
 <!ELEMENT formal-argument (type)>
 <!ATTLIST formal-argument
@@ -95,6 +104,8 @@
     message CDATA #REQUIRED
     idref IDREF #IMPLIED>
 <!ELEMENT block (label*,(%stmt-elems;)*)>
+<!ATTLIST block
+    %location-info;>
 <!ELEMENT label EMPTY>
 <!ATTLIST label
     name CDATA #REQUIRED>
@@ -187,7 +198,8 @@
 <!ELEMENT this EMPTY>
 <!ELEMENT loop (init*,test?,update*,(%stmt-elems;)?)>
 <!ATTLIST loop
-    kind (for|while) #IMPLIED>
+    kind (for|while) #IMPLIED
+    %location-info;>
 <!ELEMENT init (local-variable|%expr-elems;)*>
 <!ELEMENT update (%expr-elems;)>
 <!ELEMENT do-loop ((%stmt-elems;)?,test?)>
