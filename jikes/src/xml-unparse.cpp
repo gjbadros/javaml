@@ -1266,13 +1266,13 @@ void AstIfStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
     xml_unparse_maybe_var_ref(os,lex_stream,expression);
     xml_close(os,"test",true);
 
-    xml_open(os,"true-case");
+    xml_open(os,"true-case"); xml_nl(os);
     true_statement -> XMLUnparse(os, lex_stream);
     xml_close(os,"true-case",true);
 
     if (false_statement_opt)
       {
-        xml_open(os,"false-case");
+        xml_open(os,"false-case"); xml_nl(os);
 	false_statement_opt -> XMLUnparse(os, lex_stream);
         xml_close(os,"false-case",true);
       }
@@ -1447,16 +1447,13 @@ void AstThrowStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstSynchronizedStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstSynchronizedStatement:#" << this-> id << "*/";
-    os << lex_stream.NameString(synchronized_token);
-    os << " ";
+    xml_open(os,"synchronized");
     AstParenthesizedExpression *parenth = expression -> ParenthesizedExpressionCast();
-    if (!parenth)
-	os << "(";
+    xml_open(os,"expr");
     expression -> XMLUnparse(os, lex_stream);
-    if (!parenth)
-	os << ")";
-    os << "\n";
+    xml_close(os,"expr",true);
     block -> XMLUnparse(os, lex_stream);
+    xml_close(os,"synchronized",true);
     if (Ast::debug_unparse) os << "/*:AstSynchronizedStatement#" << this-> id << "*/";
 }
 
