@@ -148,8 +148,8 @@ an ordinary one and result in an infinite loop:
 </pre>
 </code>
 
-Other, more-concise languages suffer from far more disastrous semantic
-changes stemming from small syntactic errors (the Perl languages is the infamous
+Other, more-concise languages suffer from far more dangerous semantic
+changes stemming from small syntactic errors (the Perl language is the infamous
 example).
 
  <h4><a name="tools">1.1 - Text representation and software tools</a></h4>
@@ -595,7 +595,7 @@ altogether.
 
 <h4><a name="chosen-representation">3.1 - The chosen representation</a></h4>
 
-The prototype JavaML representation we have chosen aims to model the
+The prototype JavaML representation I have chosen aims to model the
 programming language constructs of Java (and, indeed, similar
 object-oriented programming languages) independently of the specific
 syntax of the language.  One can easily imagine a SmalltalkML that would 
@@ -662,7 +662,9 @@ though.  In the above, notice the use of the formal-argument
 <code>g</code> in line 17 as the target of the message send.  The
 <code>idref</code> attribute of that <code>var-ref</code> tag points
 back at the referenced <code>formal-argument</code> element (through its
-<code>id</code> attribute).  This linking is standard XML, thus XML
+<code>id</code> attribute).  (The <code>id</code> value chosen for
+a to-be-referenced element must be unique within a document so each is branded with
+integers to keep the values distinct.)  This linking is standard XML, thus XML
 tools are able to trace from a variable use to its definition to, e.g.,
 obtain the type of the variable.  Similar linking is done for local
 (block-declared) variables.  In JavaML, variable references are easy to
@@ -759,7 +761,7 @@ Here, there probably is <em>not</em> the implicit desire that the two
 variables have the same type, but instead the shorthand syntax is being
 used simply for brevity.  Since it is hard to automate distinguishing
 these cases, JavaML simply preserves this syntactic feature by using a
-<code>continuation="true"</code> attribute on variable declarations that
+<code>continued="true"</code> attribute on variable declarations that
 exploit this shorthand.
 
 The careful reader will observe that the JavaML representation is 
@@ -908,11 +910,11 @@ representation of the program:
 &lt;literal-string length='6'&gt; }\n&lt;/literal-string&gt;
 </pre>
 
-Notice that the output of <code>sggrep</code> is also an XML document.
-Thus we can string together SGML and XML tools in a Unix pipeline to
-combine tools in novel and useful ways.  For example, if we want to just
-see the strings, we can run <code>stripsgml</code> on the output of the
-above query:
+Notice that the output of <code>sggrep</code> is also a (not necessarily
+valid nor even well-formed) XML document.  Thus we can string together
+SGML and XML tools in a Unix pipeline to combine tools in novel and
+useful ways.  For example, if we want to just see the strings, we can
+run <code>stripsgml</code> on the output of the above query:
 
 <pre>
 <strong>
@@ -1012,9 +1014,9 @@ documents.  More powerful transformations are
 possible using XSLT <cite>[XSLT]</cite>, DSSSL <cite>[DSSSL]</cite>, or
 directly manipulating the document using a DOM (Document Object Model)
 <cite>[DOM]</cite> interface.  For example, we can rename methods named
-      <code>isBall</code> to <code>FIsBall</code> using the Perl package 
-      <code>XML::DOM</code> and the following as the
-      <code>start_tag</code> subroutine:
+<code>isBall</code> to <code>FIsBall</code> using the Perl package 
+<code>XML::DOM</code> and the following as the
+<code>start_tag</code> subroutine:
 
 <pre>
 sub start_tag { 
@@ -1320,7 +1322,7 @@ fellowship and by NSF Grant No. IIS-9975990.
 &lt;!ATTLIST new-array dimensions CDATA #REQUIRED&gt;
 &lt;!ELEMENT dim-expr (%expr-elems;)&gt;
 &lt;!ELEMENT local-variable (type,(static-initializer|%expr-elems;)?)&gt;
-&lt;!ATTLIST local-variable name CDATA #REQUIRED id ID #REQUIRED continuation
+&lt;!ATTLIST local-variable name CDATA #REQUIRED id ID #REQUIRED continued
     CDATA #IMPLIED %mod-final;&gt;
 &lt;!ELEMENT arguments (%expr-elems;)*&gt;
 &lt;!ELEMENT literal-string (#PCDATA)&gt;
