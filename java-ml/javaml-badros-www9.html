@@ -98,7 +98,7 @@ computation.  Over the years, techniques have been developed that
 largely mechanize the front-end of compilers which perform the lexical
 analysis and parsing necessary to uncover the structure of programming
 language constructs represented as plain text.  Tools such as Lex/Flex
-and Yacc/Bison <cite>[LexYacc]</cite> automate these uninteresting tasks
+and Yacc/Bison <cite>[<a href="#REF-LexYacc">LexYacc</a>]</cite> automate these uninteresting tasks
 by using well-founded concepts of regular expressions and
 grammars. Regular expressions describe how individual characters combine
 to form tokens, and the grammar enumerates how higher-level constructs
@@ -214,7 +214,7 @@ sacrifices flexibility.  IDEs generally provide only a limited set of
 capabilities and extending those is hard.  Additionally, analyses and
 transformation on source code are often hard to automate or perform in
 batch using existing interactive environments.  Some more advanced
-IDEs, such as IBM VisualAge for C++ <cite>[Montana]</cite>, expose an
+IDEs, such as IBM VisualAge for C++ <cite>[<a href="#REF-Montana">Montana</a>]</cite>, expose an
 application programming interface to the representation of the program.
 Though an improvement, this technique still suffers from an inability
 to separate simple tools from a complex environment and additionally
@@ -291,7 +291,7 @@ features of the two technologies it builds a bridge between: Java and XML.
     programming language for World Wide Web applications.  Java combines
     a simple object model reminiscent of Smalltalk with Algol block
     structure, a C++-like syntax, a static type system, and a package
-    system inspired by Modula-2. <cite>[Java,JavaNutshell]</cite>
+    system inspired by Modula-2. <cite>[<a href="#REF-Java">Java</a>,<a href="#REF-JavaNutshell">JavaNutshell</a>]</cite>
 
 <p>
 
@@ -332,16 +332,16 @@ features of the two technologies it builds a bridge between: Java and XML.
 
   <h4><a name="xml">2.2 - XML: Extensible Markup Language</a></h4>
 
-XML is a standardized eXtensible Markup Language <cite>[XML]</cite> 
+XML is a standardized eXtensible Markup Language <cite>[<a href="#REF-XML">XML</a>]</cite> 
 that is a subset of
-SGML, the standard Generalized Markup Language <cite>[SGML]</cite>.  The World Wide Web
+SGML, the standard Generalized Markup Language <cite>[<a href="#REF-SGML">SGML</a>]</cite>.  The World Wide Web
 Consortium (W3C) designed XML to be lightweight and simple, while
 retaining compatibility with SGML.  Though HTML (HyperText Markup
 Language) is currently the standard language, the W3C is positioning XML
 to be its replacement.  While HTML permits authors to use only a
 pre-determined fixed set of tags in marking up their document, XML
 allows easy specification of user-defined markup tags adapted to the
-document and data at hand. <cite>[LaTeXWeb,XML-Handbook]</cite>
+document and data at hand. <cite>[<a href="#REF-LaTeXWeb">LaTeXWeb</a>,<a href="#REF-XML-Handbook">XML-Handbook</a>]</cite>
 
 <p>
 
@@ -467,10 +467,10 @@ such as Emacs editing modes, structure-based editors, DTD parsers and
 editors, validation utilities, querying systems, transformation and
 style languages, and many more tools.  Numerous other W3C recommendations
 inter-relate to XML including Cascading Style Sheets
-<cite>[CSS2]</cite>, XSL (Extensible Stylesheet Language)
-<cite>[XSL]</cite> and XSLT (XSL for Transformations)
-<cite>[XSLT]</cite>, XPath <cite>[XPath]</cite>, and DOM (Document
-Object Model) <cite>[DOM]</cite>.
+<cite>[<a href="#REF-CSS2">CSS2</a>]</cite>, XSL (Extensible Stylesheet Language)
+<cite>[<a href="#REF-XSL">XSL</a>]</cite> and XSLT (XSL for Transformations)
+<cite>[<a href="#REF-XSLT">XSLT</a>]</cite>, XPath <cite>[<a href="#REF-XPath">XPath</a>]</cite>, and DOM (Document
+Object Model) <cite>[<a href="#REF-DOM">DOM</a>]</cite>.
 
 <p><span class="index"><a href="#top">[top]</a>
 
@@ -581,7 +581,7 @@ This is a huge step towards a more useful markup language.
 We have definitely added value to the source code
 and it is trivial to convert back to the classical representation: we simply
 remove all tags and leave the content of the elements behind (this is
-exactly what the <code>stripsgml</code> <cite>[PerlSGML]</cite> utility
+exactly what the <code>stripsgml</code> <cite>[<a href="#REF-PerlSGML">PerlSGML</a>]</cite> utility
 does).  Though this representation seems useful for many tasks, it still
 has some problems.  First, many of the details of the code are included
 in the textual content of elements.  If we want to determine what
@@ -777,7 +777,7 @@ for tools, though still accessible and readable to developers.
 To experiment with the design of JavaML and gain experience in using the
 representation, it was essential to implement a converter from the Java
 classical source representation to JavaML.  Within the IBM Jikes Java
-compiler framework <cite>[Jikes]</cite>, I added an
+compiler framework <cite>[<a href="#REF-Jikes">Jikes</a>]</cite>, I added an
 <code>XMLUnparse</code> method to each of the AST nodes. This change,
 along with some small additional code for managing the options to
 request the XML output, results in an incredibly robust and fast 
@@ -790,7 +790,7 @@ available shortly after final submission of this paper).
 
 The converter has been tested by converting several sample programs, as
 well as the whole of the 4300 line Cassowary Constraint Solving Toolkit
-<cite>[Cassowary]</cite>.  The processing of all those files takes only
+<cite>[<a href="#REF-Cassowary">Cassowary</a>]</cite>.  The processing of all those files takes only
 about six seconds on the author's RedHat6-based Pentium III-450 machine.
 Each of the files converted was then validated with respect to the
 JavaML DTD using James Clark's Jade package's <code>nsgmls</code> tool.
@@ -820,15 +820,15 @@ only three tool groups:
 
 <ul>
 <li> the XML toolbox (ltxml) from Edinburgh University
-<cite>[ltxml]</cite> which contains <code>sgcount</code>,
+<cite>[<a href="#REF-ltxml">ltxml</a>]</cite> which contains <code>sgcount</code>,
 <code>sgrpg</code>, <code>sggrep</code>, and more;
 
-<li> the perlSGML utilities <cite>[perlSGML]</cite> <!--Earl Hood--> which
+<li> the perlSGML utilities <cite>[<a href="#REF-perlSGML">perlSGML</a>]</cite> <!--Earl Hood--> which
 contains <code>dtd2html</code>, <code>dtddiff</code>,
 <code>dtdtree</code>, and more; and
 
-<li> the Perl XML::DOM package <cite>[perlDOM]</cite> which exposes a
-DOM level 1 <cite>[DOM]</cite> interface to an XML tree.
+<li> the Perl XML::DOM package <cite>[<a href="#REF-perlDOM">perlDOM</a>]</cite> which exposes a
+DOM level 1 <cite>[<a href="#REF-DOM">DOM</a>]</cite> interface to an XML tree.
 </ul>
 
 These are just a very small subset of the tools that prove useful
@@ -983,7 +983,7 @@ trivial thanks to the JavaML representation:
 The <code>sgrpg</code> (SGML RePort Generator) program permits combining
 a top-level query with a restriction on the children and an output
 format for the results (a common paradigm for querying tools 
-<cite>[XMLQL-EnE]</cite>).  For example:
+<cite>[<a href="#REF-XMLQL">XMLQL</a>-EnE]</cite>).  For example:
 
 <pre>
 <strong>
@@ -1012,9 +1012,9 @@ Transformations on source code are also very useful when modifying and
 evolving software artifacts.  Obviously, querying tools can only prune
 elements from the source document or combine elements from multiple 
 documents.  More powerful transformations are
-possible using XSLT <cite>[XSLT]</cite>, DSSSL <cite>[DSSSL]</cite>, or
+possible using XSLT <cite>[<a href="#REF-XSLT">XSLT</a>]</cite>, DSSSL <cite>[<a href="#REF-DSSSL">DSSSL</a>]</cite>, or
 directly manipulating the document using a DOM (Document Object Model)
-<cite>[DOM]</cite> interface.  For example, we can rename methods named
+<cite>[<a href="#REF-DOM">DOM</a>]</cite> interface.  For example, we can rename methods named
 <code>isBall</code> to <code>FIsBall</code> using the Perl package 
 <code>XML::DOM</code> and the following as the
 <code>start_tag</code> subroutine:
@@ -1083,7 +1083,7 @@ tools with varying degrees of success.
 
 <p>
 
-TAWK <cite>[Griswold96]</cite> extends the AWK <cite>[Awk]</cite>
+TAWK <cite>[<a href="#REF-Griswold96">Griswold96</a>]</cite> extends the AWK <cite>[<a href="#REF-Awk">Awk</a>]</cite>
 paradigm by matching patterns in the AST of a C program.  Numerous XML
 querying tools provide this same functionality for JavaML, and the
 event-action framework is similar to that used by SAX 
@@ -1091,7 +1091,7 @@ event-action framework is similar to that used by SAX
 
 <p>
 
-ASTLog <cite>[Crew97]</cite> extends the ProLog <cite>[Prolog]</cite>
+ASTLog <cite>[<a href="#REF-ASTLog">ASTLog</a>]</cite> extends the ProLog <cite>[<a href="#REF-Prolog">Prolog</a>]</cite>
 logic programming language with the ability to reason about an external
 database that models the AST.  Unlike ProLog, ASTLog statements are
 evaluated with respect to a current object.  The approach that Crew uses
@@ -1101,7 +1101,7 @@ perhaps less convenient) framework.
 
 <p>
 
-CCEL <cite>[Meyers??]</cite> provides a metalanguage for expressing
+CCEL <cite>[<a href="#REF-CCEL">CCEL</a>]</cite> provides a metalanguage for expressing
 non-linguistic intentions (i.e., ones that cannot be expressed in the
 language) about software artifacts written in C++.  JavaML can provide a
 similar capability by simply writing queries that search for violations
@@ -1118,7 +1118,7 @@ importance of XML technology.
 -->
 <p>
 
-Microsoft's Intentional Programming group <cite>[Simonyi96]</cite> has
+Microsoft's Intentional Programming group <cite>[<a href="#REF-Simonyi96">Simonyi96</a>]</cite> has
 long been working on a more abstract representation of computation that
 is syntax-independent.  Their goal appears to be to permit developers to
 describe new abstractions along with techniques to reduce those
@@ -1167,7 +1167,7 @@ more possibilities are imaginable.
 JavaML should be refined to guarantee that it is a complete, isomorphic
 representation of the constructs present in the latest version of the
 Java programming language.  Additionally, it is likely beneficial to
-migrate JavaML to use XML Schema <cite>[XMLSchema1,XMLSchema2]</cite>
+migrate JavaML to use XML Schema <cite>[<a href="#REF-XMLSchema1">XMLSchema1</a>,<a href="#REF-XMLSchema2">XMLSchema2</a>]</cite>
 instead of a DTD after the Schema working drafts are finalized.
 
 <p>
@@ -1178,7 +1178,7 @@ applied to other programming languages, or even to translate among
 languages.  To the extent that the representation abstracts away syntax,
 JavaML may also prove useful in permitting the import of visual
 representations such as Unified Modeling Language 
-diagrams <cite>[UMLNutshell,XMI]</cite>.  
+diagrams <cite>[<a href="#REF-UMLNutshell">UMLNutshell</a>,<a href="#REF-XMI">XMI</a>]</cite>.  
 Certainly generating visual representations of important
 properties of software artifacts is on the immediate horizon given the
 capabilities of XSL and DSSSL.
@@ -1191,7 +1191,7 @@ preprocessor.  The C preprocessor provides a first pass of textual
 processing to permit abstractions that cannot otherwise be expressed in
 the core C++ language.  These abstractions are often very important to
 the understandability and maintainability of the code, but do not interact
-well with parsing techniques. <cite>[EmpAnCpp,PCP3]</cite>
+well with parsing techniques. <cite>[<a href="#REF-EmpAnCpp">EmpAnCpp</a>,<a href="#REF-PCP3">PCP3</a>]</cite>
 
 <p>
 
@@ -1199,7 +1199,7 @@ The current converter that translates back from JavaML to the classical
 source representation needs to be far more robust.  It was written as
 only a proof of concept and for the author to gain experience with the
 XML DOM.  A better approach is to add a Jikes front-end that uses an XML
-parser (e.g., XML4C++ <cite>[XML4C++]</cite>) to construct the XML
+parser (e.g., XML4C++ <cite>[<a href="#REF-XML4C">XML4C</a>++]</cite>) to construct the XML
 DOM from the JavaML source, then simply write a recursive conversion
 function to build the Jikes internal AST from using the DOM API.  Then,
 using Jikes's pre-existing conventional unparser, the compiler can write
