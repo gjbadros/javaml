@@ -94,7 +94,7 @@ called an \emph{abstract syntax tree} (AST) which more directly reflects
 the structure of the source program.
 
 The textual representation of source code has several nice properties.
-It can be concise and is similar to natural languages, often making it
+It is fairly concise and is similar to natural languages, often making it
 easy to read.  Text is a universal data format thus making source code
 easy to exchange and manipulate using a wide variety of tools including
 text editors, version control systems, and command pipeline utilities
@@ -113,21 +113,11 @@ very robust.  A small change in the source code can have a dramatic
 effect on the resulting AST and, thus, the semantics of the computation.
 For example, a single extraneous semicolon can change a looping block
 into an ordinary one and result in an infinite loop.
-%% IGNORE
-\ignore{
-{\small
-\begin{verbatim}
-  int i = 10;
-  while (i > 0); {
-    /* ... */ --i;
-  }
-\end{verbatim}
-}
-%% END-IGNORE
-}
 Other, more concise, languages may suffer from far more dangerous
 semantic changes stemming from small syntactic errors (the Perl language
-is the infamous example).
+is the infamous example).  Because the source structure is not
+determined until compile-time, ambiguities and mistakes from simple
+syntactic discrepancies are discovered later than ideal.
 
 \subsection{Text representation and software tools}
 
@@ -137,7 +127,7 @@ only after parsing.  This shortcoming forces language-specific parsing
 functionality to be duplicated in every tool that needs to reason about
 the program beyond its lexical nature.  Compilers, by necessity, must
 work with the AST, but numerous other software-engineering tools would
-perform better with access to the structured representation of the
+perform better with access to a structured representation of the
 source code.  Unfortunately, many software-engineering tools do not
 embed a parser and thus are limited to lexical tasks.
 
@@ -149,7 +139,7 @@ implementation, working with the resulting AST is not always intuitive.
 An AST typically reflects quirky artifacts of the grammar rather than
 representing the programming-level constructs directly.  Additionally,
 embedding the front-end of a compiler may be deemed overkill when
-targeting a simple analysis that can do "well enough" with lexical
+targeting a simple analysis that can do ``well enough'' with lexical
 information.
 
 Other complications arise if a transformation of the source code is
@@ -158,10 +148,12 @@ classical source representation because that is the primary long-term
 storage format.  Recreating a text representation from an AST is most
 straightforwardly done using an unparsing approach that can create
 undesired lexical side effects (e.g., changes in indentation or
-whitespace) that confuse the other lexical tools that a developer relies
-upon (e.g., a version control system that is unable to disambiguate
+whitespace).  Such changes can confuse the other lexical tools that a developer relies
+upon.  For example, a version control system is unable to disambiguate
 between a meaningful change and a gratuitous one effected
-unintentionally).  Finally, using a parser in a tool necessarily targets
+unintentionally.  
+
+Finally, using a parser in a tool necessarily targets
 that tool to a specific language, thus reducing its applicability and
 generality.  Worse, because there is no standard structured external
 representation of a source program, supporting inter-operability of
@@ -192,9 +184,9 @@ dependency on proprietary technology that may be undesirable.
 
 \subsection{A solution}
 
-One of the fundamental problems underlying the above difficulties is the
+One of the fundamental issues underlying the above problems is the
 lack of a canonical structured representation of the source code.  We
-need a universal format for directly representing the structure that
+need a universal format for directly representing program structure that
 software tools can easily analyze and manipulate.  The key observation
 is that XML, the eXtensible Markup Language~\cite{XML}, provides exactly
 this capability and is an incredibly empowering complementary
@@ -208,7 +200,7 @@ correspondence between the elements and their attributes and the
 programming language constructs they model.  The structure of the source
 program is reflected in the nesting of elements in the JavaML document.
 With this representation, we can then leverage the wealth of tools for
-manipulating and querying XML and SGML documents to provide a rich
+manipulating and querying XML and SGML documents to provide a rich, open
 infrastructure for software engineering transformations and analyses on
 Java source code.
 
@@ -216,8 +208,8 @@ JavaML is well-suited to be used as a canonical representation of Java
 source code for tools.  It shares most of the strengths of the classical
 representation and overcomes many weaknesses.  The next section
 describes relevant features of Java and XML and section~\ref{sec-javaml}
-details the markup language and the implementation of a converter from
-the classical representation to JavaML.  Section~\ref{sec-leveraging}
+details the markup language and the implementations of converters between
+the classical representation and JavaML.  Section~\ref{sec-leveraging}
 gives numerous examples of how existing XML and SGML tools can be
 exploited to perform source code analyses and transformations on the
 richer representation provided by JavaML.  Sections~\ref{sec-related}
@@ -255,7 +247,7 @@ As in most other object-oriented (OO) languages, the primary unit of
 decomposition in Java is a \emph{class} which specifies the behaviour of
 a set of objects.  Each class can define several \emph{methods}, or
 behaviours, similar to functions or procedures. A class can also define
-\emph{fields}, or state variables, that are associated with "instances"
+\emph{fields}, or state variables, that are associated with \emph{instances}
 of the class called \emph{objects}. Classes can inherit behaviour and
 state from \emph{superclasses}, thus forming a hierarchy of
 inter-related classes that permits factoring related code into classes
@@ -270,7 +262,7 @@ instance of a \smtexttt{Ball} class.  This ability to behave differently
 upon receipt of the same message is largely responsible for the
 extensibility benefits touted by the OO community.
     
-%% Java also is free from "parsing state" like "public:" and "private:" in c++
+%% Java also is free from ``parsing state'' like "public:" and "private:" in c++
 
 Java is being widely used both in industry and in education, and it
 remains popular as a programming language on the web.  Unlike C++, a
@@ -287,7 +279,7 @@ representing using XML.\footnote{The applicability of this approach to
 \subsection{XML: Extensible Markup Language}
 
 XML is a standardized eXtensible Markup Language~\cite{XML} that is a
-subset of SGML, the standard Generalized Markup Language~\cite{SGML}.
+subset of SGML, the Standard Generalized Markup Language~\cite{SGML}.
 The World Wide Web Consortium (W3C) designed XML to be lightweight and
 simple, while retaining compatibility with SGML.  Although HTML
 (HyperText Markup Language) is currently the standard web document
@@ -362,7 +354,7 @@ element must contain exactly one \smtexttt{head} followed by exactly one
 \smtexttt{body} element.  The \smtexttt{head}, in turn, must contain one
 or more \smtexttt{to} elements and then a \smtexttt{from} element,
 followed by an optional \smtexttt{subject} element.  The order of the
-elements must be as specified---order \emph{does} matter. Each of those
+elements must be as specified. Each of those
 elements may contain text (also know as \emph{parsed character data} or
 \smtexttt{PCDATA}).  The single \smtexttt{ATTLIST} declaration in the
 DTD specifies that the \smtexttt{body} element \emph{may} specify a
@@ -376,7 +368,7 @@ substituted as is into the following \smtexttt{ATTLIST} declaration
 
 An XML document that is declared to adhere to this DTD is not valid if
 any of the above criteria are not met.  For example, if the
-\smtexttt{to} element is missing from an \smtexttt{email} document, that
+\smtexttt{from} element is missing from an \smtexttt{email} document, that
 document is not valid, though it may still be well-formed.
 
 When modeling data in XML, a primary design decision is choosing whether
@@ -397,8 +389,8 @@ specific order;
       
 \item only one value for an attribute can be given, while multiple
       elements of the same class can be included by a parent element
-      (e.g., we could have multiple \smtexttt{to} elements contained by
-      the \smtexttt{head} with only a simple change to the DTD).
+      (e.g., we can have multiple \smtexttt{to} elements contained by
+      the \smtexttt{head}).
 
 \end{itemize}
 
@@ -430,13 +422,17 @@ The Java Markup Language provides a complete self-describing
 representation of Java source code.  Unlike the conventional
 character-based representation of programs, JavaML reflects the
 structure of the software artifact directly in the nesting of elements
-in the XML-based syntax.  Because XML is a text-based representation,
+in the XML-based syntax.  Additionally, it represents extra edges in the 
+program graph using the \smtexttt{id} and \smtexttt{idref} linking
+capabilities of XML.
+
+Because XML is a text-based representation,
 many of the advantages of the classical source representation remain.
-Because JavaML is an XML application, JavaML is easy to parse, and all
+Because JavaML is an XML application, it is easy to parse, and all
 existing tools for working with XML can be applied to Java source code
 in its JavaML representation.  JavaML tools can leverage the existing
 infrastructure and exploit the canonical representation to improve
-inter-operability among tools.
+their inter-operability.
 
 \subsection{Possible approaches}
 
@@ -486,20 +482,21 @@ of the above might result in the below XML \emph{for just the first line
   </ImportDeclarations>
  </ImportDeclarationsopt>
 ...
-<compilation-unit>
+</compilation-unit>
 \end{verbatim}
 
 Certainly this translation is far from ideal: it is unacceptably
-verbose, exposes numerous uninteresting details of the underlying
-grammar that was used to do the initial parse from the classical source
-representation and would be difficult to work with because of the
-excessive number of nodes.
+verbose and exposes numerous uninteresting details of the underlying
+grammar that was used to parse the classical source
+representation.  This format would be difficult to work with because of
+these problems.
 
 An alternate possibility is to literally mark-up the Java source program
 without changing the text of the program (i.e., to only add tags).  This
 approach might convert the \smtexttt{FirstApplet.java} implementation
 to:
 
+{\small
 \begin{verbatim}
 <java-source-program>
 <import-declaration>import java.applet.*;
@@ -528,6 +525,7 @@ to:
 </class-declaration>
 </java-source-program>
 \end{verbatim}
+}
 
 This format is a huge step towards a more useful markup language.  We
 have definitely added value to the source code and it is trivial to
@@ -560,7 +558,7 @@ the resulting markup language.
 JavaML is defined by the document type definition (DTD) in
 appendix~\ref{app-javaml-dtd}, but is best illustrated by example.  For the
 \smtexttt{FirstApplet.java} source code listed above, we represent the
-program in JavaML as show in figure~\ref{fig-firstapplet-javaml}.
+program in JavaML as shown in figure~\ref{fig-firstapplet-javaml}.
 
 \begin{figure*}[p]
 \begin{listing}{1}
@@ -582,7 +580,7 @@ program in JavaML as show in figure~\ref{fig-firstapplet-javaml}.
         <send message="drawString">
           <target><var-ref name="g" idref="frmarg-13"/></target>
             <arguments>
-              <literal-string length="11">FirstApplet</literal-string>
+              <literal-string value="FirstApplet"/>
               <literal-number kind="integer" value="25"/>
               <literal-number kind="integer" value="50"/>
             </arguments>
@@ -596,16 +594,16 @@ program in JavaML as show in figure~\ref{fig-firstapplet-javaml}.
 \label{fig-firstapplet-javaml}}
 \end{figure*}
 
-In the above document, concepts such as methods, superclasses, message
+In JavaML, concepts such as methods, superclasses, message
 sends, and literal numbers are all directly represented in the elements
-and attributes of the representation.  The representation reflects the
+and attributes of the document contents.  The representation reflects the
 structure of the programming language in the nesting of the elements.
-For example, the literal string "FirstApplet" is a part of the message
+For example, the literal string \smtexttt{"FirstApplet"} is a part of the message
 send, thus the \smtexttt{literal-string} element is nested inside the
 \smtexttt{send} element.  This nesting is even more apparent when
 presented visually as in figure~\ref{fig-treeview}. See
  the author's JavaML web page~\cite{Badros-javaml}
-for further examples.
+for further more-complex examples.
 
 \begin{figure*}[p]
 \begin{centering}
@@ -633,11 +631,12 @@ to-be-referenced element must be unique within a document so each
 identifier is branded with an integer to keep the values distinct.)
 This linking is standard XML, thus XML tools are able to trace from a
 variable use to its definition to, e.g., obtain the type of the
-variable.  Similar linking is done for local (block-declared) variables.
-In JavaML, variable references are easy to locate because of their
-distinguishing \smtexttt{var-ref} tag.  Additionally, they are
-disambiguated from an assignment to a variable which is converted into a
-\smtexttt{var-set} tag.
+variable.  Similar linking is done for local (block-declared) variables, 
+and more could be done for other edges in the program structure graph.
+Although a single \smtexttt{var-use} tag would suffice for denoting any
+mention of a variable, JavaML instead disambiguates between references to
+variable values and variables used as lvalues using \smtexttt{var-ref}
+elements for the former, and \smtexttt{var-set} for the latter.
 
 Throughout JavaML, attributes of elements are used whenever the
 structure of the value can never be more complex than a simple text
@@ -645,11 +644,11 @@ string.  Attributes are used for modifiers such as
 \smtexttt{synchronized} and \smtexttt{final} and for visibility settings
 such as \smtexttt{public} or \smtexttt{private}.  Attributes are not
 used for properties such as types because types have some structure: a
-type can consist of a base name and a number of dimensions, and could
+type can consist of a base name and a number of dimensions, and it could
 also reference the definition of the class that implements the type, if
 desired.  If, say, a return type were just the value of an attribute on
 the method element, the end user would unacceptably have to do string
-processing on the attribute's value "\smtexttt{int[][]}" to determine
+processing on the attribute's value ``\smtexttt{int[][]}'' to determine
 that the base type of that two-dimensional array was the primitive type
 \smtexttt{int}.  Instead, types are modeled as explicit child elements
 such as \smtexttt{<type name="int" dimensions="2">}.
@@ -710,11 +709,12 @@ three times longer than the classical source code.  That expansion is a
 fundamental tradeoff of moving to a self-describing data format such as
 XML.  It is important that the terse classical representation can be
 employed by programmers in certain tasks including ordinary development
-and program editing.  JavaML is complementary to the classical source
-representation and is especially appropriate for tools, though it is
-still accessible and readable to developers.
+and program editing (though perhaps JavaML may be the underlying
+representation).  JavaML is complementary to classical source
+code and is especially appropriate for tools while remaining
+accessible to and directly readable by developers.
 
-\subsection{Implementation of converter}
+\subsection{Implementation of converters}
 
 To experiment with the design of JavaML and gain experience in using the
 representation, it was essential to implement a converter from the Java
@@ -729,16 +729,19 @@ support JavaML.
 
 The converter has been tested by converting 15,000 lines of numerous
 sample programs including the 4300 line Cassowary Constraint Solving
-Toolkit~\cite{CassoInI} and over 20 applets~\cite{SunApplets}.  Each of
+Toolkit~\cite{CassoInI} and over twenty diverse applets~\cite{SunApplets}.  Each of
 the files converted was then validated with respect to the JavaML DTD
 using James Clark's Jade package's \smtexttt{nsgmls} tool~\cite{Jade}.
 The processing of the entire regression test takes only about twelve
 seconds on the author's RedHat6-based dual Pentium III-450 machine.
 
-Also implemented is an XSLT stylesheet that outputs the
-classical source representation given the JavaML representation. The
-style sheet has been tested with XT~\cite{Clark-XT} and consists of 58
-template rules and just under 500 lines of code. 
+Also implemented is an XSLT stylesheet that outputs the classical source
+representation given the JavaML representation. The style sheet has been
+tested with XT~\cite{Clark-XT} and consists of 65 template rules and
+just under 600 lines of code.  It was tested on numerous programs by
+processing a file to JavaML, back-converting it, and then re-converting
+to JavaML: no differences should exist between the result and the
+originally-converted JavaML file.
 
 All of the source code is available from the JavaML home
 page~\cite{Badros-javaml}.
@@ -756,7 +759,7 @@ SGML and XML tools can be used, combined, and extended.  XML tools
 encompass a broad range of features that include querying and
 transformation, document differencing and merging~\cite{XMLDiffMerge},
 and simple APIs for working with the document directly.  In this paper,
-I will (for space reasons) limit discussion to uses of only four tool
+I will (for space reasons) limit discussion to uses of only three tool
 groups:
 
 \begin{itemize}
@@ -764,12 +767,8 @@ groups:
 which contains \smtexttt{sgcount},
 \smtexttt{sgrpg}, \smtexttt{sggrep}, and more;
 
-\item XSLT~\cite{XSLT} processors (e.g., XT~\cite{Clark-XT} and Saxon~\cite{Saxon}
+\item XSLT~\cite{XSLT} processors (e.g., XT~\cite{Clark-XT} and Saxon~\cite{Saxon})
       and the XML parser XP~\cite{Clark-XP};
-
-\item the perlSGML utilities~\cite{perlSGML} which
-contains \smtexttt{dtd2html}, \smtexttt{dtddiff},
-\smtexttt{dtdtree}, and more; and
 
 \item the Perl XML::DOM package~\cite{perlDOM} which exposes a
 DOM level~1~\cite{DOM} interface to an XML tree.
@@ -868,7 +867,7 @@ representation of the program:
 \noindent Notice that the output of \smtexttt{sggrep} is also a (not necessarily
 valid nor even well-formed) XML document.  Thus we can string together
 SGML and XML tools in a Unix pipeline to combine tools in novel and
-useful ways.  For example, it is useful to convert results back into
+useful ways.  For example, it is sometimes worthwhile to convert results back into
 ordinary Java source representation to aid the human software-engineer.
 We can do this using \smtexttt{results-to-plain-source} which is a
 wrapper around an XSLT stylesheet that converts JavaML back into
@@ -876,7 +875,8 @@ plain source code:
 
 \begin{verbatim}
 % sggrep '.*/literal-string' \
-   < Hangman.java.xml | results-to-plain-source
+      < Hangman.java.xml \
+      | results-to-plain-source
 \end{verbatim}
 
 \noindent\emph{outputs:}
@@ -923,9 +923,13 @@ message \smtexttt{setFont} we can do so easily and reliably:
 }
 
 \noindent Because of the structural markup, places where the seven characters
-``setFont'' appear in a comment or a literal string will \emph{not} be reported by
-this query.  A similar attempt to retrieve this information using lexical tools would 
-likely contain those false positives.
+``setFont'' appear in a comment, a literal string, or a variable name
+will \emph{not} be reported by this query.  A similar attempt to
+retrieve this information using lexical tools would likely contain those
+false positives.  Imagine trying to find all type cast expressions using 
+only lexical tools---the over-use of parentheses in Java expressions
+make that task very difficult, while it is trivial with JavaML thanks to 
+the \smtexttt{cast-expr} element.
 
 Another class of common analyses is the semantic checks done by the
 compiler prior to translation.  For example, in Java code, only abstract
@@ -979,7 +983,7 @@ public paint
 }
 
 \noindent searches for method definitions that contain message sends of the
-message \smtexttt{hasMoreElements}.  It then outputs the
+message \smtexttt{drawLine}.  It then outputs the
 \smtexttt{visibility} and \smtexttt{name} attributes of the matched
 elements as shown above, confirming our intuition that the
 \smtexttt{paint()} method is the only function that invoked \smtexttt{drawLine}.
@@ -1039,29 +1043,29 @@ xt source.java.xml method-rename.xsl \
 
 While a similar textual transformation could be performed using a text
 editor or Sed, those tools will over-aggressively change all occurrences
-of the six character sequence \smtexttt{isBall}: variable names, literal
+of the six character sequence \smtexttt{isBall}. Variable names, literal
 strings, comments, and packages might incorrectly be affected by the
 text-based transformation. This is a key benefit of the JavaML
 representation: we have more fine-grained, semantically-based control
 over the affected constructs.
 
 Other possibilities for transformations include using a style sheet to output a
-browesable HTML representation of the program (see Figure~\ref{fig:ie-hangman-html})
+browesable HTML representation of the program (see figure~\ref{fig:ie-hangman-html})
 or syntax-highlighted PostScript.  Adding debug or instrumentation code at entry and
-exit to and from functions is also straightforward (see Figure~\ref{fig:dom-instrument}).
+exit to and from functions is also straightforward (see figure~\ref{fig:dom-instrument}).
 
 \begin{figure*}[htbp]
-\begin{centering}
-\includegraphics[height=8in]{ie-hangman-html.eps}
+\begin{minipage}[b]{0.4\linewidth}
+\includegraphics[width=\linewidth]{ie-hangman-html.eps}
 \caption{A view of Hangman.java.xml processed by an XSLT HTML pretty-printer and
   indexer.  The method index links to the start of the definition of each method, and 
   syntax highlighting is done using color-coding and italics.
 \label{fig:ie-hangman-html}}
-\end{centering}
-\end{figure*}
-
-\begin{figure*}[p]
-\begin{listing}{1}
+\end{minipage}%
+\hspace*{15pt}
+\begin{minipage}[b]{0.55\linewidth}
+{\small
+\begin{verbatim}
 use XML::DOM;
 use IO::Handle;
 
@@ -1108,12 +1112,14 @@ sub parseXMLFragment {
   $subtree->setOwnerDocument($doc);
   return $subtree;
 }
-\end{listing}
+\end{verbatim}
+}
 \caption{Perl program to instrument every method with invocations of
-  Tracer.StartMethod(\textit{method\_name}) and
-  Tracer.ExitMethod(\textit{method\_name}).  The program uses the Document Object
+  \smtexttt{Tracer.StartMethod(}\textit{method\_name}\smtexttt{)} and
+  \smtexttt{Tracer.ExitMethod(}\textit{method\_name}\smtexttt{)}.  The program uses the Document Object
   Model (DOM)~\cite{DOM} Perl module~\cite{perlDOM}.
 \label{fig:dom-instrument}}
+\end{minipage}
 \end{figure*}
 
 \section{Related work}
@@ -1144,6 +1150,14 @@ ordinary representation of C, Modula-3, and Modula-2 into the database.  The dat
 approach may prove useful for storing XML, especially in the context of
 the software-engineering applications for which JavaML is designed.
 
+The Software Development Foundation~\cite{SDS} is an embryonic open
+architecture based on XML designed for developing tools for software
+environments.  That project is concerned more with language-independent
+representations of ``interesting information'' about source code in a
+format called CSF---code structure format.  The architects of the
+Software Development Foundation are currently considering integrating
+JavaML into their system.
+
 CCEL~\cite{CCEL92} provides a metalanguage for expressing non-linguistic
 intentions (i.e., ones that cannot be expressed in the language) about
 software artifacts written in C++.  JavaML can provide a similar
@@ -1165,7 +1179,8 @@ must simply write a transformation from Java++ML to JavaML.  Because
 DTDs are exceptionally easy to extend, this approach is tenable and
 likely a fruitful avenue for future work.  There are several utilities
 for documenting and comparing DTDs (e.g., \smtexttt{dtd2html} and
-\smtexttt{dtddiff}) that would be helpful when applying this technique.
+\smtexttt{dtddiff} of the perlSGML package~\cite{perlSGML}) that would
+be helpful when applying this technique.
 
 
 %% Knuth's literate programming?  \cite{Knuth92}.
@@ -1190,13 +1205,7 @@ Another useful extension to the current transformation system is to do
 more cross-linking of elements.  Type elements could reference their
 defining classes in other JavaML documents.  Import declarations could
 reference the top-level documentation for the imported package.  Many
-more possibilities are imaginable.
-
-JavaML should be refined to guarantee that it is a complete, isomorphic
-representation of the constructs present in the latest version of the
-Java programming language.  Additionally, it is likely beneficial to
-migrate JavaML to use XML Schema~\cite{XMLSchema1,XMLSchema2} instead of
-a DTD after the Schema working drafts are finalized.
+more possibilities are feasible.
 
 Although this paper has presented a markup language for Java, the same
 basic approach can be applied to other programming languages, or even to
@@ -1216,24 +1225,25 @@ the understandability and maintainability of the code, but do not
 interact well with parsing techniques~\cite{ErnstBadrosNotkin00,Badros00-spe}.
 
 The current converter that translates back from JavaML to the classical
-source representation needs to be far more robust.  It was written as
-only a proof of concept and for the author to gain experience with the
-XML DOM.  A better approach is to add a Jikes front-end that uses an XML
-parser (e.g., XML4C++~\cite{XML4C++}) to construct the XML DOM from the
-JavaML source, then simply write a recursive conversion function to
-build the Jikes internal AST from using the DOM API.  Then, using
-Jikes's pre-existing conventional unparser, the compiler can write out
-the classical representation for the source code.  The key benefit of
-this technique is that it then permits the compiler to work directly on
-the JavaML representation of the source code via the new front-end.
+source representation is based on XSLT.  It would be useful to add a
+Jikes front-end that would permit the compiler to read JavaML directly.
+Such an implementation would use an XML parser (e.g.,
+XML4C++~\cite{XML4C++}) to construct the XML DOM from the JavaML source,
+then simply recursively build the Jikes internal AST using the DOM API.
+Back-conversion to the plain source code could then be done using
+Jikes's pre-existing conventional unparser.
 
 Using JavaML as the primary source representation has the potential to
 simplify the compiler beyond just eliminating its classical front-end.
 Some semantic analyses can be removed from the compiler once it knows
 that the input is a valid JavaML document.  It will be useful to
 characterize which semantic errors are provably impossible to encounter
-given that precondition.  Additionally, more semantic analyses can be
-moved into the editing environment reasonably painlessly in the form of
+given that precondition.  Because XML
+Schema~\cite{XMLSchema1,XMLSchema2} provide an even finer-grained
+specification of validity for XML documents, it is likely beneficial to
+migrate JavaML to use an them instead of a DTD after the working drafts
+are finalized.  Additionally, more semantic analyses can be moved into
+the editing environment reasonably painlessly in the form of
 straightforward queries (such as some of those described earlier in
 section~\ref{sec-leveraging}).
 
@@ -1241,12 +1251,13 @@ Because the concise textual representation of source code is nicely
 suited to expert programmers, it's unlikely that they will be interested
 in discarding their favourite text editor anytime soon.  It will be
 useful to investigate better ways to convert interactively and
-incrementally from the classical source representation to JavaML and
-support useful editing capabilities along the lines of current text
-editing systems.  The work on structured text editors is highly relevant
-here, but may prove more fruitful given the incredible resources that
-can now be thrown at the problem given the growing commercial importance
-of XML technology.
+incrementally between the classical source representation and JavaML.
+The capabilities could then be used to transparently support interactive
+editing of XML representations using plain-text format to which human
+engineers are accustomed.  The work on structured text editors is highly
+relevant and may finally achieve acceptance give the incredible
+resources that will now be thrown at the problem given the growing
+commercial importance of XML technology.
 
 \section{Conclusion}
 \label{sec-conclusion}
