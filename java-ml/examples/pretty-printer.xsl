@@ -448,5 +448,8 @@
   <xsl:text>&#xa;</xsl:text>
 </xsl:template>
 
+<xsl:template match="break">
+  <xsl:text>break</xsl:text>
+</xsl:template>
 
 </xsl:stylesheet>
