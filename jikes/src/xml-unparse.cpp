@@ -21,14 +21,16 @@
 void
 xml_prefix(Ostream &xo)
 {
-  xo << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n\n";
+  xo << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
+     << "<!DOCTYPE java-source-program SYSTEM \"../java-ml.dtd\">\n\n"
+     << "<java-source-program>\n";
 }
 
 /* Output any suffix for the converted XML file */
 void
 xml_suffix(Ostream &xo)
 {
-  /* empty for now --11/12/99 gjb */
+  xo << "</java-source-program>\n";
 }
 
 char *
@@ -223,7 +225,7 @@ void AstImportDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
     xnm << ends;
     xml_output(os,"import",
                "module", xnm.str(),
-               XML_CLOSE);
+               NULL);
     xml_nl(os);
     if (Ast::debug_unparse) os << "/*:AstImportDeclaration#" << this-> id << "*/";
 }
@@ -320,20 +322,20 @@ void AstClassDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
       }
     }
 
-    char *szExtends = "Object";
+    char *szSuperclass = "Object";
     if (super_opt) {
       // os << "extends ";
       ostrstream xnm;
       Ostream nm(&xnm);
       super_opt -> XMLUnparse(nm, lex_stream);
       xnm << ends;
-      szExtends = xnm.str();
+      szSuperclass = xnm.str();
     }
 
     xml_output(os,"class",
                "name", xml_name_string(lex_stream,identifier_token),
                "visibility",szVisibility,
-               "extends",szExtends,
+               "superclass",szSuperclass,
                "abstract",SzOrNullFromF(fAbstract),
                "final",SzOrNullFromF(fFinal),
                "synchronized",SzOrNullFromF(fSynchronized),
@@ -533,7 +535,7 @@ void AstFormalParameter::XMLUnparse(Ostream& os, LexStream& lex_stream)
                "type",szType,
                "name",szName,
                "final",SzOrNullFromF(fFinal),
-               XML_CLOSE);
+               NULL);
 
     if (Ast::debug_unparse) os << "/*:AstFormalParameter#" << this-> id << "*/";
 }
@@ -1053,10 +1055,9 @@ void AstReturnStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
     // Do NOT use this; when the return statement is not literally
     // present in the source, the return_token points at the next "}".
     // os << lex_stream.NameString(return_token);
-    if (!expression_opt) {
-      xml_output(os,"return",XML_CLOSE);
-      xml_nl(os);
-    } else {
+
+    // just drop the return tag if there is nothing to return --11/12/99 gjb
+    if (expression_opt) {
       xml_output(os,"return",NULL);
       expression_opt -> XMLUnparse(os, lex_stream);
       xml_close(os,"return",true);
