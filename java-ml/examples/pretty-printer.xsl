@@ -60,7 +60,7 @@
 
 <xsl:template match="superclass">
   <xsl:text> extends </xsl:text>
-  <xsl:value-of select="@class"/>
+  <xsl:value-of select="@name"/>
 </xsl:template>
 
 <xsl:template match="field">
@@ -91,7 +91,7 @@
   <xsl:value-of select="@name"/>
   <xsl:apply-templates select="*[position() > 1]"/>
   <xsl:choose>
-    <xsl:when test="statements"/>
+    <xsl:when test="block"/>
     <xsl:otherwise><xsl:text>;&#xA;</xsl:text></xsl:otherwise>
   </xsl:choose>
 </xsl:template>
@@ -145,12 +145,12 @@
    </xsl:choose>
 </xsl:template>
 
-<xsl:template match="statements">
+<xsl:template match="block">
   <xsl:text>{&#xA;</xsl:text>
   <xsl:for-each select="*">
     <xsl:apply-templates select="."/>
     <xsl:choose>
-      <xsl:when test="if|true-case|false-case|loop|statements"/>
+      <xsl:when test="if|true-case|false-case|loop|block"/>
       <xsl:when test="following-sibling::local-variable[@continued and position()=1]">
         <xsl:value-of select="following-sibling"/>
       </xsl:when>
@@ -331,7 +331,7 @@
 
 <xsl:template match="true-case">
   <xsl:apply-templates/>
-  <xsl:if test="not(.//statements)">
+  <xsl:if test="not(.//block)">
     <xsl:text>;&#xA;</xsl:text>
   </xsl:if>
 </xsl:template>
@@ -339,7 +339,7 @@
 <xsl:template match="false-case">
   <xsl:text> else </xsl:text>
   <xsl:apply-templates/>
-  <xsl:if test="not(.//statements)">
+  <xsl:if test="not(.//block)">
     <xsl:text>;&#xA;</xsl:text>
   </xsl:if>
 </xsl:template>
@@ -404,7 +404,7 @@
   <xsl:text>)&#xA;</xsl:text>
   <xsl:variable name="numtoskip" select="count(init|test|update)"/>
   <xsl:apply-templates select="*[position() > $numtoskip]"/>
-  <xsl:if test="not(.//statements)">
+  <xsl:if test="not(.//block)">
     <xsl:text>;&#xA;</xsl:text>
   </xsl:if>
 </xsl:template>
@@ -412,7 +412,7 @@
 <xsl:template match="loop[@kind='while']">
   <xsl:text>while </xsl:text>
   <xsl:apply-templates/>
-  <xsl:if test="not(.//statements)">
+  <xsl:if test="not(.//block)">
     <xsl:text>;&#xA;</xsl:text>
   </xsl:if>
 </xsl:template>
@@ -420,7 +420,7 @@
 <xsl:template match="do-loop">
   <xsl:text>do </xsl:text>
   <xsl:apply-templates select="*[1]"/>
-  <xsl:if test="not(statements)">
+  <xsl:if test="not(block)">
     <xsl:text>{} </xsl:text>
   </xsl:if>
   <xsl:text>while </xsl:text>
@@ -442,7 +442,7 @@
   <xsl:apply-templates select="formal-argument"/>
   <xsl:text>)</xsl:text>
   <xsl:apply-templates select="*[position() > 1]"/>
-  <xsl:if test="not(statements)">
+  <xsl:if test="not(block)">
     <xsl:text>{} </xsl:text>
   </xsl:if>
   <xsl:text>&#xa;</xsl:text>
