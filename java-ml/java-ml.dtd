@@ -15,8 +15,8 @@
 <!ENTITY % mod-synchronized "synchronized CDATA #IMPLIED">
 <!ENTITY % location-info 
 	"line CDATA #IMPLIED col CDATA #IMPLIED 
-         end-line CDATA #IMPLIED end-col CDATA #IMPLIED">
-
+         end-line CDATA #IMPLIED end-col CDATA #IMPLIED
+	 comment CDATA #IMPLIED">
 <!ENTITY % expr-elems "send|new|new-array|var-ref|field-access|array-ref|paren|assignment-expr|conditional-expr|binary-expr|unary-expr|cast-expr|instanceof-test|literal-number|literal-string|literal-char|literal-boolean|literal-null|this|super">
 <!ENTITY % stmt-elems "block|local-variable|try|throw|if|switch|loop|do-loop|return|continue|break|synchronized|%expr-elems;">
 
