@@ -34,6 +34,7 @@ const char *g_szClassName = NULL;
 bool g_fInsideCatch = false;
 bool g_fTopLevelBlock = false;
 bool g_fNewline = true;
+bool g_fRequireBlockTag = false;
 
 int g_cchIndent = 0;
 /* GJB:FIXME:: this should be an option */
@@ -407,8 +408,11 @@ void Ast::XMLUnparse(Ostream& os, LexStream& lex_stream)
     if (debug_unparse) os << "/*:Ast#" << this-> id << "*/";
 }
 
-bool FXMLStatementTagNeeded(AstBlock *pb)
+bool FXMLBlockTagNeeded(AstBlock *pb)
 {
+  if (pb->NumLabels() > 0)
+    return true;
+
   if (pb->NumStatements() == 0 || pb->no_braces)
     return false;
 
@@ -426,13 +430,13 @@ bool FXMLStatementTagNeeded(AstBlock *pb)
   AstBlock *pbChild = NULL;
   if (pb->NumStatements() == 1 &&
       (pbChild = dynamic_cast<AstBlock *>(pb->Statement(0))) != NULL &&
-      FXMLStatementTagNeeded(pbChild))
+      FXMLBlockTagNeeded(pbChild))
     return false;
 
   AstReturnStatement *pretChild = NULL;
   if (pb->NumStatements() == 2 &&
       (pbChild = dynamic_cast<AstBlock *>(pb->Statement(0))) != NULL &&
-      FXMLStatementTagNeeded(pbChild) &&
+      FXMLBlockTagNeeded(pbChild) &&
       (pretChild = dynamic_cast<AstReturnStatement *>(pb->Statement(1))) != NULL &&
       !pretChild->expression_opt)
     return false;
@@ -447,16 +451,12 @@ void AstBlock::XMLUnparse(Ostream& os, LexStream& lex_stream)
     if (Ast::debug_unparse) os << "/*no_braces:" << no_braces << "*/";
     AstBlock *pblockdeclPrior = g_pblockdecl;
     g_pblockdecl = this;
-    for (int i = 0; i < this -> NumLabels(); i++)
-    {
-      xml_output(os, "label",
-                 "name",lex_stream.NameString(this->Label(i)),
-                 XML_CLOSE);
-    }
 
     // avoid nested statements
     // at the start of method, constructor bodies, loops, etc.
-    if ( FXMLStatementTagNeeded(this)) {
+    if ( FXMLBlockTagNeeded(this) || g_fRequireBlockTag) {
+      // GJB:FIXME:: ugly -- passing through global
+      g_fRequireBlockTag = false;
 #ifdef JIKES_XML_STATEMENT_HAS_NUMBER_ATTRIBUTE
       char szNum[20];
       sprintf(szNum,"%d",this->NumStatements());
@@ -470,6 +470,13 @@ void AstBlock::XMLUnparse(Ostream& os, LexStream& lex_stream)
                  NULL);
       xml_nl(os);
       fDidOpenStatements = true;
+      for (int i = 0; i < this -> NumLabels(); i++)
+        {
+          xml_output(os, "label",
+                     "name",xml_name_string(lex_stream,this->Label(i)),
+                     XML_CLOSE);
+          xml_nl(os);
+        }
     }
 
     int length = NumStatements();
@@ -1452,6 +1459,8 @@ void AstSynchronizedStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
     xml_open(os,"expr");
     expression -> XMLUnparse(os, lex_stream);
     xml_close(os,"expr",true);
+    // GJB:FIXME:: this is ugly.
+    g_fRequireBlockTag = true;
     block -> XMLUnparse(os, lex_stream);
     xml_close(os,"synchronized",true);
     if (Ast::debug_unparse) os << "/*:AstSynchronizedStatement#" << this-> id << "*/";
@@ -1466,7 +1475,7 @@ void AstCatchClause::XMLUnparse(Ostream& os, LexStream& lex_stream)
     formal_parameter -> XMLUnparse(os, lex_stream);
     block -> XMLUnparse(os, lex_stream);
     g_fInsideCatch = fInsideCatchPrev;
-    xml_close(os,"catch");
+    xml_close(os,"catch",true);
     if (Ast::debug_unparse) os << "/*:AstCatchClause#" << this-> id << "*/";
 }
 
@@ -1475,14 +1484,14 @@ void AstFinallyClause::XMLUnparse(Ostream& os, LexStream& lex_stream)
     if (Ast::debug_unparse) os << "/*AstFinallyClause:#" << this-> id << "*/";
     xml_open(os,"finally");
     block -> XMLUnparse(os, lex_stream);
-    xml_close(os,"finally");
+    xml_close(os,"finally",true);
     if (Ast::debug_unparse) os << "/*:AstFinallyClause#" << this-> id << "*/";
 }
 
 void AstTryStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstTryStatement:#" << this-> id << "*/";
-    xml_open(os,"try");
+    xml_open(os,"try"); xml_nl(os);
     block -> XMLUnparse(os, lex_stream);
     for (int k = 0; k < this -> NumCatchClauses(); k++) {
       this -> CatchClause(k) -> XMLUnparse(os, lex_stream);
@@ -1490,7 +1499,7 @@ void AstTryStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
     if (finally_clause_opt) {
       finally_clause_opt -> XMLUnparse(os, lex_stream);
     }
-    xml_close(os,"try");
+    xml_close(os,"try",true);
     if (Ast::debug_unparse) os << "/*:AstTryStatement#" << this-> id << "*/";
 }
 
