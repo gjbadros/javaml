@@ -15,26 +15,49 @@ public class FirstApplet extends Applet {
 
 -->
 
-<?xml version=1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE java-source-program [
    <!ENTITY % visibility-attribute "visibility (public|private|protected) #IMPLIED">
    <!ENTITY % kind-attribute "kind (integer|real|double) #IMPLIED">
+   <!ENTITY % mod-final "final (final) #IMPLIED">
+   <!ENTITY % mod-static "static (static) #IMPLIED">
+   <!ENTITY % mod-volatile "volatile (volatile) #IMPLIED">
+   <!ENTITY % mod-transient "transient (transient) #IMPLIED">
+   <!ENTITY % mod-native "native (native) #IMPLIED">
+   <!ENTITY % mod-abstract "abstract (abstract) #IMPLIED">
+   <!ENTITY % mod-synchronized "synchronized (synchronized) #IMPLIED">
    <!ELEMENT java-source-program (import|class)* >
    <!ATTLIST java-source-program
        version CDATA #IMPLIED>
    <!ELEMENT import EMPTY>
    <!ATTLIST import
        module CDATA #REQUIRED>
-   <!ELEMENT class ((implement)*, (comment|method)*) >
+   <!ELEMENT class ((implement)*, (comment|method|field)*) >
    <!ATTLIST class
        name CDATA #REQUIRED
        %visibility-attribute 
        superclass CDATA "Object">
-   <!ELEMENT method (comment,formal-arguments,code)>
+   <!ELEMENT field EMPTY>
+   <!ATTLIST field
+       type CDATA #REQUIRED
+       name CDATA #REQUIRED
+       %visibility-attribute
+       %mod-final
+       %mod-static
+       %mod-volatile
+       %mod-transient>
+   <!ELEMENT method (comment,formal-arguments,statements)>
    <!ATTLIST method 
        name CDATA #REQUIRED
        id ID #REQUIRED
        %visibility-attribute
+       %mod-abstract
+       %mod-final
+       %mod-static
+       %mod-synchronized
+       %mod-volatile
+       %mod-transient
+       %mod-native
        return-type CDATA #REQUIRED>
    <!ELEMENT comment (#PCDATA)>
    <!ELEMENT formal-arguments (formal-argument)*>
@@ -43,12 +66,11 @@ public class FirstApplet extends Applet {
        type CDATA #REQUIRED
        name CDATA #REQUIRED
        id ID #REQUIRED>
-   <!ELEMENT send (arguments)>
-   <!ATTLIST send
-       target IDREF #REQUIRED
-       targetname CDATA #REQUIRED
-       message CDATA #REQUIRED>
-   <!ELEMENT code (send|var-decl|condition|loop|return)*>
+   <!ELEMENT send (target,arguments)>
+   <!ELEMENT target (#PCDATA)>
+   <!ELEMENT return (expression)>
+   <!ELEMENT statements (send|var-decl|condition|loop|return)*>
+   <!ELEMENT expression (#PCDATA)>
    <!ELEMENT arguments (literal-string|literal-number)*>
    <!ELEMENT literal-string EMPTY>
    <!ATTLIST literal-string
@@ -69,15 +91,16 @@ public class FirstApplet extends Applet {
     <formal-arguments>
       <formal-argument type="Graphics" name="g" id="FirstApplet-paint-g">
     </formal-arguments>
-    <code>
-       <send target="FirstApplet-paint-g" targetname="g" message="drawString">
+    <statements>
+       <send>
+          <target>g.drawString</target>
           <arguments>
              <literal-string value="Hello World">
              <literal-number kind="integer" value="25">
              <literal-number kind="integer" value="50">
           </arguments>
        </send>
-    </code>
+    </statements>
   </method>
 </class>
 </java-source-program>
