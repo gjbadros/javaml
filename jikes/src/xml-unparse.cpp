@@ -1667,10 +1667,10 @@ void AstClassInstanceCreationExpression::XMLUnparse(Ostream& os, LexStream& lex_
                    "interface",SzFromUnparse(lex_stream, class_type->type),
                    XML_CLOSE);
       } else {
-        /* GJB:FIXME:: this always get sused, even when the class_type is
+        /* GJB:FIXME:: this always gets used, even when the class_type is
            a superclass */
         xml_output(os,"superclass",
-                   "class",SzFromUnparse(lex_stream, class_type->type),
+                   "name",SzFromUnparse(lex_stream, class_type->type),
                    XML_CLOSE);
       }
       xml_nl(os);

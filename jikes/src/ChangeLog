@@ -1,3 +1,17 @@
+Tue Feb 15 10:43:29 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Replace attribute "class" w/ "name" in 2nd use
+	of "superclass" tag that I missed before.
+
+Fri Feb 11 09:06:38 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Replace OutputLiteralString() with
+ 	SzNewEscapedLiteralString() and use the latter to output
+ 	value="..." attributes for literal-string and literal-char
+ 	elements.  Output true/false as literal-boolean w/ value="true" or
+ 	"false" (instead of as separate <literal-true/> and
+ 	<literal-false/> elements.
+
 Tue Feb  8 17:30:11 2000  Greg J. Badros  <gjb@cs.washington.edu>
 
 	* xml-unparse.cpp:  Rename FXMLStatementTagNeeded to
