@@ -9,9 +9,9 @@
 <!ENTITY % mod-abstract "abstract CDATA #IMPLIED">
 <!ENTITY % mod-synchronized "synchronized CDATA #IMPLIED">
 
-<!ENTITY % expression-types "send|var-ref|array-ref|paren|assignment-expr|conditional-expr|binary-expr|unary-expr|cast-expr|literal-number|literal-string|literal-true|literal-false">
+<!ENTITY % expression-types "send|var-ref|array-ref|paren|assignment-expr|conditional-expr|binary-expr|unary-expr|cast-expr|literal-number|literal-string|literal-true|literal-false|literal-null|this|super">
 
-<!ELEMENT java-source-program (package-decl|import|class)* >
+<!ELEMENT java-source-program (package-decl?,import*,class+) >
 <!ATTLIST java-source-program
     version CDATA #IMPLIED>
 <!ELEMENT import EMPTY>
@@ -34,7 +34,7 @@
     %mod-static
     %mod-volatile
     %mod-transient>
-<!ELEMENT constructor (comment?,formal-arguments,throws?,statements)>
+<!ELEMENT constructor (comment?,formal-arguments,throws?,(super-call|this-call)?,statements)>
 <!ATTLIST constructor
     name CDATA #REQUIRED
     id ID #REQUIRED
@@ -110,6 +110,7 @@
 <!ELEMENT target-type (#PCDATA)>
 <!ELEMENT literal-false EMPTY>
 <!ELEMENT literal-true EMPTY>
+<!ELEMENT literal-null EMPTY>
 <!ELEMENT if (test,true-case,false-case?)>
 <!ELEMENT test (%expression-types)>
 <!ELEMENT true-case (statements)>
@@ -117,3 +118,8 @@
 <!ELEMENT array-ref (base,offset)>
 <!ELEMENT base (%expression-types)>
 <!ELEMENT offset (%expression-types)>
+<!ELEMENT static-initializer (statements)>
+<!ELEMENT super-call (arguments)>
+<!ELEMENT this-call (arguments)>
+<!ELEMENT super EMPTY>
+<!ELEMENT this EMPTY>
