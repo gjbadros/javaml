@@ -1626,7 +1626,7 @@ void AstPostUnaryExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
     if (Ast::debug_unparse) os << "/*AstPostUnaryExpression:#" << this-> id << "*/";
     xml_output(os,"unary-expr",
                "op",xml_name_string(lex_stream,post_operator_token),
-               "post","yes",
+               "post","true",
                NULL);
     xml_unparse_maybe_var_ref(os,lex_stream,expression);
     xml_close(os,"unary-expr");
