@@ -1,5 +1,6 @@
 // $Id$
-//
+// Copyright (C) 2000 Greg J. Badros <gjb@cs.washington.edu>
+// 
 // This software is subject to the terms of the IBM Jikes Compiler
 // License Agreement available at the following URL:
 // http://www.ibm.com/research/jikes.
@@ -18,7 +19,6 @@
 #include "symbol.h"
 #include "semantic.h"
 
-
 /* make <arguments></arguments>
    and <formal-argments></formal-arguments>
    into <arguments/>
@@ -28,21 +28,26 @@
 
 #define XML_CLOSE ((char *) 1)
 
-char *g_szMethodName = NULL;
-char *g_szClassName = NULL;
+const char *g_szMethodName = NULL;
+const char *g_szClassName = NULL;
 
 bool g_fInsideCatch = false;
+
+// GJB:FIXME:: Ugly hack to avoid nested statements
+// at the start of method bodies.
+bool fLastWasMethodDeclarator = false;
+bool fLastWasSwitchBlock = false;
 
 AstClassDeclaration *g_pclassdecl = NULL;
 AstBlock *g_pblockdecl = NULL;
 AstMethodDeclaration *g_pmethoddecl = NULL;
 
-PackageSymbol *ThisPackage() {
-  return g_pclassdecl->semantic_environment->sem->Package();
-}
-
 SemanticEnvironment *ThisEnvironment() {
   return g_pclassdecl->semantic_environment;
+}
+
+PackageSymbol *ThisPackage() {
+  return ThisEnvironment()->sem->Package();
 }
 
 void xml_unhandled(Ostream &xo, char *szType, char *szExtra)
@@ -210,6 +215,7 @@ SzFromUnparse(LexStream &lex_stream, Ast *pnode)
 }
 
 template <class T>
+void
 xml_unparse_throws(Ostream &xo, LexStream &lex_stream, T *pnode)
 {
   if (pnode->NumThrows() > 0) {
@@ -226,6 +232,7 @@ xml_unparse_throws(Ostream &xo, LexStream &lex_stream, T *pnode)
 /* MethodDeclarator has similar code to this
    for formal arguments */
 template <class T>
+void
 xml_unparse_arguments(Ostream &os, LexStream &lex_stream, T *pnode)
 {
 #ifdef SHORTCUT_XML_CLOSE
@@ -304,8 +311,14 @@ xml_name_string(LexStream &ls, LexStream::TokenIndex i)
     // GJB:FIXME:: this is an ugly hack;
     // does XML really disallow this? --11/13/99 gjb
     nm << "lt";
+  } else if (strcmp(sz,"<=") == 0) {
+    nm << "le";
   } else if (strcmp(sz,"&&") == 0) {
     nm << "logand";
+  } else if (strcmp(sz,"&") == 0) {
+    nm << "bitand";
+  } else if (strcmp(sz,"<<") == 0) { 
+    nm << "left-shift";
   } else {
     nm << ls.NameString(i);
   }
@@ -436,6 +449,7 @@ void Ast::XMLUnparse(Ostream& os, LexStream& lex_stream)
 
 void AstBlock::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
+    bool fDidOpenStatements = false;
     if (Ast::debug_unparse) os << "/*AstBlock:#" << this-> id << "*/";
     if (Ast::debug_unparse) os << "/*no_braces:" << no_braces << "*/";
     AstBlock *pblockdeclPrior = g_pblockdecl;
@@ -447,17 +461,36 @@ void AstBlock::XMLUnparse(Ostream& os, LexStream& lex_stream)
                  XML_CLOSE);
     }
 
-    /* GJB:FIXME:: we get extra nestings of statements
-       that'd be nice to remove */
-    if ( this->NumStatements() > 0) {
-      xml_open(os, "statements");
-      xml_nl(os);
+    // GJB:FIXME:: Ugly hack to avoid nested statements
+    // at the start of method bodies.
+    if ( !no_braces && !fLastWasSwitchBlock) {
+      if (!((NumStatements() == 1 && dynamic_cast<AstBlock *>(Statement(0))) ||
+            (NumStatements() == 2 && dynamic_cast<AstBlock *>(Statement(1)) &&
+             (dynamic_cast<AstThisCall*>(Statement(0)) || dynamic_cast<AstSuperCall*>(Statement(0)))))) {
+        char szNum[20];
+        sprintf(szNum,"%d",this->NumStatements());
+        xml_output(os, "statements",
+#if 0 // GJB:FIXME:: having num=5, e.g., makes harder to update and is of
+                   // marginal utility
+                   "num",szNum,
+#endif
+                   NULL);
+        xml_nl(os);
+        fDidOpenStatements = true;
+      } else {
+#if 0
+        xml_output(os, "extra-statements", XML_CLOSE);
+#endif
+      }
     }
+    fLastWasMethodDeclarator = false;
+    fLastWasSwitchBlock = false;
+
     for (int i = 0; i < this -> NumStatements(); i++)
     {
       this -> Statement(i) -> XMLUnparse(os, lex_stream);
     }
-    if ( this->NumStatements() > 0) {
+    if ( fDidOpenStatements ) {
       xml_close(os, "statements",true);
     }
     g_pblockdecl = pblockdeclPrior;
@@ -625,30 +658,27 @@ void AstClassDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
       }
     }
 
-    char *szSuperclass = "Object";
-    if (super_opt) {
-      // os << "extends ";
-      ostrstream xnm;
-      Ostream nm(&xnm);
-      super_opt -> XMLUnparse(nm, lex_stream);
-      xnm << ends;
-      szSuperclass = xnm.str();
-    }
-
-    char *szClassName = xml_name_string(lex_stream,identifier_token);
+    const char *szSuperclass = (super_opt? SzFromUnparse(lex_stream, super_opt):
+                          "Object");
+    const char *szClassName = xml_name_string(lex_stream,identifier_token);
 
     xml_output(os,"class",
                "name", szClassName,
                "visibility",szVisibility,
-               "superclass",szSuperclass,
                "abstract",SzOrNullFromF(fAbstract),
                "final",SzOrNullFromF(fFinal),
                "synchronized",SzOrNullFromF(fSynchronized),
+               "static",SzOrNullFromF(fStatic),
                "",SzOrNullFromF(false),
                NULL);
     // os << ") #" << class_body -> id << "\n";
 
     xml_nl(os);
+    xml_output(os,"superclass",
+               "class",szSuperclass,
+               XML_CLOSE);
+    xml_nl(os);
+
     if (NumInterfaces() > 0)
       {
 	// os << "implements ";
@@ -828,10 +858,10 @@ void AstFormalParameter::XMLUnparse(Ostream& os, LexStream& lex_stream)
       }
     }
 
-    char *szName = SzFromUnparse(lex_stream,formal_declarator->variable_declarator_name);
+    const char *szName = SzFromUnparse(lex_stream,formal_declarator->variable_declarator_name);
     // GJB:FIXME:: it'd be better to get these from the AST somehow
-    char *szClassName = g_szClassName;
-    char *szMethodName = g_szMethodName;
+    const char *szClassName = g_szClassName;
+    const char *szMethodName = g_szMethodName;
 
     xml_output(os,"formal-argument",
                "name",szName,
@@ -870,6 +900,9 @@ void AstMethodDeclarator::XMLUnparse(Ostream& os, LexStream& lex_stream)
     }
 #endif
 
+    // GJB:FIXME:: Ugly hack to avoid nested statements
+    // at the start of method bodies.
+    fLastWasMethodDeclarator = true;
     if (Ast::debug_unparse) os << "/*:AstMethodDeclarator#" << this-> id << "*/";
 }
 
@@ -926,9 +959,9 @@ void AstMethodDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
       szNumBrackets = SzNewFromLong(method_declarator->NumBrackets());
     }
 
-    char *szMethodName = xml_name_string(lex_stream,method_declarator->identifier_token);
+    const char *szMethodName = xml_name_string(lex_stream,method_declarator->identifier_token);
     // GJB:FIXME:: it'd be better to get these from the AST somehow
-    char *szClassName = g_szClassName;
+    const char *szClassName = g_szClassName;
 
     xml_output(os,"method",
                "name", szMethodName,
@@ -997,15 +1030,14 @@ void AstConstructorBlock::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstConstructorBlock:#" << this-> id << "*/";
     if (explicit_constructor_invocation_opt)
-    {
-#if 0 // I think this is redundant --11/12/99 gjb
-        xml_open(os,"statements");
+      {
+#ifdef FORCE_CONSTRUCT_STATEMENTS_BLOCK
+        xml_open(os,"statements"); xml_nl(os);
 #endif
 	explicit_constructor_invocation_opt -> XMLUnparse(os, lex_stream);
-	// os << ";\n";
-    }
+      }
     block -> XMLUnparse(os, lex_stream);
-#if 0
+#ifdef FORCE_CONSTRUCT_STATEMENTS_BLOCK
     if (explicit_constructor_invocation_opt)
       xml_close(os,"statements",true);
 #endif
@@ -1058,9 +1090,9 @@ void AstConstructorDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
       }
     }
 
-    char *szConstructorName = xml_name_string(lex_stream,constructor_declarator->identifier_token);
+    const char *szConstructorName = xml_name_string(lex_stream,constructor_declarator->identifier_token);
     // GJB:FIXME:: it'd be better to get these from the AST somehow
-    char *szClassName = g_szClassName;
+    const char *szClassName = g_szClassName;
 
     xml_output(os,"constructor",
                "name", szConstructorName,
@@ -1271,54 +1303,52 @@ void AstEmptyStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstExpressionStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstExpressionStatement:#" << this-> id << "*/";
-    expression -> XMLUnparse(os, lex_stream);
+    xml_unparse_maybe_var_ref(os, lex_stream, expression);
     if (Ast::debug_unparse) os << "/*:AstExpressionStatement#" << this-> id << "*/";
 }
 
 void AstCaseLabel::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstCaseLabel:#" << this-> id << "*/";
-    os << lex_stream.NameString(case_token);
-    os << " ";
-    expression -> XMLUnparse(os, lex_stream);
-    os << ":\n";
+    xml_open(os, "case");
+    xml_unparse_maybe_var_ref(os,lex_stream, expression);
+    xml_close(os, "case", true);
     if (Ast::debug_unparse) os << "/*:AstCaseLabel#" << this-> id << "*/";
 }
 
 void AstDefaultLabel::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstDefaultLabel:#" << this-> id << "*/";
-    os << lex_stream.NameString(default_token);
-    os << ":\n";
+    xml_output(os,"default-case",XML_CLOSE);
     if (Ast::debug_unparse) os << "/*:AstDefaultLabel#" << this-> id << "*/";
 }
 
 void AstSwitchBlockStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstSwitchBlockStatement:#" << this-> id << "*/";
-    for (int j = 0; j < NumSwitchLabels(); j++)
-	this -> SwitchLabel(j) -> XMLUnparse(os, lex_stream);
-    for (int l = 0; l < NumStatements(); l++)
-	this -> Statement(l) -> XMLUnparse(os, lex_stream);
+    for (int j = 0; j < NumSwitchLabels(); j++) {
+      this -> SwitchLabel(j) -> XMLUnparse(os, lex_stream);
+    }
+    xml_open(os, "statements");
+    for (int l = 0; l < NumStatements(); l++) {
+      this -> Statement(l) -> XMLUnparse(os, lex_stream);
+    }
+    xml_close(os,"statements", true);
     if (Ast::debug_unparse) os << "/*:AstSwitchBlockStatement#" << this-> id << "*/";
 }
 
 void AstSwitchStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstSwitchStatement:#" << this-> id << "*/";
-  // What about the label_opt??
-    os << lex_stream.NameString(switch_token);
+    // What about the label_opt??
+    xml_open(os, "switch"); xml_nl(os);
     AstParenthesizedExpression *parenth = expression -> ParenthesizedExpressionCast();
-    if (!parenth)
-	os << "(";
-    expression -> XMLUnparse(os, lex_stream);
-    if (!parenth)
-	os << ")";
-    // I think that switch_block will output its own braces.
-    // os << "{\n";
+    xml_unparse_maybe_var_ref(os,lex_stream,expression);
+    fLastWasSwitchBlock = true;
     switch_block -> XMLUnparse(os, lex_stream);
+    fLastWasSwitchBlock = false;
     // what about switch_labels_opt?
-    // os << "}\n";
+    xml_close(os, "switch", true);
     if (Ast::debug_unparse) os << "/*:AstSwitchStatement#" << this-> id << "*/";
 }
 
@@ -1548,10 +1578,12 @@ void AstCharacterLiteral::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstCharacterLiteral:#" << this-> id << "*/";
     {
+      xml_open(os,"literal-char");
       bool old_expand = os.ExpandWchar();
       os.SetExpandWchar(true);
       os << lex_stream.NameString(character_literal_token), lex_stream.NameStringLength(character_literal_token);
       os.SetExpandWchar(old_expand);
+      xml_close(os, "literal-char", false);
     }
     if (Ast::debug_unparse) os << "/*:AstCharacterLiteral#" << this-> id << "*/";
 }
@@ -1591,10 +1623,6 @@ void AstTypeExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
     if (Ast::debug_unparse) os << "/*AstTypeExpression:#" << this-> id << "*/";
     /* GJB:FIXME:: would like type expressions to have IDREFs pointing
        back to the node that defines the class or the interface */
-#if 0
-    NameSymbol *name_symbol = lex_stream->NameSymbol(type->identifier_token);
-    TypeSymbol *type = 
-#endif
     xml_output(os,"type",
                "name",SzFromUnparse(lex_stream,type),
                XML_CLOSE);
@@ -1609,8 +1637,25 @@ void AstClassInstanceCreationExpression::XMLUnparse(Ostream& os, LexStream& lex_
     if (dot_token_opt /* base_opt - see ast.h for explanation */)
 	base_opt -> XMLUnparse(os, lex_stream);
     xml_unparse_arguments(os,lex_stream,this);
-    if (class_body_opt)
-	class_body_opt -> XMLUnparse(os, lex_stream);
+    if (class_body_opt) {
+      xml_nl(os);
+      xml_open(os,"anonymous-class");
+      xml_nl(os);
+      if (0 /* class_type is an interface GJB:FIXME:: how do I get at that? */) {
+        xml_output(os,"implement",
+                   "class",SzFromUnparse(lex_stream, class_type->type),
+                   XML_CLOSE);
+      } else {
+        /* GJB:FIXME:: this always get sused, even when the class_type is
+           a superclass */
+        xml_output(os,"superclass",
+                   "class",SzFromUnparse(lex_stream, class_type->type),
+                   XML_CLOSE);
+      }
+      xml_nl(os);
+      class_body_opt -> XMLUnparse(os, lex_stream);
+      xml_close(os,"anonymous-class",true);
+    }
     xml_close(os,"new",true);
     if (Ast::debug_unparse) os << "/*:AstClassInstanceCreationExpression#" << this-> id << "*/";
 }
@@ -1755,11 +1800,9 @@ void AstConditionalExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstConditionalExpression:#" << this-> id << "*/";
     xml_open(os,"conditional-expr");
-    test_expression -> XMLUnparse(os, lex_stream);
-    //    os << " ? ";
-    true_expression -> XMLUnparse(os, lex_stream);
-    // os << " : ";
-    false_expression -> XMLUnparse(os, lex_stream);
+    xml_unparse_maybe_var_ref(os,lex_stream,test_expression);
+    xml_unparse_maybe_var_ref(os,lex_stream,true_expression);
+    xml_unparse_maybe_var_ref(os,lex_stream,false_expression);
     xml_close(os,"conditional-expr",false);
     if (Ast::debug_unparse) os << "/*:AstConditionalExpression#" << this-> id << "*/";
 }
