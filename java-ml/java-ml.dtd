@@ -93,9 +93,8 @@
     id ID #REQUIRED
     %mod-final;>
 <!ELEMENT arguments (%expr-elems;)*>
-<!ELEMENT literal-string EMPTY>
+<!ELEMENT literal-string (#PCDATA)>
 <!ATTLIST literal-string
-    value CDATA #REQUIRED
     length CDATA #REQUIRED>
 <!ELEMENT literal-number EMPTY>
 <!ATTLIST literal-number
@@ -104,7 +103,8 @@
     base CDATA "10">
 <!ELEMENT var-ref EMPTY>
 <!ATTLIST var-ref
-    name CDATA #REQUIRED>
+    name CDATA #REQUIRED
+    idref IDREF #IMPLIED>
 <!ELEMENT field-access (%expr-elems;)>
 <!ATTLIST field-access
     field CDATA #REQUIRED>
