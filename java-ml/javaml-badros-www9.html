@@ -119,21 +119,19 @@ utilities such as <code>grep</code>, <code>awk</code>, and
 
 <p>
 
-Nevertheless, the <em>plain old source representation</em> (hereafter abbreviated
-POSR) has numerous problems.  The syntax of popular contemporary
+Nevertheless, the <em>classical source representation</em> has numerous 
+problems.  The syntax of popular contemporary
 languages such as C++ and Perl push the limits of parsing capabilities
 (witness the <code>typename</code> keyword in C++ that is necessary to
 resolve an ambiguity in template-based code).  Constructing a front end
 for such languages is difficult despite the support from 
 tools.  Perhaps more disconcerting is that evolving the syntax of the
 language often requires manipulating a fragile grammar.  This limitation
-complicates handling an evolving language, but is an issue even for
-stable grammars because it complicates the possibility of user-defined
-syntactic extensions.
+complicates handling an evolving language.
 
 <p>
 
-Another problem with the POSR is that parsing is not very
+Another problem with the classical representation is that parsing is not very
 robust.  A small change in the source code can have a dramatic effect on
 the resulting AST and thus the semantics of the computation.  For
 example, a single extraneous semicolon can change a looping block into
@@ -154,7 +152,8 @@ example).
 
  <h4><a name="tools">1.1 - Text representation and software tools</a></h4>
 
-Probably the most significant limitation of the POSR is that the structure
+Probably the most significant limitation of the classical source representation
+is that the structure
 of the program is made manifest only after parsing.  This shortcoming
 forces language-specific parsing functionality to be duplicated in every
 tool that needs to reason about the program beyond its lexical nature.
@@ -179,7 +178,8 @@ a simple analysis that can do "good enough" with lexical information.
 <p>
 
 Other complications arise if a transformation of the source code is
-desired: a change in the AST must ultimately be reflected in the POSR
+desired: a change in the AST must ultimately be reflected in the classical
+source representation
 since that is the primary long-term representation.  Recreating a text
 representation from an AST is most
 straightforwardly done using an unparsing approach that can create
@@ -247,11 +247,12 @@ transformations and analyses on Java source code.
 <p>
 
 JavaML is well-suited to be used as a canonical representation of Java
-source code for tools.  It shares most of the strengths of the POSR and overcomes
+source code for tools.  It shares most of the strengths of the classical
+representation and overcomes
 many weaknesses.  The <a href="#background">next section</a> describes
 relevant features of Java and XML and <a href="#javaml">
 section 3</a> details the markup language and the implementation of a
-converter from the POSR to JavaML.  <a href="#leveraging-xml">Section
+converter from the classical representation to JavaML.  <a href="#leveraging-xml">Section
 4</a> gives numerous examples of how existing XML and SGML tools can be
 exploited to perform source code analyses and transformations on the
 richer representation provided by JavaML.  Sections <a href="#related
@@ -481,7 +482,7 @@ representation of Java source code.  Unlike the conventional
 character-based representation of programs, JavaML reflects the
 structure of the software artifact directly in the nesting of elements
 in the XML-based syntax.  Since XML is a text-based representation, many
-of the advantages of the plain old source representation (POSR) remain. Since
+of the advantages of the classical source representation remain. Since
 JavaML is an XML application, JavaML is incredibly easy to parse, and
 all existing tools for working with XML can be applied to Java source
 code in its JavaML representation.  JavaML tools can leverage the
@@ -543,7 +544,7 @@ of the above might result in the below <em>for just the first line of code</em>:
 
 Certainly this is far from ideal.  It is unacceptably verbose, exposes
 numerous uninteresting details of the underlying grammar that was used to do the
-initial parse from the POSR, and would be difficult to work with because
+initial parse from the classical source representation and would be difficult to work with because
 of the excessive number of nodes.
 
 <p>
@@ -578,8 +579,8 @@ convert the <code>FirstApplet.java</code> implementation to:
 </code>
 
 This is a huge step towards a more useful markup language.
-We have definitely added value to the
-representation, and it is trivial to convert back to the POSR: we simply
+We have definitely added value to the source code
+and it is trivial to convert back to the classical representation: we simply
 remove all tags and leave the content of the elements behind (this is
 exactly what the <code>stripsgml</code> <cite>[PerlSGML]</cite> utility
 does).  Though this representation seems useful for many tasks, it still
@@ -589,7 +590,7 @@ packages are being imported, our XML query would need to lexically
 analyze the content of the import-declaration elements.  This is
 inconvenient and is not taking advantage of the capabilities that XML
 provides.  Perhaps more significantly, the above XML representation
-retains artifacts from the POSR that another representation might permit
+retains artifacts from the classical source code that another representation might permit
 us to abstract away from and free ourselves of those syntactic burdens
 altogether.
 
@@ -600,7 +601,7 @@ programming language constructs of Java (and, indeed, similar
 object-oriented programming languages) independently of the specific
 syntax of the language.  One can easily imagine a SmalltalkML that would 
 be significantly the same, and even an OOML that could be converted into 
-both Java POSR or Smalltalk file-out format.  With this goal in mind,
+both classical Java source code or Smalltalk file-out format.  With this goal in mind,
 JavaML was designed from first principles of the constructs and then
 iteratively refined to improve the usefulness
 and readability of the resulting markup language.  
@@ -765,22 +766,22 @@ these cases, JavaML simply preserves this syntactic feature by using a
 exploit this shorthand.
 
 The careful reader will observe that the JavaML representation is 
-about three times longer than the POSR.  That expansion is a fundamental
+about three times longer than the classical source code.  That expansion is a fundamental
 tradeoff of moving to a self-describing data format such as XML.
-It is important that the terse POSR can be employed by programmers in
+It is important that the terse classical representation can be employed by programmers in
 certain tasks including classical development and program editing.
-JavaML is complementary to the POSR and is especially appropriate
+JavaML is complementary to the classical source representation and is especially appropriate
 for tools, though still accessible and readable to developers.
 
 <h4><a name="implementation">3.3 - Implementation of converter</a></h4>
 
 To experiment with the design of JavaML and gain experience in using the
 representation, it was essential to implement a converter from the Java
-plain old source representation to JavaML.  Within the IBM Jikes Java
+classical source representation to JavaML.  Within the IBM Jikes Java
 compiler framework <cite>[Jikes]</cite>, I added an
 <code>XMLUnparse</code> method to each of the AST nodes. This change,
 along with some small additional code for managing the options to
-request the XML output, results in an incredibly robust and fast POSR to
+request the XML output, results in an incredibly robust and fast 
 JavaML converter.  In total, I added about 1600 non-comment-non-blank
 lines of C++ code to the Jikes framework to support the option.  The
 source code is available upon request (and will be made publicly
@@ -797,7 +798,8 @@ JavaML DTD using James Clark's Jade package's <code>nsgmls</code> tool.
 
 <p>
 
-Also implemented is a prototype back-converter that outputs the POSR given
+Also implemented is a prototype back-converter that outputs the classical
+source representation given
 the JavaML representation. That application uses the XML and DOM packages
 and contains about 360 lines of Perl.
 See <a href="#future-work">section 6</a> for
@@ -1043,7 +1045,7 @@ sub start_tag {
 <p>
 
 Other possibilities for transformations include using a style sheet to
-convert from JavaML back into the plain old source representation or a
+convert from JavaML back into the classical source representation or a
 PostScript text representation with nice syntax highlighting.  Adding
 debug or instrumentation code at entry and exit to and from functions is
 also straightforward.
@@ -1139,7 +1141,7 @@ technique.
 <h3><a name="future-work">6 - Future work</a></h3>
 
 The one unfortunate shortcoming of the current implementation of the
-plain old source representation to JavaML converter
+classical source representation to JavaML converter
 is that it loses source-level comments.  Though these
 are an essential part of any software artifact, conventional parsing
 technology throws the comments away early in the lexical analysis phase.
@@ -1165,7 +1167,7 @@ more possibilities are imaginable.
 JavaML should be refined to guarantee that it is a complete, isomorphic
 representation of the constructs present in the latest version of the
 Java programming language.  Additionally, it is likely beneficial to
-migrata JavaML to use XML Schema <cite>[XMLSchema1,XMLSchema2]</cite>
+migrate JavaML to use XML Schema <cite>[XMLSchema1,XMLSchema2]</cite>
 instead of a DTD after the Schema working drafts are finalized.
 
 <p>
@@ -1192,7 +1194,7 @@ well with parsing techniques. <cite>[EmpAnCpp,Pcp3]</cite>
 
 <p>
 
-The current converter that translates back from JavaML to the plain old
+The current converter that translates back from JavaML to the classical
 source representation needs to be far more robust.  It was written as
 only a proof of concept and for the author to gain experience with the
 XML DOM.  A better approach is to add a Jikes front-end that uses an XML
@@ -1200,7 +1202,7 @@ parser (e.g., XML4C++ <cite>[XML4C++]</cite>) to construct the XML
 DOM from the JavaML source, then simply write a recursive conversion
 function to build the Jikes internal AST from using the DOM API.  Then,
 using Jikes's pre-existing conventional unparser, the compiler can write
-out the POSR for the source code.  The key benefit of this technique is
+out the classical representation for the source code.  The key benefit of this technique is
 that it then permits the compiler to work directly on the JavaML
 representation of the source code via the new front end.
 
@@ -1222,7 +1224,7 @@ Since the concise textual representation of source code is nicely suited
 to expert programmers, it's unlikely that they will be interested in
 discarding their favourite text editor anytime soon.  It will be useful
 to investigate better ways to convert interactively and incrementally
-from the POSR to
+from the classical source representation to
 JavaML and support useful editing capabilities along the lines of
 current text editing systems.  The work on structured text editors is
 highly relevant here, but may prove more fruitful given the incredible
@@ -1234,7 +1236,7 @@ commercial importance of XML technology.
 <h3><a name="conclusion">7 - Conclusion</a></h3>
 
 JavaML is an alternate representation of Java source programs that is
-based on XML.  Unlike the plain old textual source representation, the
+based on XML.  Unlike the classical textual source representation, the
 JavaML representation makes it easy for software tools to reason about
 programming-level constructs in a Java program.  This results from the
 ability of JavaML to more directly represent the structure of the program.
@@ -1245,8 +1247,9 @@ Given JavaML, the wealth of pre-existing XML and SGML tools can perform
 numerous interesting and useful analyses and transformations of Java
 source programs.  But the best is yet to come.  XML tools are improving
 continually to support the growing infrastructure of XML-based
-documents.  Ultimately, JavaML could replace the plain old source
-representation of Java programs, relegating text-parsing to just one of
+documents.  Ultimately, JavaML could replace the classical source
+representation of Java programs as the storage format for programs,
+relegating text-parsing to just one of
 many possible ways of interacting directly with the structured
 representation of the software artifact throughout the development
 process.
@@ -1697,7 +1700,7 @@ Addison-Wesley, 1996.
 <p>
 <strong>[Java]]</strong> &nbsp; 
 Ken Arnold and James Gosling.
-<emph>The Java Programming Langauge</emph>, 2nd ed.
+<emph>The Java Programming Language</emph>, 2nd ed.
 Addison-Wesley Longman, 1997.
 
 <p>
@@ -1750,7 +1753,7 @@ Addison-Wesley, 1997.
 <p>
 <strong>[Modula-2]</strong> &nbsp;
 British Standards Institution.
-<emph>Modulea-2 Draft International Standard</emph>, ISO-94.
+<emph>Modula-2 Draft International Standard</emph>, ISO-94.
 June 1994.
 
 <p>
@@ -1784,7 +1787,7 @@ October 1997. Santa Barbara, California.
 <strong>[Cassowary]</strong> &nbsp;
 Greg Badros and Alan Borning.
 "The Cassowary Linear Arithmetic Constraint Solving Algorithm: Interface and Implementation".
-University of Washinggton TR UW-CSE-98-06-04.
+University of Washington TR UW-CSE-98-06-04.
 
 
 
