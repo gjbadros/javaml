@@ -1,0 +1,41 @@
+JavaML: A Markup Language for Java Source Code 
+Copyright (C) 2000  Greg J. Badros
+Distributed under the LGPL
+
+See: http://www.cs.washington.edu/homes/gjb/papers/javaml/javaml.html
+
+Abstract
+
+The classical plain-text representation of source code is convenient for
+programmers but requires parsing to uncover the deep structure of the
+program. While sophisticated software tools parse source code to gain
+access to the program's structure, many lightweight programming aids
+such as grep rely instead on only the lexical structure of source
+code. I describe a new XML application that provides an alternative
+representation of Java source code. This XML-based representation,
+called JavaML, is more natural for tools and permits easy specification
+of numerous software-engineering analyses by leveraging the abundance of
+XML tools and techniques. A robust converter built with the IBM Jikes
+Java compiler framework translates from the classical Java source code
+representation to JavaML.
+
+
+I've added an XML unparser to Jikes to support the DTD (document
+type definition) described in java-ml.dtd.
+
+To get started, try:
+
+export CLASSPATH=/usr/lib/netscape/java/classes/java40.jar:$CLASSPATH
+../jikes/src/jikes +ux FirstApplet.java
+
+Then use James Clark's JADE package's nsgml (see http://www.jclark.com/jade/)
+to do:
+
+% nsgmls-xml xml-unparsed/FirstApplet.java.xml
+
+to check the output against java-ml.dtd
+
+nsgmls-xml is just:
+
+#!/bin/sh -
+nsgmls -c/usr/doc/jade-1.2.1/pubtext/xml.soc -wxml "$@"
