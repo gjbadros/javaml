@@ -19,6 +19,8 @@
 #include "symbol.h"
 #include "semantic.h"
 
+// GJB:FIXME:: wstring2string leaks
+
 /* make <arguments></arguments>
    and <formal-argments></formal-arguments>
    into <arguments/>
@@ -51,9 +53,14 @@ SemanticEnvironment *ThisEnvironment() {
   return g_pclassdecl->semantic_environment;
 }
 
-PackageSymbol *ThisPackage() {
-  return ThisEnvironment()->sem->Package();
+Semantic *ThisSemantic() {
+  return ThisEnvironment()->sem;
 }
+
+PackageSymbol *ThisPackage() {
+  return ThisSemantic()->Package();
+}
+
 
 void xml_unhandled(Ostream &xo, char *szType, char *szExtra)
 {
@@ -111,7 +118,7 @@ char *SzNewEscapedLiteralString(const char *sz)
 }
 
 char *
-SzIdFromMethod(long id, const char *szClassName,const char *szMethodName)
+SzIdFromMethod(long id, const Ast *pnode)
 {
   ostrstream xo;
   xo << "meth-" << id << ends;
@@ -119,7 +126,7 @@ SzIdFromMethod(long id, const char *szClassName,const char *szMethodName)
 }
 
 char *
-SzIdFromConstructor(long id, const char *szClassName,const char *szConstructorName)
+SzIdFromConstructor(long id, const Ast *pnode)
 {
   ostrstream xo;
   xo << "ctr-" << id << ends;
@@ -127,22 +134,15 @@ SzIdFromConstructor(long id, const char *szClassName,const char *szConstructorNa
 }
 
 char *
-SzIdFromFormalArgument(long id, const char *szClassName,
-                       const char *szMethodName, const char *szFormalArg)
+SzIdFromFormalArgument(long id, const Ast *pnode)
 {
   ostrstream xo;
-  // GJB:FIXME:: this is a hack;
-  // catch block formal-arguments get found
-  // like local variables, so their uses' idref-s
-  // point back to locvar-#, not frmarg-# so we
-  // need to be sure that the formal-argument gets
-  // an id locvar-#, not frmarg-#
   xo << "frmarg-" << id << ends;
   return xo.str();
 }
 
 char *
-SzIdFromLocalVariable(long id, const char *szVarName)
+SzIdFromLocalVariable(long id, const Ast *pnode)
 {
   ostrstream xo;
   xo << "locvar-" << id << ends;
@@ -244,6 +244,8 @@ xml_output(Ostream &xo, char *szTag, ...)
   char *sz;
   while ((sz = va_arg(ap, char *)) != NULL && sz != XML_CLOSE) {
     char *szVal = va_arg(ap, char *);
+    assert (szVal != XML_CLOSE && 
+            "Broken xml_output call -- check parameters");
     if (szVal)
       xo << " " << sz << "=\"" << szVal << "\"";
   }
@@ -280,6 +282,49 @@ xml_close(Ostream &xo, char *szTag, bool fNewline = false)
     xml_nl(xo);
 }
 
+void
+xml_location_element(Ostream &xo, LexStream &lex_stream, LexStream::TokenIndex start, LexStream::TokenIndex end)
+{
+  FileLocation flStart(&lex_stream,start);
+  char *szLocationStart = wstring2string(flStart.location);
+  char *pchLineStart = strrchr(szLocationStart,':');
+  *pchLineStart = '\0';
+  // Only include column attribute if column information exists
+  // need to run with +D to get the column information;
+  int columnStart = lex_stream.Column(start); // 0 means no column information available
+  // but we subtract by 1 to make the column number reported be 0-based
+  // since Emacs is 0-based for columns
+  char *szColStart = columnStart != 0? SzNewFromLong(columnStart - 1) : NULL;
+
+  FileLocation *pflEnd = NULL;
+  char *szLocationEnd = NULL;
+  char *pchLineEnd = NULL;
+  char *szColEnd = NULL;
+  if (end > 0) {
+    pflEnd = new FileLocation(&lex_stream, end);
+    szLocationEnd = wstring2string(pflEnd->location);
+    pchLineEnd = strrchr(szLocationEnd,':');
+    int columnEnd = lex_stream.Column(end);
+    szColEnd = columnEnd != 0? SzNewFromLong(columnEnd - 1) : NULL;
+  }
+  xml_output(xo,"location",
+             "filename",szLocationStart,
+             "line",(pchLineStart + 1),
+             "column", szColStart,
+             "end-line",(pchLineEnd? pchLineEnd + 1: NULL),
+             "end-column", szColEnd,
+             XML_CLOSE);
+
+  delete szColStart;
+  delete szColEnd;
+
+  // remove null terminator so delete works
+  *pchLineStart = ':';
+
+  delete [] szLocationStart;
+  delete [] szLocationEnd;
+}
+                       
 char *
 xml_name_string(LexStream &ls, LexStream::TokenIndex i)
 {
@@ -321,12 +366,12 @@ void xml_unparse_maybe_var_ref(Ostream &xo, LexStream &ls, Ast *pnode)
       if (g_pblockdecl && g_pblockdecl->block_symbol)
         var_symbol = g_pblockdecl->block_symbol->FindVariableSymbol(name_symbol);
       if (var_symbol)
-        szIdRef = SzIdFromLocalVariable(var_symbol->declarator->id,wstring2string(var_symbol->Name()));
+        szIdRef = SzIdFromLocalVariable(var_symbol->declarator->id,pnode);
       else if (g_pmethoddecl && g_pmethoddecl->method_symbol) {
         var_symbol = g_pmethoddecl->method_symbol->block_symbol->FindVariableSymbol(name_symbol);
         /* GJB:FIXME:: cheat here instead of figuring out classname, methodname, etc. */
         if (var_symbol)
-          szIdRef = SzIdFromFormalArgument(var_symbol->declarator->id,"class","method","formal-name");
+          szIdRef = SzIdFromFormalArgument(var_symbol->declarator->id,pnode);
       }
     }
     xml_output(xo,"var-ref",
@@ -644,7 +689,6 @@ void AstClassDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
     bool fTransient = false;
     bool fNative = false;
     char *szVisibility = NULL;
-
     g_pclassdecl = this;
 
     for (int i = 0; i < this -> NumClassModifiers(); i++)
@@ -696,6 +740,10 @@ void AstClassDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
                NULL);
     // os << ") #" << class_body -> id << "\n";
 
+    LexStream::TokenIndex start_token = 
+      NumClassModifiers() > 0? ClassModifier(0)->modifier_kind_token : class_token;
+
+    xml_location_element(os, lex_stream, LeftToken(), RightToken());
     xml_nl(os);
     xml_output(os,"superclass",
                "name",szSuperclass,
@@ -817,7 +865,8 @@ void AstFieldDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
 
     for (int k = 0; k < this -> NumVariableDeclarators(); k++)
       {
-        char *szName = SzFromUnparse(lex_stream,VariableDeclarator(k)->variable_declarator_name);
+        AstVariableDeclarator *pvarid = VariableDeclarator(k);
+        char *szName = SzFromUnparse(lex_stream,pvarid->variable_declarator_name);
         xml_output(os,"field",
                    "name",szName,
                    "visibility",szVisibility,
@@ -826,8 +875,12 @@ void AstFieldDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
                    "volatile",SzOrNullFromF(fVolatile),
                    "transient",SzOrNullFromF(fTransient),
                    NULL);
+        xml_location_element(os, lex_stream, pvarid->variable_declarator_name->identifier_token, -1);
+        // GJB:FIXME:: which should I use here? the below is for the entire field declaration
+        // and will treat "int x, y;" differently.  The above just marks the identifiers location.
+        //xml_location_element(os, lex_stream, LeftToken(), RightToken());
         xml_unparse_maybe_type(os,lex_stream,type);
-        xml_unparse_maybe_var_ref(os,lex_stream,VariableDeclarator(k));
+        xml_unparse_maybe_var_ref(os,lex_stream,pvarid);
         xml_close(os,"field",true);
       }
     if (Ast::debug_unparse) os << "/*:AstFieldDeclaration#" << this-> id << "*/";
@@ -893,8 +946,8 @@ void AstFormalParameter::XMLUnparse(Ostream& os, LexStream& lex_stream)
                "final",SzOrNullFromF(fFinal),
                "id",
                (g_fInsideCatch? 
-                SzIdFromLocalVariable(formal_declarator->id,szName):
-                SzIdFromFormalArgument(formal_declarator->id,szClassName,szMethodName,szName)),
+                SzIdFromLocalVariable(formal_declarator->id,this):
+                SzIdFromFormalArgument(formal_declarator->id,this)),
                NULL);
     xml_unparse_maybe_type(os,lex_stream,type);
     xml_close(os,"formal-argument",true);
@@ -995,11 +1048,13 @@ void AstMethodDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
                "synchronized",SzOrNullFromF(fSynchronized),
                "native",SzOrNullFromF(fNative),
                "num-brackets", szNumBrackets,
-               "id",SzIdFromMethod(this->id,szClassName,szMethodName),
+               "id",SzIdFromMethod(id,this),
                NULL);
-    xml_nl(os);
 
     delete szNumBrackets;
+
+    xml_location_element(os, lex_stream, LeftToken(), RightToken() );
+    xml_nl(os);
 
     xml_unparse_maybe_type(os,lex_stream,type);
     xml_nl(os);
@@ -1122,8 +1177,9 @@ void AstConstructorDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
                "static",SzOrNullFromF(fStatic),
                "synchronized",SzOrNullFromF(fSynchronized),
                "native",SzOrNullFromF(fNative),
-               "id",SzIdFromConstructor(this->id,szClassName,szConstructorName),
+               "id",SzIdFromConstructor(id,this),
                NULL);
+    xml_location_element(os, lex_stream, LeftToken(), RightToken());
     xml_nl(os);
 
     g_szMethodName = szConstructorName;
@@ -1193,6 +1249,8 @@ void AstInterfaceDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
                "final",SzOrNullFromF(fFinal),
                "synchronized",SzOrNullFromF(fSynchronized),
                NULL);
+
+    xml_location_element(os, lex_stream, LeftToken(), RightToken());
 
     if (NumExtendsInterfaces() > 0)
       {
@@ -1277,7 +1335,7 @@ void AstLocalVariableDeclarationStatement::XMLUnparse(Ostream& os, LexStream& le
                    "volatile",SzOrNullFromF(fVolatile),
                    "transient",SzOrNullFromF(fTransient),
                    "continued",(k==0?NULL:"true"),
-                   "id",SzIdFromLocalVariable(VariableDeclarator(k)->id,szName),
+                   "id",SzIdFromLocalVariable(VariableDeclarator(k)->id,this),
                    NULL);
         // Repeat the type for each variable
         xml_unparse_maybe_type(os,lex_stream,type);
@@ -1672,6 +1730,7 @@ void AstClassInstanceCreationExpression::XMLUnparse(Ostream& os, LexStream& lex_
     if (class_body_opt) {
       xml_nl(os);
       xml_open(os,"anonymous-class");
+      xml_location_element(os, lex_stream, LeftToken(), RightToken());
       xml_nl(os);
       if (0 /* class_type is an interface GJB:FIXME:: how do I get at that? */) {
         xml_output(os,"implement",
