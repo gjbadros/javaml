@@ -1,23 +1,29 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!ENTITY % visibility-attribute "visibility (public|private|protected) #IMPLIED">
-<!ENTITY % kind-attribute "kind (integer|real|double) #IMPLIED">
-<!ENTITY % mod-final "final (final) #IMPLIED">
-<!ENTITY % mod-static "static (static) #IMPLIED">
-<!ENTITY % mod-volatile "volatile (volatile) #IMPLIED">
-<!ENTITY % mod-transient "transient (transient) #IMPLIED">
-<!ENTITY % mod-native "native (native) #IMPLIED">
-<!ENTITY % mod-abstract "abstract (abstract) #IMPLIED">
-<!ENTITY % mod-synchronized "synchronized (synchronized) #IMPLIED">
-<!ELEMENT java-source-program (import|class)* >
+<!ENTITY % kind-attribute "kind (integer|long|real|double) #IMPLIED">
+<!ENTITY % mod-final "final CDATA #IMPLIED">
+<!ENTITY % mod-static "static CDATA #IMPLIED">
+<!ENTITY % mod-volatile "volatile CDATA #IMPLIED">
+<!ENTITY % mod-transient "transient CDATA #IMPLIED">
+<!ENTITY % mod-native "native CDATA #IMPLIED">
+<!ENTITY % mod-abstract "abstract CDATA #IMPLIED">
+<!ENTITY % mod-synchronized "synchronized CDATA #IMPLIED">
+
+<!ENTITY % expression-types "send|assignment-expr|conditional-expr|binary-expr|literal-number|literal-string|literal-true|literal-false">
+
+<!ELEMENT java-source-program (package-decl|import|class)* >
 <!ATTLIST java-source-program
     version CDATA #IMPLIED>
 <!ELEMENT import EMPTY>
 <!ATTLIST import
     module CDATA #REQUIRED>
-<!ELEMENT class ((implement)*, (comment|method|field)*) >
+<!ELEMENT class ((implement)*, (comment|constructor|method|field)*) >
 <!ATTLIST class
     name CDATA #REQUIRED
     %visibility-attribute 
+    %mod-abstract
+    %mod-final
+    %mod-synchronized
     superclass CDATA "Object">
 <!ELEMENT field EMPTY>
 <!ATTLIST field
@@ -28,7 +34,18 @@
     %mod-static
     %mod-volatile
     %mod-transient>
-<!ELEMENT method (comment?,formal-arguments,statements)>
+<!ELEMENT constructor (comment?,formal-arguments,throws?,statements)>
+<!ATTLIST constructor
+    name CDATA #REQUIRED
+    id ID #REQUIRED
+    %visibility-attribute
+    %mod-final
+    %mod-static
+    %mod-synchronized
+    %mod-volatile
+    %mod-transient
+    %mod-native>
+<!ELEMENT method (comment?,formal-arguments,throws?,statements?)>
 <!ATTLIST method 
     name CDATA #REQUIRED
     id ID #REQUIRED
@@ -47,18 +64,40 @@
 <!ATTLIST formal-argument
     type CDATA #REQUIRED
     name CDATA #REQUIRED
+    %mod-final
     id ID #REQUIRED>
 <!ELEMENT send (target,arguments)>
-<!ELEMENT target (#PCDATA)>
-<!ELEMENT return (expression)?>
-<!ELEMENT statements (statements|send|var-decl|condition|loop|return)*>
-<!ELEMENT expression (#PCDATA)>
-<!ELEMENT arguments (literal-string|literal-number)*>
+<!ELEMENT target ANY>
+<!ELEMENT return ANY>
+<!ELEMENT statements (statements|local-variable|throw|condition|loop|return|%expression-types)*>
+<!ELEMENT throw ANY>
+<!ELEMENT throws EMPTY>
+<!ATTLIST throws
+    exception CDATA #REQUIRED>
+<!ELEMENT new (arguments)>
+<!ATTLIST new
+    class CDATA #REQUIRED>
+<!ELEMENT local-variable EMPTY>
+<!ATTLIST local-variable
+    type CDATA #REQUIRED
+    name CDATA #REQUIRED>
+<!ELEMENT arguments (%expression-types)*>
 <!ELEMENT literal-string EMPTY>
 <!ATTLIST literal-string
-    value CDATA #REQUIRED>
+    value CDATA #REQUIRED
+    length CDATA #REQUIRED>
 <!ELEMENT literal-number EMPTY>
 <!ATTLIST literal-number
     value CDATA #REQUIRED
     %kind-attribute
     base CDATA "10">
+<!ELEMENT var-ref EMPTY>
+<!ATTLIST var-ref
+    name CDATA #REQUIRED>
+<!ELEMENT package-decl EMPTY>
+<!ATTLIST package-decl
+    name CDATA #REQUIRED>
+<!ELEMENT assignment-expr ANY>
+<!ELEMENT binary-expr ((%expression-types),(%expression-types))>
+<!ATTLIST binary-expr
+    op CDATA #REQUIRED>

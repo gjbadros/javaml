@@ -4,6 +4,7 @@ Possible Analyses:
 * changing sense of a default parameter (via overriding, since no defaults in Java)
 * renaming a method
 * search for unused variables
+* etags
 
 
 XML DTD Stuff:
@@ -11,3 +12,6 @@ XML DTD Stuff:
 If an attribute is specified to be entry, then when the tag
 is used it should be <foo>, not <foo/>
 
+
+Duplicate attribute values not allowed:
+http://www.oasis-open.org/cover/duplTokens.html

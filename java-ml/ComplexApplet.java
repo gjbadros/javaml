@@ -1,6 +1,7 @@
+package foo;
+
 import java.applet.*;   // do not forget this import statement!
 import java.awt.*;      // Or this one for the graphics!
-
 
 public abstract class ComplexApplet extends Applet {
 
@@ -27,7 +28,7 @@ public abstract class ComplexApplet extends Applet {
   }
 
   protected final int bar() {
-    return 1 + 2;
+    return 1 + 2 + 3;
   }
   double baz(int i) throws Exception {
     throw new Exception();
