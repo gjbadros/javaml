@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!-- java-ml.dtd 0.9 -->
+<!-- java-ml.dtd 0.92 -->
 <!-- Copyright (C) 2000, Greg J. Badros 
      <gjb@cs.washington.edu> -->
 <!-- A DTD for JavaML, an XML representation 
@@ -13,7 +13,7 @@
 <!ENTITY % interface-visibility-attribute 
     "visibility (public) #IMPLIED">
 <!ENTITY % kind-attribute 
-    "kind (integer|long|real|\
+    "kind (integer|long|float|\
      double) #IMPLIED">
 <!ENTITY % mod-final 
     "final CDATA #IMPLIED">
@@ -35,9 +35,14 @@
      field-access|array-ref|paren|\
      assignment-expr|conditional-expr|\
      binary-expr|unary-expr|cast-expr|\
-     literal-number|literal-string|\
+     instanceof-test|literal-number|\
+     literal-string|literal-char|\
      literal-true|literal-false|\
      literal-null|this|super">
+<!ENTITY % stmt-elems 
+    "statements|local-variable|try|throw|\
+     if|switch|loop|do-loop|return|\
+     continue|break|%expr-elems;">
 
 <!ELEMENT java-source-program 
     (package-decl?,import*,
@@ -50,10 +55,19 @@
     module CDATA #REQUIRED>
 <!ELEMENT class 
     (superclass?, implement*,
-      (constructor|method|field)*)>
+      (class|interface|constructor|method|\
+     field|static-initializer)*)>
 <!ATTLIST class
     name CDATA #REQUIRED
     %visibility-attribute;
+    %mod-static;
+    %mod-abstract;
+    %mod-final;
+    %mod-synchronized;>
+<!ELEMENT anonymous-class 
+    (superclass?, implement*,
+      (constructor|method|field)*)>
+<!ATTLIST anonymous-class
     %mod-abstract;
     %mod-final;
     %mod-synchronized;>
@@ -67,11 +81,13 @@
     %interface-visibility-attribute;>
 <!ELEMENT implement EMPTY>
 <!ATTLIST implement
-    class CDATA #REQUIRED>
+    interface CDATA #REQUIRED>
 <!ELEMENT extend EMPTY>
 <!ATTLIST extend
     interface CDATA #REQUIRED>
-<!ELEMENT field (type,(%expr-elems;)?)>
+<!ELEMENT field 
+    (type,
+     (array-initializer|%expr-elems;)?)>
 <!ATTLIST field
     name CDATA #REQUIRED
     %visibility-attribute;
@@ -81,7 +97,8 @@
     %mod-transient;>
 <!ELEMENT constructor 
     (formal-arguments,throws*,
-     (super-call|this-call)?,statements)>
+     (super-call|this-call)?,
+     (%stmt-elems;))>
 <!ATTLIST constructor
     name CDATA #REQUIRED
     id ID #REQUIRED
@@ -94,7 +111,7 @@
     %mod-native;>
 <!ELEMENT method 
     (type,formal-arguments,throws*,
-     statements?)>
+     (%stmt-elems;)?)>
 <!ATTLIST method 
     name CDATA #REQUIRED
     id ID #REQUIRED
@@ -116,39 +133,43 @@
 <!ELEMENT send (target?,arguments)>
 <!ATTLIST send
     message CDATA #REQUIRED>
+<!ELEMENT statements (%stmt-elems;)*>
 <!ELEMENT target (%expr-elems;)>
-<!ELEMENT return (%expr-elems;)>
-<!ELEMENT statements 
-    (statements|local-variable|try|throw|\
-     if|loop|do-loop|return|continue|break|\
-     %expr-elems;)*>
+<!ELEMENT return (%expr-elems;)?>
 <!ELEMENT throw (%expr-elems;)>
 <!ELEMENT throws EMPTY>
 <!ATTLIST throws
     exception CDATA #REQUIRED>
-<!ELEMENT new (type,arguments)>
+<!ELEMENT new 
+    (type,arguments,anonymous-class?)>
 <!ELEMENT type EMPTY>
 <!ATTLIST type
     primitive CDATA #IMPLIED
     name CDATA #REQUIRED
     dimensions CDATA #IMPLIED>
 <!ELEMENT new-array 
-    (type,dim-expr*,(%expr-elems;)?)>
+    (type,dim-expr*,array-initializer?)>
 <!ATTLIST new-array
     dimensions CDATA #REQUIRED>
 <!ELEMENT dim-expr (%expr-elems;)>
 <!ELEMENT local-variable 
     (type,
-     (static-initializer|%expr-elems;)?)>
+     (static-initializer|array-initializer|\
+     %expr-elems;)?)>
 <!ATTLIST local-variable
     name CDATA #REQUIRED
     id ID #REQUIRED
-    continuation CDATA #IMPLIED
+    continued CDATA #IMPLIED
     %mod-final;>
+<!ELEMENT array-initializer 
+    (array-initializer|%expr-elems;)*>
+<!ATTLIST array-initializer
+    length CDATA #REQUIRED>
 <!ELEMENT arguments (%expr-elems;)*>
 <!ELEMENT literal-string (#PCDATA)>
 <!ATTLIST literal-string
-    len CDATA #REQUIRED>
+    length CDATA #REQUIRED>
+<!ELEMENT literal-char (#PCDATA)>
 <!ELEMENT literal-number EMPTY>
 <!ATTLIST literal-number
     value CDATA #REQUIRED
@@ -172,8 +193,12 @@
     name CDATA #REQUIRED>
 <!ELEMENT assignment-expr 
     (lvalue,(%expr-elems;))>
+<!ATTLIST assignment-expr
+    op CDATA #REQUIRED>
 <!ELEMENT lvalue 
     (var-set|field-set|%expr-elems;)>
+<!ELEMENT instanceof-test 
+    ((%expr-elems;),type)>
 <!ELEMENT binary-expr 
     ((%expr-elems;),(%expr-elems;))>
 <!ATTLIST binary-expr
@@ -189,29 +214,30 @@
 <!ELEMENT literal-null EMPTY>
 <!ELEMENT if (test,true-case,false-case?)>
 <!ELEMENT test (%expr-elems;)>
-<!ELEMENT true-case (statements)>
-<!ELEMENT false-case (statements)>
+<!ELEMENT true-case (%stmt-elems;)>
+<!ELEMENT false-case (%stmt-elems;)>
 <!ELEMENT array-ref (base,offset)>
 <!ELEMENT base (%expr-elems;)>
 <!ELEMENT offset (%expr-elems;)>
-<!ELEMENT static-initializer (statements)>
+<!ELEMENT static-initializer 
+    (%stmt-elems;)>
 <!ELEMENT super-call (arguments)>
 <!ELEMENT this-call (arguments)>
 <!ELEMENT super EMPTY>
 <!ELEMENT this EMPTY>
 <!ELEMENT loop 
-    (init*,test?,update*,statements?)>
+    (init*,test?,update*,(%stmt-elems;)?)>
 <!ATTLIST loop
     kind (for|while) #IMPLIED>
 <!ELEMENT init 
-    (local-variable|%expr-elems;)>
+    (local-variable|%expr-elems;)*>
 <!ELEMENT update (%expr-elems;)>
-<!ELEMENT do-loop (statements?,test?)>
+<!ELEMENT do-loop ((%stmt-elems;)?,test?)>
 <!ELEMENT try 
-    (statements,catch*,finally?)>
+    ((%stmt-elems;),catch*,finally?)>
 <!ELEMENT catch 
-    (formal-argument,statements?)>
-<!ELEMENT finally (statements)>
+    (formal-argument,(%stmt-elems;)?)>
+<!ELEMENT finally (%stmt-elems;)>
 <!ELEMENT continue EMPTY>
 <!ATTLIST continue
     targetname CDATA #IMPLIED>
@@ -221,3 +247,8 @@
 <!ELEMENT conditional-expr 
     ((%expr-elems;),(%expr-elems;),
      (%expr-elems;))>
+<!ELEMENT switch 
+    ((%expr-elems;),((case|default-case)+,
+     (%stmt-elems;))+)>
+<!ELEMENT case (%expr-elems;)>
+<!ELEMENT default-case EMPTY>
