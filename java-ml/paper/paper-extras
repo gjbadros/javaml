@@ -1,0 +1,28 @@
+<!--
+
+GJB:FIXME:: need another transformation example, ideally using XSLT if I
+can find a working implementation of that.
+
+* changing sense of a default parameter (via overriding, because no
+defaults in Java)
+
+* renaming a method
+
+* search for unused variables
+
+* etags
+
+* add debug/instrumentation code at entry/exit to function/block whatever
+
+* better diff utility; canonical ast differ for cheating check
+
+ -->
+
+
+<!--
+
+Many structure-based editing systems have been
+developed. [GJB:FIXME::].  XML editors are likely to supersede the 
+capabilities of prior systems simply because of the commercial
+importance of XML technology.
+-->

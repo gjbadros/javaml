@@ -1,0 +1,3 @@
+#!/bin/sh -
+rm -f badros.zip
+zip badros.zip javaml.html *.gif
