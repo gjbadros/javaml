@@ -1,0 +1,4 @@
+#!/uns/bin/zsh -f
+f=$1; shift;
+jikes-xml $f "$@"
+`dirname $0`/javaml-to-plain-source xml-unparsed/$f.xml
