@@ -22,11 +22,11 @@ char *g_szClassName = NULL;
 
 
 /* Output any prefix header for the converted XML file */
-void xml_prefix(Ostream &xo)
+void xml_prefix(Ostream &xo,char *szInfilename)
 {
   xo << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
      << "<!DOCTYPE java-source-program SYSTEM \"../java-ml.dtd\">\n\n"
-     << "<java-source-program>\n";
+     << "<java-source-program name=\"" << szInfilename << "\">\n";
 }
 
 /* Output any suffix for the converted XML file */
@@ -302,7 +302,7 @@ void AstCompilationUnit::XMLUnparse(LexStream& lex_stream, char *directory)
     abort();
   }
   Ostream os(&os_base);
-  xml_prefix(os);
+  xml_prefix(os,in_file_name);
   this -> XMLUnparse(os, lex_stream);
   xml_suffix(os);
   delete[] out_file_name;
@@ -738,7 +738,6 @@ void AstMethodDeclarator::XMLUnparse(Ostream& os, LexStream& lex_stream)
       for (int k = 0; k < this -> NumFormalParameters(); k++)
         {
           this -> FormalParameter(k) -> XMLUnparse(os, lex_stream);
-          xml_nl(os);
         }
       xml_close(os,"formal-arguments",true);
 #ifdef SHORTCUT_XML_CLOSE
@@ -819,6 +818,7 @@ void AstMethodDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
     delete szNumBrackets;
 
     xml_unparse_maybe_type(os,lex_stream,type);
+    xml_nl(os);
 
     g_szMethodName = szMethodName;
     method_declarator -> XMLUnparse(os, lex_stream);
@@ -1492,9 +1492,10 @@ void AstMethodInvocation::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstMethodInvocation:#" << this-> id << "*/";
     xml_open(os,"send");
+    xml_nl(os);
     xml_open(os,"target");
     xml_unparse_maybe_var_ref(os,lex_stream,method);
-    xml_close(os,"target",false);
+    xml_close(os,"target",true);
 #ifdef SHORTCUT_XML_CLOSE
     if (NumArguments() > 0) {
 #endif
@@ -1509,6 +1510,7 @@ void AstMethodInvocation::XMLUnparse(Ostream& os, LexStream& lex_stream)
       xml_output(os,"arguments",XML_CLOSE);
     }
 #endif
+    xml_nl(os);
     xml_close(os,"send",true);
     if (Ast::debug_unparse) os << "/*:AstMethodInvocation#" << this-> id << "*/";
 }
