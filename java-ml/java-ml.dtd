@@ -28,7 +28,7 @@
     %mod-static
     %mod-volatile
     %mod-transient>
-<!ELEMENT method (comment,formal-arguments,statements)>
+<!ELEMENT method (comment?,formal-arguments,statements)>
 <!ATTLIST method 
     name CDATA #REQUIRED
     id ID #REQUIRED
@@ -50,8 +50,8 @@
     id ID #REQUIRED>
 <!ELEMENT send (target,arguments)>
 <!ELEMENT target (#PCDATA)>
-<!ELEMENT return (expression)>
-<!ELEMENT statements (send|var-decl|condition|loop|return)*>
+<!ELEMENT return (expression)?>
+<!ELEMENT statements (statements|send|var-decl|condition|loop|return)*>
 <!ELEMENT expression (#PCDATA)>
 <!ELEMENT arguments (literal-string|literal-number)*>
 <!ELEMENT literal-string EMPTY>
