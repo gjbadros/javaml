@@ -97,6 +97,7 @@
 <!ATTLIST local-variable
     name CDATA #REQUIRED
     id ID #REQUIRED
+    continuation CDATA #IMPLIED
     %mod-final;>
 <!ELEMENT arguments (%expr-elems;)*>
 <!ELEMENT literal-string (#PCDATA)>
