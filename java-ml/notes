@@ -57,6 +57,12 @@ e.g., make true-case an optional child of an if element
 
 
 
+xmldiff from IBM AlphaWorks failed to get a nice diff for a simple
+change of type made to the return parameter of FirstApplet.java.xml.
+--11/22/99 gjb
+
+
+
 
 XML DTD Stuff:
 
