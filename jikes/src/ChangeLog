@@ -1,3 +1,10 @@
+Tue Nov 16 16:34:01 1999  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp (SzIdFromFormalArgument): Hack so idref/id of
+	catch clause formal arguments match up (use global
+	g_fInsideCatch).  Also hack so that type=".." attributes just have 
+	names, not type="<type name="..""
+
 Tue Nov 16 16:04:02 1999  Greg J. Badros  <gjb@cs.washington.edu>
 
 	* xml-unparse.cpp: Use post="true", not post="yes" as attribute
