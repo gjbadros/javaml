@@ -67,12 +67,14 @@ void xml_prefix(Ostream &xo,char *szInfilename)
 {
   xo << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
      << "<!DOCTYPE java-source-program SYSTEM \"java-ml.dtd\">\n\n"
-     << "<java-source-program name=\"" << szInfilename << "\">\n";
+     << "<java-source-program>\n"
+     << "<java-class-file name=\"" << szInfilename << "\">\n";
 }
 
 /* Output any suffix for the converted XML file */
 void xml_suffix(Ostream &xo)
 {
+  xo << "</java-class-file>\n";
   xo << "</java-source-program>\n";
 }
 
@@ -617,8 +619,16 @@ void AstEmptyDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstClassBody::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstClassBody:#" << this-> id << "*/";
-    for (int k = 0; k < this -> NumClassBodyDeclarations(); k++)
-	this -> ClassBodyDeclaration(k) -> XMLUnparse(os, lex_stream);
+    for (int k = 0; k < this -> NumClassBodyDeclarations(); k++) {
+      AstBlock *pInstanceInitializer = dynamic_cast<AstBlock *>(ClassBodyDeclaration(k));
+      if (pInstanceInitializer) {
+        xml_open(os,"instance-initializer");
+      }
+      ClassBodyDeclaration(k) -> XMLUnparse(os, lex_stream);
+      if (pInstanceInitializer) {
+        xml_close(os,"instance-initializer",true);
+      }
+    }
     if (Ast::debug_unparse) os << "/*:AstClassBody#" << this-> id << "*/";
 }
 
@@ -1016,7 +1026,7 @@ void AstStaticInitializer::XMLUnparse(Ostream& os, LexStream& lex_stream)
     if (Ast::debug_unparse) os << "/*AstStaticInitializer:#" << this-> id << "*/";
     xml_open(os,"static-initializer");
     block -> XMLUnparse(os, lex_stream);
-    xml_close(os,"static-initializer");
+    xml_close(os,"static-initializer",true);
     if (Ast::debug_unparse) os << "/*:AstStaticInitializer#" << this-> id << "*/";
 }
 
@@ -1025,7 +1035,7 @@ void AstThisCall::XMLUnparse(Ostream& os, LexStream& lex_stream)
     if (Ast::debug_unparse) os << "/*AstThisCall:#" << this-> id << "*/";
     xml_open(os,"this-call");
     xml_unparse_arguments(os,lex_stream,this);
-    xml_close(os,"this-call");
+    xml_close(os,"this-call",true);
     if (Ast::debug_unparse) os << "/*:AstThisCall#" << this-> id << "*/";
 }
 
@@ -1698,9 +1708,7 @@ void AstArrayCreationExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
                "dimensions",szNumDimensions,
                NULL);
     delete szNumDimensions;
-    //    xml_open(os,"array-type");
     xml_unparse_maybe_type(os,lex_stream, array_type);
-    //    xml_close(os,"array-type");
     for (int i = 0; i < NumDimExprs(); i++) {
       DimExpr(i) -> XMLUnparse(os, lex_stream);
     }
