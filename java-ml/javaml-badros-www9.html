@@ -3,7 +3,7 @@
 <html>
 <head>
 <title>
-JavaML: A Markup Language for Java Source Code, by Greg J. Badros
+JavaML: A Markup Language for Java Source, by Greg J. Badros
 </title>
 <!--
   Title 
@@ -40,6 +40,7 @@ DD { MARGIN-TOP: 5em; margin-left: 5em }
 BLOCKQUOTE { MARGIN-LEFT: 1em; MARGIN-RIGHT: 1em }
 IMG { VERTICAL-ALIGN: top; ALIGN: center; }
 SUP { COLOR: #0000FF; FONT-SIZE: small; }
+
 -->
 </STYLE>
 </head>
@@ -160,7 +161,7 @@ be used to encode deep structure of a program;  language-independent
 transformations such as renaming a local variable, etc. 
 </pre>
 
-<br><small><a href="#top">[top]</a></small>
+<p><span class="index"><a href="#top">[top]</a></span>
 
 <h3><a name="background">Background</a></h3>
 
@@ -177,7 +178,7 @@ features of these technologies.
     programming language for World Wide Web applications.  Java combines
     a simple object model reminiscent of Smalltalk with Algol block
     structure, a C++-like syntax, a static type system, and a package
-    system inspired by Modula-2.
+    system inspired by Modula-2. <cite>[Java,JavaNutshell]</cite>
 
 <p>
 
@@ -212,26 +213,139 @@ features of these technologies.
    make Java source programs syntactically very clean, and make Java an
    ideal language for representing using XML.
 
- <h4><a name="xml">XML -- Extensible Markup Language</a></h4>
+<h4><a name="xml">XML -- Extensible Markup Language</a></h4>
+
+XML is a standardized extensible markup language that is a subset of
+SGML, the standard Generalized Markup Language.  The World Wide Web
+Consortium (W3C) designed XML to be lightweight and simple, while
+retaining compatibility with SGML.  Though HTML (HyperText Markup
+Language) is currently the standard language, the W3C is positioning XML
+to be its replacement.  While HTML permits authors to use only a
+pre-determined fixed set of tags in marking up their document, XML
+allows easy specification of user-defined markup tags adapted to the
+document and data at hand. <cite>[XML-Rec,LaTeXWeb,XML-Handbook]</cite>
+
+<p>
+
+An XML document consists simply of text marked up with tags enclosed in
+angle braces.  A simple example is:
+
+<code>
 <pre>
-
-Properties of XML that influenced DTD design:
-
-attributes are unordered, finite
- -> cannot use for arguments
-attributes are only text strings, so cannot have references
- -> e.g., types need to be encoded as elements
-    not 
-     [method return-type="boolean" ...] ... 
-    but
-    [method ...][type name="boolean" primitive="true"/] ...
-Didn't want stuff like boolean[][] since then end user
-would have to do string processing on the attribute value to
-get at the base type.
-
+&lt;?xml version="1.0"?&gt;
+&lt;!DOCTYPE email SYSTEM "email.dtd"&gt;
+&lt;email&gt;
+  &lt;head&gt;
+    &lt;to&gt;Mom&lt;/to&gt;
+    &lt;from&gt;Greg&lt;/from&gt;
+    &lt;subject&gt;My trip&lt;/subject&gt;
+  &lt;/head&gt;
+  &lt;body encoding="ascii"&gt;Weather is terrific&lt;/body&gt;
+&lt;/email&gt;
 </pre>
+</code>
 
-<br><small><a href="#top">[top]</a></small>
+The <code>&lt;email&gt;</code> is an open tag for the <code>email</code>
+element.  The <code>&lt;/email&gt;</code> at the end of the example is the
+corresponding close tag.  Text and other nested tags can appear between
+the open and close constructs.  In the above, the <code>email</code>
+element contains two elements: a <code>head</code> and a
+<code>body</code>.  Additionally, an XML open tag can associate
+attribute/value pairs with an element.  The <code>body</code> element
+above has the value <code>ascii</code> for its <code>encoding</code>
+attribute.  For an XML document to be <em>well-formed</em>, the
+document must simply conform to the numerous syntactic rules required of
+XML documents (e.g., tags must be balanced and properly nested,
+attribute values must be of the proper form and enclosed in quotes,
+etc.).
+
+A more stringent characterization of an XML document is
+<em>validity</em>.  An XML document is valid if and only if it is
+both well-formed and adheres to its specified <em>document type
+definition</em>, or <em>DTD</em>.  A document type definition is a
+formal description of the grammar of the specific language to be used by
+a class of XML documents.  A DTD defines all the permitted element
+names, and describes the attributes that each kind of element may
+posess. It also restricts the structure of the nesting within a valid
+XML document.  The above XML example is valid with respect to the
+following DTD:
+
+<code>
+<pre>
+&lt;!-- email DTD --&gt;
+&lt;!ELEMENT email (head,body)&gt;
+&lt;!ELEMENT head (to,from,subject?)&gt;
+&lt;!ELEMENT to (#PCDATA)&gt;
+&lt;!ELEMENT from (#PCDATA)&gt;
+&lt;!ELEMENT subject (#PCDATA)&gt;
+&lt;!ELEMENT body (#PCDATA)&gt;
+&lt;!ATTLIST body
+    encoding (ascii|mime) #REQUIRED&gt;
+    encrypted (yes|no) #IMPLIED&gt;
+</pre>
+</code>
+
+According to this DTD, there are six element classes. The
+<code>email</code> element must contain exactly one <code>head</code>
+followed by exactly one <code>body</code> element.  The
+<code>head</code>, in turn, must contain <code>to</code> and
+<code>from</code> elements, in that order, followed by an optional
+<code>subject</code> element.  Each of those elements may contain parsed
+character data (<em>PCDATA</em>).  The single <code>ATTLIST</code>
+declaration in the DTD specifies that the <code>body</code> element
+<em>must</em> specify a value of either <code>ascii</code> or
+<code>mime</code> for the <code>encoding</code> attribute, and
+<em>may</em> specify a value for the <code>encrypted</code> attribute.
+A XML document that is declared to adhere to this DTD is not valid if
+any of the above criteria are not met.  For example, if the
+<code>to</code> element is missing from an <code>email</code> document,
+that document is not valid, though it may still be well-formed.
+
+<p>
+
+When modeling data in XML, a primary design decision is choosing whether
+to nest elements or to use attributes.  In the above example, we could
+      have folded all of the information contained in the
+      <code>head</code> into attributes of the <code>email</code>
+      element if we chose.  There are several important differences
+      between using attributes and nesting elements:
+
+<ul>
+
+<li> Attributes/value pairs are unordered, while nested children have a
+	specific order;
+
+<li> values for attributes may contain only character data, and may not
+	include other markup, while nested children can arbitrarily nest 
+	further;
+
+<li> only one value for an attribute can be given, while multiple
+	elements of the same class can be siblings (e.g., we could have
+	multiple <code>to</code> elements contained by the
+	<code>head</code> with only a simple change to the DTD).
+
+</ul>
+
+Though the above limitations sometimes mandate using one technique or
+the other, the decision is often initially a matter of taste.  However,
+later experiences in using the resulting documents may suggest
+revisiting the decision in order to simplify some useful manipulation of
+the document.
+
+<p>
+
+<!--GJB:FIXME:: lots of cite s here--> 
+
+XML, in part due to its SGML heritage, is very well supported by tools
+such as Emacs editing modes, structure-based editors, validation
+utilities, querying systems, transformation and style languages, and
+much more.  Many other W3C recommendations inter-relate to XML including
+Cascading Style Sheets <cite>[CSS2]</cite>, XSL (Extensible Stylesheet
+Language) <cite>[XSL]</cite> and XSLT (XSL for Transformations)
+<cite>[XSLT]</cite>, XPath <cite>[XPath]</cite>, and DOM (Document
+Object Model) <cite>[DOM]</cite>.
+
+<p><span class="index"><a href="#top">[top]</a>
 
 <h3><a name="javaml">JavaML</a></h3>
 <pre>
@@ -250,14 +364,28 @@ Above is related to language translation issue:
   -> leads to more abstract representation
   -> tradeoff with preserving abstractions
 
+Properties of XML that influenced DTD design:
+
+attributes are unordered, finite
+ -> cannot use for arguments
+attributes are only text strings, so cannot have references
+ -> e.g., types need to be encoded as elements
+    not 
+     [method return-type="boolean" ...] ... 
+    but
+    [method ...][type name="boolean" primitive="true"/] ...
+Didn't want stuff like boolean[][] since then end user
+would have to do string processing on the attribute value to
+get at the base type.
+
 </pre>	
 
-<br><small><a href="#top">[top]</a></small>
+<p><span class="index"><a href="#top">[top]</a></span>
 
 <h3><a name="leveraging-xml">Leveraging XML</a></h3>
 <!-- example uses -->
 
-<br><small><a href="#top">[top]</a></small>
+<p><span class="index"><a href="#top">[top]</a></span>
 
 <h3><a name="related-work">Related work</a></h3>
 <pre>
@@ -275,7 +403,7 @@ Intentional Programming
 Structured Editors
 </pre>
 
-<br><small><a href="#top">[top]</a></small>
+<p><span class="index"><a href="#top">[top]</a></span>
 
 <h3><a name="future-work">Future work</a></h3>
 <pre>
@@ -324,13 +452,13 @@ Issue:
 [/field-access]
 
 </pre>
-<br><small><a href="#top">[top]</a></small>
+<p><span class="index"><a href="#top">[top]</a></span>
 
 <h3><a name="conclusion">Conclusion</a></h3>
 
 The best is yet to come.  XML tools are improving all the time.
 
-<br><small><a href="#top">[top]</a></small>
+<p><span class="index"><a href="#top">[top]</a></span>
 
 
 <h3><a name="acknowledgments">Acknowledgments</a></h3> 
@@ -340,7 +468,7 @@ helpful discussion. Thanks to IBM for constructing the
 Jikes compiler framework, and for making it publically available, and
 thanks to Mike Ernst for helpful pointers on its use.
 
-<br><small><a href="#top">[top]</a></small>
+<p><span class="index"><a href="#top">[top]</a></span>
 
 
 <h3><a name="javaml-dtd">Appendix 1 - JavaML DTD</a></h3>
@@ -514,7 +642,7 @@ thanks to Mike Ernst for helpful pointers on its use.
 &lt;!ELEMENT conditional-expr ((%expr-elems;),(%expr-elems;),(%expr-elems;))&gt;
 </pre>
 
-<br><small><a href="#top">[top]</a></small>
+<p><span class="index"><a href="#top">[top]</a></span>
 
 
 <h3><a name="set.java">Appendix 2a - Extended Example, <strong>Set.java</strong></a></h3>
@@ -590,7 +718,7 @@ class Set {
 }
 </pre>
 
-<br><small><a href="#top">[top]</a></small>
+<p><span class="index"><a href="#top">[top]</a></span>
 
 
 <h3><a name="set.java.xml">Appendix 2b - Extended Example, <strong>Set.java.xml</strong></a></h3>
@@ -814,12 +942,26 @@ class Set {
 </pre>
 
 
-<br><small><a href="#top">[top]</a></small>
+<p><span class="index"><a href="#top">[top]</a></span>
 
 
 <h3><a name="references">References</a></h3>
 
 Java
+
+JavaNutShell
+
+http://www.w3.org/TR/xslt
+
+http://www.w3.org/TR/WD-xsl/
+
+http://www.w3.org/XML/1999/XML-in-10-points
+
+http://www.w3.org/TR/xpath
+
+http://www.w3.org/TR/xmlschema-1/
+
+http://www.w3.org/TR/xmlschema-2/
 
 Smalltalk
 
@@ -833,7 +975,7 @@ EvilMacros
 
 Framework for Preprocessor-aware C Source Code Analyses
 
-<br><small><a href="#top">[top]</a></small>
+<p><span class="index"><a href="#top">[top]</a></span>
 
 
 <h3><a name="vitae">Vitae</a></h3>
@@ -872,7 +1014,7 @@ internet.
 <a href="#references">References</a>  &nbsp;
 <a href="#vitae">Vitae</a> 
 
-<br><small><a href="#top">[top]</a></small>
+<p><span class="index"><a href="#top">[top]</a></span>
 
 <hr>
 <address>Greg J. Badros / 
