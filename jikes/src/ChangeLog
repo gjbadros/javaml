@@ -1,3 +1,18 @@
+Tue Feb  8 13:54:25 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Clean up lots of old, irrelevant FIXMEs.  Drop
+ 	XML_MANGLE_FOR_IDS cond. case. Make SzIdFromMethod always use
+ 	frmarg, and just make sure that catch's formal arguments are id'd
+ 	as local variables.
+
+Mon Feb  7 14:18:10 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Produce nicely-indented XML output using new
+	xml_handle_indent and a couple of global variables.  Just update
+	the indent count in xml_output and xml_close, and set g_fNewline
+	when outputting a newline in xml_nl.  Then print the indent chars
+	if about to open or close a tag and g_fNewline is set.
+
 Sun Feb  6 18:21:31 2000  Greg J. Badros  <gjb@cs.washington.edu>
 
 	* xml-unparse.cpp: Output literal-char using OutputLiteralString
