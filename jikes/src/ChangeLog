@@ -1,3 +1,8 @@
+Thu Nov 11 14:56:27 1999  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Fix printing of class name, added
+	xml_name_string to abstract what'll probably be a common idiom.
+
 Thu Nov 11 14:14:52 1999  Greg J. Badros  <gjb@cs.washington.edu>
 
 	* Makefile.in: Added xml-unparse.o file w/ dep rules.
