@@ -79,7 +79,7 @@ SUP { COLOR: #0000FF; FONT-SIZE: small; }
       application that provides an alternative representation
       of Java source code. This XML-based representation, called JavaML,
       is more natural for tools and permits easy specification of
-      numerous software-engineering analysis by leveraging the abundance
+      numerous software-engineering analyses by leveraging the abundance
       of XML tools and techniques.  A robust converter built with the IBM
       Jikes Java compiler framework translates from the classical Java
       source code representation to JavaML.
@@ -1037,12 +1037,12 @@ sub start_tag {
   my %attrs = SGMLparse_attr_spec($attr_spec);
   # ...
   if ($tag eq "method") {
-    if ($attrs{name} eq "bar") {
-      $attrs{name} = "Bar";
+    if ($attrs{name} eq "isBall") {
+      $attrs{name} = "FIsBall";
     }
   } elsif ($tag eq "send") {
-    if ($attrs{message} eq "bar") {
-      $attrs{message} = "Bar";
+    if ($attrs{message} eq "isBall") {
+      $attrs{message} = "FIsBall";
     }
   }
   # ...
