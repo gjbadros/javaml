@@ -37,10 +37,10 @@ University of Washington, Box 352350\\
 Seattle, WA ~ 98195-2350, USA}
 \date{}
 
-\thispagestyle{empty}
-\pagestyle{empty}
+%\pagestyle{empty}
 
 \maketitle
+\thispagestyle{empty}
 
 \section*{Abstract}
 The classical plain-text representation of source code is convenient for
@@ -396,7 +396,7 @@ Sheets~\cite{CSS2}, XSL (Extensible Stylesheet Language)~\cite{XSL}, and
 XSLT (XSL for Transformations)~\cite{XSLT}, XPath~\cite{XPath}, and DOM
 (Document Object Model)~\cite{DOM}.
 
-\section{JavaML: The Java Markup Language}
+\section{Java Markup Language (JavaML)}
 \label{sec-javaml}
 
 The Java Markup Language provides a complete self-describing
@@ -811,11 +811,11 @@ Suppose we wish to see all the string literals that a program contains.
 We can do this trivially using \smtexttt{sggrep} on the JavaML
 representation of the program:
 
-{\bfseries
 \begin{verbatim}
-% sggrep '.*/literal-string' < Set.java.xml
+% sggrep '.*/literal-string' \
+           < Set.java.xml
 \end{verbatim}
-}
+
 {\small
 \begin{verbatim}
 <?xml version='1.0' encoding='UTF-8'?>
@@ -832,16 +832,16 @@ SGML and XML tools in a Unix pipeline to combine tools in novel and
 useful ways.  For example, if we want to just see the strings, we can
 run \smtexttt{stripsgml} on the output of the above query:
 
-{\small
 \begin{verbatim}
-% sggrep '.*/literal-string' < Set.java.xml | stripsgml
+% sggrep '.*/literal-string' \
+           < Set.java.xml | stripsgml
 \end{verbatim}
 \begin{verbatim}
 { 
 , 
  }\n
 \end{verbatim}
-}
+
 We can also query the JavaML source for elements based on values of
 their attributes.  For example, if we wish to find all sends of the
 message \smtexttt{clone} we can do so easily and reliably:
