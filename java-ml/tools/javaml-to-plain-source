@@ -7,6 +7,8 @@ if [ x"-" = x"$1" -o x"" = x"$1" ]; then
 else
   FNAME=$1
 fi
+test -f `dirname $FNAME`/java-ml.dtd || \
+   ln -s $HOME/java-ml/java-ml.dtd `dirname $FNAME`/java-ml.dtd
 saxon $FNAME `dirname $0`/javaml-to-plain-source.xsl || exit $?
 $needremoving && rm $FNAME
 exit 0
