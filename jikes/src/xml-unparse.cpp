@@ -15,6 +15,13 @@
 #include <fstream.h>
 #include <stdarg.h>
 
+/* make <arguments></arguments>
+   and <formal-argments></formal-arguments>
+   into <arguments/>
+   and <formal-arguments/>
+   respectively */
+#define SHORTCUT_XML_CLOSE
+
 #define XML_CLOSE ((char *) 1)
 
 char *g_szMethodName = NULL;
@@ -24,8 +31,8 @@ char *g_szClassName = NULL;
 /* Output any prefix header for the converted XML file */
 void xml_prefix(Ostream &xo,char *szInfilename)
 {
-  xo << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
-     << "<!DOCTYPE java-source-program SYSTEM \"../java-ml.dtd\">\n\n"
+  xo << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+     << "<!DOCTYPE java-source-program SYSTEM \"java-ml.dtd\">\n\n"
      << "<java-source-program name=\"" << szInfilename << "\">\n";
 }
 
@@ -152,6 +159,28 @@ xml_unparse_throws(Ostream &xo, LexStream &lex_stream, T *pnode)
     }
   }
 }
+
+/* MethodDeclarator has similar code to this
+   for formal arguments */
+template <class T>
+xml_unparse_arguments(Ostream &os, LexStream &lex_stream, T *pnode)
+{
+#ifdef SHORTCUT_XML_CLOSE
+    if (pnode->NumArguments() > 0) {
+#endif
+      xml_open(os,"arguments");
+      for (int i = 0; i < pnode->NumArguments(); i++)
+        {
+          xml_unparse_maybe_var_ref(os,lex_stream,pnode->Argument(i));
+        }
+      xml_close(os,"arguments",false);
+#ifdef SHORTCUT_XML_CLOSE
+    } else {
+      xml_output(os,"arguments",XML_CLOSE);
+    }
+#endif
+}
+
 
 /* extra parameters are
    attribute/value pairs (always as char *'s).
@@ -727,6 +756,8 @@ void AstMethodDeclarator::XMLUnparse(Ostream& os, LexStream& lex_stream)
     /* the name and number of brackets is handled in Method's unparse
        since that stuff belongs with the method tag --11/12/99 gjb */
 
+    /* This is a lot like the code in 
+       xml_unparse_arguments */
 #ifdef SHORTCUT_XML_CLOSE
     if (this -> NumFormalParameters() == 0) {
       xml_output(os,"formal-arguments",XML_CLOSE);
@@ -844,12 +875,7 @@ void AstThisCall::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstThisCall:#" << this-> id << "*/";
     xml_open(os,"this-call");
-    xml_open(os,"arguments");
-    for (int i = 0; i < this -> NumArguments(); i++)
-      {
-        xml_unparse_maybe_var_ref(os,lex_stream,Argument(i));
-      }
-    xml_close(os,"arguments");
+    xml_unparse_arguments(os,lex_stream,this);
     xml_close(os,"this-call");
     if (Ast::debug_unparse) os << "/*:AstThisCall#" << this-> id << "*/";
 }
@@ -862,12 +888,7 @@ void AstSuperCall::XMLUnparse(Ostream& os, LexStream& lex_stream)
         xml_output(os,"super-call",
                    "base",SzFromUnparse(lex_stream,base_opt),
                    NULL);
-        xml_open(os,"arguments");
-        for (int j = 0; j < NumArguments(); j++)
-          {
-            xml_unparse_maybe_var_ref(os,lex_stream,Argument(j));
-          }
-        xml_close(os,"arguments", false);
+        xml_unparse_arguments(os,lex_stream,this);
         xml_close(os,"super-call",true);
       }
     if (Ast::debug_unparse) os << "/*:AstSuperCall#" << this-> id << "*/";
@@ -1438,12 +1459,7 @@ void AstClassInstanceCreationExpression::XMLUnparse(Ostream& os, LexStream& lex_
     xml_unparse_maybe_type(os,lex_stream,class_type);
     if (dot_token_opt /* base_opt - see ast.h for explanation */)
 	base_opt -> XMLUnparse(os, lex_stream);
-    xml_open(os,"arguments");
-    for (int j = 0; j < NumArguments(); j++)
-      {
-        xml_unparse_maybe_var_ref(os,lex_stream,Argument(j));
-      }
-    xml_close(os,"arguments",false);
+    xml_unparse_arguments(os,lex_stream,this);
     if (class_body_opt)
 	class_body_opt -> XMLUnparse(os, lex_stream);
     xml_close(os,"new",true);
@@ -1516,20 +1532,7 @@ void AstMethodInvocation::XMLUnparse(Ostream& os, LexStream& lex_stream)
       xml_unparse_maybe_var_ref(os,lex_stream,pnodeTarget);
       xml_close(os,"target",true);
     }
-#ifdef SHORTCUT_XML_CLOSE
-    if (NumArguments() > 0) {
-#endif
-      xml_open(os,"arguments");
-      for (int i = 0; i < this -> NumArguments(); i++)
-        {
-          xml_unparse_maybe_var_ref(os,lex_stream,Argument(i));
-        }
-      xml_close(os,"arguments",false);
-#ifdef SHORTCUT_XML_CLOSE
-    } else {
-      xml_output(os,"arguments",XML_CLOSE);
-    }
-#endif
+    xml_unparse_arguments(os,lex_stream,this);
     xml_nl(os);
     xml_close(os,"send",true);
     if (Ast::debug_unparse) os << "/*:AstMethodInvocation#" << this-> id << "*/";
