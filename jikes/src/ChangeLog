@@ -1,3 +1,32 @@
+Fri Feb 18 16:57:43 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Added xml_output_with_location() and output the
+ 	location information if debug_xml_unparse_ast_show_locations
+ 	option was selected. drop xml_location_element().  Drop
+	xml_unhandled, and use asserts instead. Added location information 
+	to elements: block, method, class, anonymous-class, field,
+	interface, constructor, loop.
+
+	* stream.h: Make control field public so I can look at
+ 	options.debug_xml_unparse_ast_show_locations in XMLUnparse.
+
+	* stream.cpp: get column information if
+	debug_xml_unparse_ast_show_locations is set, as well as if
+	dump_errors is set.
+
+	* option.h, option.cpp, jikes.cpp: Added
+	debug_xml_unparse_ast_show_locations, handle it, document it.
+
+Fri Feb 18 15:57:17 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Make SzIdFrom*() use Ast *pnode instead of a
+	bunch of const char *'s.  This is to be more flexible w.r.t. how
+	the skolem function is mangled together.  Added
+	xml_location_element() and call it to add location sub-elements to 
+	various important elements.  I'm going to switch to using location 
+	attributes on nearly all elements instead, but since this is
+	working now, I want to commit before making those changes.
+
 Wed Feb 16 17:57:35 2000  Greg J. Badros  <gjb@cs.washington.edu>
 
 	* xml-unparse.cpp: Use new switch-block element, added a newline
