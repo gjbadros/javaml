@@ -87,7 +87,7 @@
 <!ATTLIST new-array
     dimensions CDATA #REQUIRED>
 <!ELEMENT dim-expr (%expr-elems;)>
-<!ELEMENT local-variable (type,(%expr-elems;)?)>
+<!ELEMENT local-variable (type,(static-initializer|%expr-elems;)?)>
 <!ATTLIST local-variable
     name CDATA #REQUIRED
     %mod-final;
