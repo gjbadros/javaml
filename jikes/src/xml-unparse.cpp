@@ -45,6 +45,13 @@ SemanticEnvironment *ThisEnvironment() {
   return g_pclassdecl->semantic_environment;
 }
 
+void xml_unhandled(Ostream &xo, char *szType, char *szExtra)
+{
+  xo << "<!-- Unhandled `" << szType << "'";
+  if (szExtra)
+    xo << ": " << szExtra << "-->\n";
+}
+
 /* Output any prefix header for the converted XML file */
 void xml_prefix(Ostream &xo,char *szInfilename)
 {
@@ -543,17 +550,15 @@ void AstCompilationUnit::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstModifier::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstModifier:#" << this-> id << "*/";
-    os << lex_stream.NameString(modifier_kind_token);
-    os << " ";
+    xml_unhandled(os,"modifier",
+                  wstring2string(lex_stream.NameString(modifier_kind_token)));
     if (Ast::debug_unparse) os << "/*:AstModifier#" << this-> id << "*/";
 }
 
 void AstEmptyDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstEmptyDeclaration:#" << this-> id << "*/";
-#if 0
-    xml_output("empty-declaration",XML_CLOSE);
-#endif
+    xml_unhandled(os,"empty-declaration",NULL);
     if (Ast::debug_unparse) os << "/*:AstEmptyDeclaration#" << this-> id << "*/";
 }
 
@@ -649,12 +654,8 @@ void AstClassDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
 	// os << "implements ";
 	for (int j = 0; j < NumInterfaces(); j++)
 	  {
-            ostrstream xnm;
-            Ostream nm(&xnm);
-	    this -> Interface(j) -> XMLUnparse(nm, lex_stream);
-            xnm << ends;
             xml_output(os,"implement",
-                       "class",xnm.str(),
+                       "class",SzFromUnparse(lex_stream, this->Interface(j)),
                        XML_CLOSE);
             xml_nl(os);
 	  }
@@ -670,19 +671,18 @@ void AstClassDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
 
 void AstArrayInitializer::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
+  // GJB:FIXME:: test this
     if (Ast::debug_unparse) os << "/*AstArrayInitializer:#" << this-> id << "*/";
-    os << "\n{ ";
     for (int k = 0; k < NumVariableInitializers(); k++)
       {
-	if (k>0) os << ", ";
 	this -> VariableInitializer(k) -> XMLUnparse(os, lex_stream);
       }
-    os << " }";
     if (Ast::debug_unparse) os << "/*:AstArrayInitializer#" << this-> id << "*/";
 }
 
 void AstBrackets::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
+  // GJB:FIXME:: can we get here?
     if (Ast::debug_unparse) os << "/*AstBrackets:#" << this-> id << "*/";
     os << "[]";
     if (Ast::debug_unparse) os << "/*:AstBrackets#" << this-> id << "*/";
@@ -692,6 +692,7 @@ void AstVariableDeclaratorId::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstVariableDeclaratorId:#" << this-> id << "*/";
     os << lex_stream.NameString(identifier_token);
+    // GJB:FIXME:: can we get here?
     for (int i = 0; i < NumBrackets(); i++)
 	 os << "[]";
     if (Ast::debug_unparse) os << "/*:AstVariableDeclaratorId#" << this-> id << "*/";
@@ -962,6 +963,7 @@ void AstMethodDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstStaticInitializer::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstStaticInitializer:#" << this-> id << "*/";
+    // GJB:FIXME:: test this
     xml_open(os,"static-initializer");
     block -> XMLUnparse(os, lex_stream);
     xml_close(os,"static-initializer");
@@ -1086,30 +1088,76 @@ void AstConstructorDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstInterfaceDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstInterfaceDeclaration:#" << this-> id << "*/";
+    // GJB:FIXME:: test this!
+
+    bool fAbstract = false;
+    bool fFinal = false;
+    bool fStatic = false;
+    bool fSynchronized = false;
+    bool fVolatile = false;
+    bool fTransient = false;
+    bool fNative = false;
+    char *szVisibility = NULL;
+
+    // GJB:FIXME:: which of these are okay for interfaces?
     for (int i = 0; i < this -> NumInterfaceModifiers(); i++)
     {
-	os << lex_stream.NameString(this -> InterfaceModifier(i) -> modifier_kind_token);
-	os << " ";
+      switch (InterfaceModifier(i)->kind) {
+      case Ast::ABSTRACT: /* class/methods */
+        fAbstract = true; break;
+      case Ast::FINAL: /* class/methods/fields */
+        fFinal = true; break;
+      case Ast::STATIC: /* methods/fields */
+        fStatic = true; break;
+      case Ast::NATIVE:  /* methods */
+        fNative = true; break;
+      case Ast::SYNCHRONIZED: /* class/methods */
+        fSynchronized = true; break;
+      case Ast::VOLATILE: /* fields */
+        fVolatile = true; break;
+      case Ast::TRANSIENT: /* fields */
+        fTransient = true; break;
+
+      case Ast::PUBLIC:
+        szVisibility = "public"; break;
+      case Ast::PRIVATE:
+        szVisibility = "private"; break;
+      case Ast::PROTECTED:
+        szVisibility = "protected"; break;
+      default:
+        os << "<!--" << "***Can not handle interface modifier "
+           << lex_stream.NameString(InterfaceModifier(i)->modifier_kind_token)
+           << " (#" << InterfaceModifier(i)->kind << ")"
+           << "-->\n";
+        break;
+      }
     }
-    os << lex_stream.NameString(interface_token);
-    os << " ";
-    os << lex_stream.NameString(identifier_token);
+
+    char *szInterfaceName = xml_name_string(lex_stream,identifier_token);
+
+    xml_output(os,"interface",
+               "name", szInterfaceName,
+               "visibility",szVisibility,
+               "abstract",SzOrNullFromF(fAbstract),
+               "final",SzOrNullFromF(fFinal),
+               "synchronized",SzOrNullFromF(fSynchronized),
+               NULL);
+
     if (NumExtendsInterfaces() > 0)
       {
-	os << " extends ";
 	for (int j = 0; j < NumExtendsInterfaces(); j++)
 	  {
-	    if (j>0) os << ", ";
-	    this -> ExtendsInterface(j) -> XMLUnparse(os, lex_stream);
+            xml_output(os,"extend",
+                       "interface",SzFromUnparse(lex_stream, this->ExtendsInterface(j)),
+                       XML_CLOSE);
+            xml_nl(os);
 	  }
       }
-    os << " {\n";
     for (int k = 0; k < NumInterfaceMemberDeclarations(); k++)
       {
 	this -> InterfaceMemberDeclaration(k) -> XMLUnparse(os, lex_stream);
-	os << "\n";
       }
-    os << "}\n";
+    xml_close(os,"interface",true);
     if (Ast::debug_unparse) os << "/*:AstInterfaceDeclaration#" << this-> id << "*/";
 }
 
