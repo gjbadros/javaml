@@ -6,6 +6,8 @@ import java.awt.*;      // Or this one for the graphics!
 public abstract class ComplexApplet extends Applet {
 
   ComplexApplet(int c) {
+    Object o = new Double(2);
+    boolean f = true;
     System.err.println(Double.MAX_VALUE);
     double m = Double.MIN_VALUE, i = 20;
     afield = c;
