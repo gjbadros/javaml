@@ -497,7 +497,7 @@ void AstBlock::XMLUnparse(Ostream& os, LexStream& lex_stream)
       char szNum[20];
       sprintf(szNum,"%d",this->NumStatements());
 #endif
-      xml_output(os, "statements",
+      xml_output(os, "block",
 #ifdef JIKES_XML_STATEMENT_HAS_NUMBER_ATTRIBUTE
    // GJB:FIXME:: having num=5, e.g., makes harder to update and is of marginal utility
                  // DTD needs updating if this code is used
@@ -531,7 +531,7 @@ void AstBlock::XMLUnparse(Ostream& os, LexStream& lex_stream)
     }
 
     if ( fDidOpenStatements ) {
-      xml_close(os, "statements",true);
+      xml_close(os, "block",true);
     }
 
     g_pblockdecl = pblockdeclPrior;
@@ -710,7 +710,7 @@ void AstClassDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
 
     xml_nl(os);
     xml_output(os,"superclass",
-               "class",szSuperclass,
+               "name",szSuperclass,
                XML_CLOSE);
     xml_nl(os);
 
@@ -736,12 +736,17 @@ void AstClassDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
 
 void AstArrayInitializer::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
-  // GJB:FIXME:: test this
     if (Ast::debug_unparse) os << "/*AstArrayInitializer:#" << this-> id << "*/";
+    char *szLen = SzNewFromLong(NumVariableInitializers());
+    xml_output(os,"array-initializer",
+               "length",szLen,
+               NULL);
+    delete szLen;
     for (int k = 0; k < NumVariableInitializers(); k++)
       {
         xml_unparse_maybe_var_ref(os,lex_stream,VariableInitializer(k));
       }
+    xml_close(os,"array-initializer",true);
     if (Ast::debug_unparse) os << "/*:AstArrayInitializer#" << this-> id << "*/";
 }
 
@@ -1322,7 +1327,7 @@ void AstEmptyStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstEmptyStatement:#" << this-> id << "*/";
 #if 0 /* GJB:FIXME:: do we need a <statements/> here? */
-    xml_output(os,"statements",XML_CLOSE);
+    xml_output(os,"block",XML_CLOSE);
     xml_nl(os);
 #endif
     if (Ast::debug_unparse) os << "/*:AstEmptyStatement#" << this-> id << "*/";
@@ -1357,11 +1362,11 @@ void AstSwitchBlockStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
     for (int j = 0; j < NumSwitchLabels(); j++) {
       this -> SwitchLabel(j) -> XMLUnparse(os, lex_stream);
     }
-    xml_open(os, "statements");
+    xml_open(os, "block");
     for (int l = 0; l < NumStatements(); l++) {
       this -> Statement(l) -> XMLUnparse(os, lex_stream);
     }
-    xml_close(os,"statements", true);
+    xml_close(os,"block", true);
     if (Ast::debug_unparse) os << "/*:AstSwitchBlockStatement#" << this-> id << "*/";
 }
 
@@ -1600,9 +1605,11 @@ void AstStringLiteral::XMLUnparse(Ostream& os, LexStream& lex_stream)
       nm << lex_stream.NameString(string_literal_token), lex_stream.NameStringLength(string_literal_token);
     }
     xnm << ends;
+    char *szLen = SzNewFromLong(lex_stream.NameStringLength(string_literal_token)-2);
     xml_output(os,"literal-string",
-               "length",SzNewFromLong(lex_stream.NameStringLength(string_literal_token)-2),
+               "length", szLen,
                NULL);
+    delete szLen;
     OutputLiteralString(os,xnm.str());
     xml_close(os,"literal-string");
     if (Ast::debug_unparse) os << "/*:AstStringLiteral#" << this-> id << "*/";
