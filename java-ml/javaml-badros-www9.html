@@ -311,7 +311,7 @@ features of the two technologies it builds a bridge between: Java and XML.
    receiving the message.  For example, an instance of the <code>ColoredBall</code>
    class may respond to the <code>draw</code> message differently than an instance
    of a <code>Ball</code> class.  This ability to behave differently upon receipt
-   of the same message is called polymorphism and is largely responsible
+   of the same message is largely responsible
    for the extensibility benefits touted by the OO community.
     
 <p>
@@ -600,7 +600,7 @@ The prototype JavaML representation I have chosen aims to model the
 programming language constructs of Java (and, indeed, similar
 object-oriented programming languages) independently of the specific
 syntax of the language.  One can easily imagine a SmalltalkML that would 
-be significantly the same, and even an OOML that could be converted into 
+be very similar, and even an OOML that could be converted into 
 both classical Java source code or Smalltalk file-out format.  With this goal in mind,
 JavaML was designed from first principles of the constructs and then
 iteratively refined to improve the usefulness
@@ -848,7 +848,7 @@ scale well.
 One common software engineering task (for better or for worse)
 is to accumulate metrics about a
 source code artifact.  With JavaML, the SGML utility
-<code>sgcount</code> does a fantastic job of summarizing the constructs
+<code>sgcount</code> does an excellent job of summarizing the constructs
 in a Java program:
 
 <pre>
@@ -1023,28 +1023,24 @@ possible using XSLT <cite>[<a href="#REF-XSLT">XSLT</a>]</cite>, DSSSL <cite>[<a
 directly manipulating the document using a DOM (Document Object Model)
 <cite>[<a href="#REF-DOM">DOM</a>]</cite> interface.  For example, we can rename methods named
 <code>isBall</code> to <code>FIsBall</code> using the Perl package 
-<code>XML::DOM</code> and the following as the
+<code>XML::DOM</code> and the following in the
 <code>start_tag</code> subroutine:
 
 <pre>
 sub start_tag { 
-  my ($this,$gi,$attr_spec) = @_;
-  my $empty = '';
-  if ($attr_spec =~ s%/$%%) { $empty = '/'; }
+  my ($this,$tag,$attr_spec) = @_;
   my %attrs = SGMLparse_attr_spec($attr_spec);
-  if ($gi eq "method") {
+  # ...
+  if ($tag eq "method") {
     if ($attrs{name} eq "bar") {
       $attrs{name} = "Bar";
     }
-  } elsif ($gi eq "send") {
+  } elsif ($tag eq "send") {
     if ($attrs{message} eq "bar") {
       $attrs{name} = "Bar";
     }
   }
-  $attr_spec = SGMLattr_to_sgml(\%attrs);
-  print "&lt;$gi";
-  if ($attr_spec ne "") { print " $attr_spec"; }
-  print "$empty&gt;";
+  # ...
 }
 </pre>
 
