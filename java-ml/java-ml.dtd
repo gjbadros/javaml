@@ -9,7 +9,7 @@
 <!ENTITY % mod-abstract "abstract CDATA #IMPLIED">
 <!ENTITY % mod-synchronized "synchronized CDATA #IMPLIED">
 
-<!ENTITY % expression-types "send|new|new-array|var-ref|field-access|array-ref|paren|assignment-expr|conditional-expr|binary-expr|unary-expr|cast-expr|literal-number|literal-string|literal-true|literal-false|literal-null|this|super">
+<!ENTITY % expr-elems "send|new|new-array|var-ref|field-access|array-ref|paren|assignment-expr|conditional-expr|binary-expr|unary-expr|cast-expr|literal-number|literal-string|literal-true|literal-false|literal-null|this|super">
 
 <!ELEMENT java-source-program (package-decl?,import*,class+) >
 <!ATTLIST java-source-program
@@ -25,7 +25,7 @@
     %mod-final
     %mod-synchronized
     superclass CDATA "Object">
-<!ELEMENT field (%expression-types)?>
+<!ELEMENT field (%expr-elems)?>
 <!ATTLIST field
     type CDATA #REQUIRED
     name CDATA #REQUIRED
@@ -69,25 +69,25 @@
 <!ELEMENT send (target,arguments)>
 <!ELEMENT target ANY>
 <!ELEMENT return ANY>
-<!ELEMENT statements (statements|local-variable|try|throw|if|loop|return|continue|break|%expression-types)*>
+<!ELEMENT statements (statements|local-variable|try|throw|if|loop|return|continue|break|%expr-elems)*>
 <!ELEMENT throw ANY>
 <!ELEMENT throws EMPTY>
 <!ATTLIST throws
     exception CDATA #REQUIRED>
 <!ELEMENT new (class-type,arguments)>
 <!ELEMENT class-type (#PCDATA)>
-<!ELEMENT new-array (array-type,dim-expr*,(%expression-types)?)>
+<!ELEMENT new-array (array-type,dim-expr*,(%expr-elems)?)>
 <!ATTLIST new-array
     dimensions CDATA #REQUIRED>
 <!ELEMENT dim-expr ANY>
 <!ELEMENT array-type (#PCDATA)>
-<!ELEMENT local-variable (%expression-types)?>
+<!ELEMENT local-variable (%expr-elems)?>
 <!ATTLIST local-variable
     type CDATA #REQUIRED
     name CDATA #REQUIRED
     %mod-final
     id ID #IMPLIED>
-<!ELEMENT arguments (%expression-types)*>
+<!ELEMENT arguments (%expr-elems)*>
 <!ELEMENT literal-string EMPTY>
 <!ATTLIST literal-string
     value CDATA #REQUIRED
@@ -100,33 +100,33 @@
 <!ELEMENT var-ref EMPTY>
 <!ATTLIST var-ref
     name CDATA #REQUIRED>
-<!ELEMENT field-access (%expression-types)>
+<!ELEMENT field-access (%expr-elems)>
 <!ATTLIST field-access
     field CDATA #REQUIRED>
 <!ELEMENT package-decl EMPTY>
 <!ATTLIST package-decl
     name CDATA #REQUIRED>
 <!ELEMENT assignment-expr ANY>
-<!ELEMENT binary-expr ((%expression-types),(%expression-types))>
+<!ELEMENT binary-expr ((%expr-elems),(%expr-elems))>
 <!ATTLIST binary-expr
     op CDATA #REQUIRED>
-<!ELEMENT paren (%expression-types)>
-<!ELEMENT unary-expr (%expression-types)>
+<!ELEMENT paren (%expr-elems)>
+<!ELEMENT unary-expr (%expr-elems)>
 <!ATTLIST unary-expr
     op CDATA #REQUIRED
     post (yes|no) #IMPLIED>
-<!ELEMENT cast-expr (target-type,(%expression-types))>
+<!ELEMENT cast-expr (target-type,(%expr-elems))>
 <!ELEMENT target-type (#PCDATA)>
 <!ELEMENT literal-false EMPTY>
 <!ELEMENT literal-true EMPTY>
 <!ELEMENT literal-null EMPTY>
 <!ELEMENT if (test,true-case,false-case?)>
-<!ELEMENT test (%expression-types)>
+<!ELEMENT test (%expr-elems)>
 <!ELEMENT true-case (statements)>
 <!ELEMENT false-case (statements)>
 <!ELEMENT array-ref (base,offset)>
-<!ELEMENT base (%expression-types)>
-<!ELEMENT offset (%expression-types)>
+<!ELEMENT base (%expr-elems)>
+<!ELEMENT offset (%expr-elems)>
 <!ELEMENT static-initializer (statements)>
 <!ELEMENT super-call (arguments)>
 <!ELEMENT this-call (arguments)>
@@ -147,4 +147,4 @@
 <!ELEMENT break EMPTY>
 <!ATTLIST break
     targetname CDATA #IMPLIED>
-<!ELEMENT conditional-expr ((%expression-types),(%expression-types),(%expression-types))>
+<!ELEMENT conditional-expr ((%expr-elems),(%expr-elems),(%expr-elems))>
