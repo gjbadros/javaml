@@ -179,8 +179,8 @@
 <!ELEMENT array-ref (base,offset)>
 <!ELEMENT base (%expr-elems;)>
 <!ELEMENT offset (%expr-elems;)>
-<!ELEMENT static-initializer (%stmt-elems;)>
-<!ELEMENT instance-initializer (%stmt-elems;)>
+<!ELEMENT static-initializer (%stmt-elems;)*>
+<!ELEMENT instance-initializer (%stmt-elems;)*>
 <!ELEMENT super-call (arguments)>
 <!ELEMENT this-call (arguments)>
 <!ELEMENT super EMPTY>
@@ -201,6 +201,7 @@
 <!ATTLIST break
     targetname CDATA #IMPLIED>
 <!ELEMENT conditional-expr ((%expr-elems;),(%expr-elems;),(%expr-elems;))>
-<!ELEMENT switch ((%expr-elems;),((case|default-case)+,(%stmt-elems;))+)>
+<!ELEMENT switch ((%expr-elems;),switch-block+)>
+<!ELEMENT switch-block ((case|default-case)+,(%stmt-elems;)*)>
 <!ELEMENT case (%expr-elems;)>
 <!ELEMENT default-case EMPTY>
