@@ -1,3 +1,13 @@
+Fri Feb 18 23:24:18 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Permit SzNewEscapedLiteralString() to take NULL 
+	and return NULL.  Add fIgnoreFirstAndLast argument to let it
+	escape comments where the first and last characters *should* be
+	included. (xml_output_with_location): Simplify this proc's 
+	displaying of location information.  Display comments using
+	comment="..." attribute, instead of as PCDATA since DTD's can't
+	verify order of sub-elements for mixed-content elements.
+
 Fri Feb 18 20:54:11 2000  Greg J. Badros  <gjb@cs.washington.edu>
 
 	* xml-unparse.cpp: Include comments as text nodes in the output!
