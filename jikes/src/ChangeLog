@@ -1,3 +1,10 @@
+Sat Feb 19 13:03:55 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Added SzIdFor() and wrote SzIdFrom*()s in terms 
+	of it.  Have SzIdFor() prepend the filename so that the cat-javaml 
+	script can safely combine multiple .java.xml files into one big
+	database w/o id collisions.
+
 Fri Feb 18 23:24:18 2000  Greg J. Badros  <gjb@cs.washington.edu>
 
 	* xml-unparse.cpp: Permit SzNewEscapedLiteralString() to take NULL 
