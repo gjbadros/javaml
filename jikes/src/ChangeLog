@@ -1,3 +1,39 @@
+Sat Feb  5 14:05:54 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: More changes -- avoid nested <statements> more
+	reliably.  Clean up a bunch of #if 0 code, #ifdef XML_LONG_WINDED
+	code.  Use "interface" attribute on "implement" tag (not
+	"class").  Use &lt; and &amp; in xml_name_string, instead of
+	trying to use higher-level operator names that won't convert back
+	properly to plain text.
+
+Mon Jan 31 13:17:56 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+        **** Resync'd w/ jikes-latest CVS tree
+
+	* README-JAVAML: Added.
+
+	* java-ml.dtd: Added. The document type definition (DTD) for
+ 	JavaML; useful with SGML-aware editors (e.g., psgml mode for
+ 	Emacs) and for validating parsers (e.g., JADE:
+ 	http://www.jclark.com/jade)
+
+ 	* xml-unparse.cpp: Added to unparse into JavaML representation.
+  	See http://www.cs.washington.edu/homes/gjb/papers/javaml/javaml.html
+
+	* Makefile.in: Added xml-unparse.o to list of files, and added its 
+	build rule.
+
+	* ast.h: Updated all AST node classes to have XMLUnparse() method
+	(analogous to existing Unparse() method)
+
+	* control.cpp: Added handing of debug_xml_unparse_ast option
+
+	* jikes.cpp: Updated usage message to include usage for +ux, +udx, 
+	the new XML unparsing options.
+
+	* option.cpp, option.h: Handle the +ux, +udx options
+
 Mon Dec 20 16:43:33 1999  Greg J. Badros  <gjb@cs.washington.edu>
 
 	* xml-unparse.cpp: Subtract off 2 when giving the length of a

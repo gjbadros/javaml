@@ -1,4 +1,5 @@
 config.status
+config.cache
 jikes
 Makefile
 *.o
