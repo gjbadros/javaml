@@ -654,9 +654,16 @@ structure of the programming language in the nesting of the elements.
 For example, the literal
 string "Hello World" is a part of the message send, thus the
 <code>literal-string</code> element is nested inside the
-<code>send</code> element.  See Appendices <a
+<code>send</code> element.  This nesting is even more apparent
+when presented visually as in <a href="#fig1">figure 1</a>. See Appendices <a
 href="#set.java">2a</a> and <a href="#set.java.xml">2b</a> for an
 example of a more complex converted program.
+
+<p class="caption">
+<a name="fig1"><IMG ALT="Tree view of FirstApplet's JavaML representation." SRC="./diff-tree-view.gif"></a>
+<strong>Figure 1</strong> &#151; A fully-expanded tree view of the JavaML representation 
+of the <code>FirstApplet</code> example as viewed by IBM's <code>xmldiff</code> utility <cite>[XMLDiffMerge]</cite>.</p>
+
 
 <h4><a name="design-decisions">3.3 - Design decisions</a></h4>
 
