@@ -1,3 +1,19 @@
+Sat Nov 13 17:44:44 1999  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Track class and method name for mangling of
+ 	IDs, but just use Ast id numbers instead since the mangling makes
+ 	the ids too long
+
+Sat Nov 13 17:09:33 1999  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp:  Wrote SzNewConvertingUnderscores(), and use it 
+	to get id tags to be in acceptable format lexically.  Line
+	break after package declarations and assignment expressions.
+	Handle variable initializations.  Correct handling of
+	formalparameter names (since variable-declarators now print
+	nothing).  Handle do/while/for loops.  Now works on numerous of
+	the Cassowary source files.
+
 Sat Nov 13 15:13:40 1999  Greg J. Badros  <gjb@cs.washington.edu>
 
 	* xml-unparse.cpp: Use xml_unparse_maybe_var_ref for Argument
