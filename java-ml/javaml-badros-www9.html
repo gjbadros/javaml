@@ -255,9 +255,9 @@ section 3</a> details the markup language and the implementation of a
 converter from the classical representation to JavaML.  <a href="#leveraging-xml">Section
 4</a> gives numerous examples of how existing XML and SGML tools can be
 exploited to perform source code analyses and transformations on the
-richer representation provided by JavaML.  Sections <a href="#related
-work">5</a> and <a href="#future-work">6</a> describe others' related
-work and suggest avenues for exciting future work, and
+richer representation provided by JavaML.  Sections <a href="#related-work">5</a>
+and <a href="#future-work">6</a> describe others' <a href="#related-work">related
+work</a> and suggest avenues for exciting <a href="#future-work">future work</a>, and
 <a href="#conclusion">section 7</a> concludes.
 
 <p>
@@ -1090,7 +1090,7 @@ tools with varying degrees of success.
 
 <p>
 
-TAWK <cite>[<a href="#REF-TAWK">TAWK</a>]</cite> extends the AWK <cite>[<a href="#REF-Awk">Awk</a>]</cite>
+TAWK <cite>[<a href="#REF-TAWK">TAWK</a>]</cite> extends the AWK <cite>[<a href="#REF-AwkSed">AwkSed</a>]</cite>
 paradigm by matching patterns in the AST of a C program.  Numerous XML
 querying tools provide this same functionality for JavaML, and the
 event-action framework is similar to that used by SAX 
@@ -1206,7 +1206,7 @@ The current converter that translates back from JavaML to the classical
 source representation needs to be far more robust.  It was written as
 only a proof of concept and for the author to gain experience with the
 XML DOM.  A better approach is to add a Jikes front-end that uses an XML
-parser (e.g., XML4C++ <cite>[<a href="#REF-XML4C">XML4C</a>++]</cite>) to construct the XML
+parser (e.g., XML4C++ <cite>[<a href="#REF-XML4C++">XML4C++</a>++]</cite>) to construct the XML
 DOM from the JavaML source, then simply write a recursive conversion
 function to build the Jikes internal AST from using the DOM API.  Then,
 using Jikes's pre-existing conventional unparser, the compiler can write
@@ -1706,59 +1706,39 @@ class Set {
 <h3><a name="references">References</a></h3>
 
 <small>
-<p>
-<a name="REF-JavaSpec"><strong>[JavaSpec]</strong></a> &nbsp; 
-James Gosling, Bill Joy, and Guy Steele. 
-<em>The Java Language Specification</em>.
-Addison-Wesley, 1996.
 
 <p>
-<a name="REF-Java"><strong>[Java]</strong></a> &nbsp; 
-Ken Arnold and James Gosling.
-<em>The Java Programming Language</em>, 2nd ed.
-Addison Wesley Longman, 1997.
+<a name="REF-ASTLog"><strong>[ASTLog]</strong></a> &nbsp;
+Roger Crew.
+"ASTLOG: A Language for Examining Abstract Syntax Trees".
+<em>Proceedings of the USENIX Conference on Domain-Specific Languages</em>
+October 1997. Santa Barbara, California.
 
 <p>
-<a name="REF-JavaNutShell"><strong>[JavaNutShell]</strong></a> &nbsp;
-David Flanagan.
-<em>Java in a Nutshell</em>, 2nd ed.
-O'Reilly and Associates, 1996.
+<a name="REF-AwkSed"><strong>[AwkSed]</strong></a> &nbsp;
+Dale Dougherty.
+<em>Sed and Awk</em>
+O'Reilly and Associates, 1990.
+
 
 <p>
-<a name="REF-UMLNutshell"><strong>[UMLNutshell]</strong></a> &nbsp;
-Sinan Si Alhir.
-<em>UML in a Nutshell</em>.
-O'Reilly and Associates, 1998.
+<a name="REF-C++"><strong>[C++]</strong></a> &nbsp;
+Bjarne Stoustrup.
+<em>The C++ Programming Language</em>, 3rd ed.
+Addison-Wesley, 1997.
 
 <p>
-<a name="REF-XMLDiffMerge"><strong>[XMLDiffMerge]</strong></a> &nbsp;
-IBM AlphaWorks.
-XML Diff and Merge Tool.
-<code><a href="http://www.alphaworks.ibm.com/tech/xmldiffmerge">http://www.alphaworks.ibm.com/tech/xmldiffmerge</a></code>
+<a name="REF-Cassowary"><strong>[Cassowary]</strong></a> &nbsp;
+Greg Badros and Alan Borning.
+"The Cassowary Linear Arithmetic Constraint Solving Algorithm: Interface and Implementation".
+University of Washington TR UW-CSE-98-06-04.
 
 <p>
-<a name="REF-XMI"><strong>[XMI]</strong></a> &nbsp;
-IBM AlphaWorks.
-XML Metadata Interchange (XMI) Toolkit.
-<code><a href="http://www.alphaworks.ibm.com/tech/xmitoolkit">http://www.alphaworks.ibm.com/tech/xmitoolkit</a></code>
-
-<p>
-<a name="REF-XML4C++"><strong>[XML4C++]</strong></a> &nbsp;
-IBM AlphaWorks.
-XML for C++.
-<code><a href="http://www.alphaworks.ibm.com/tech/xml4c">http://www.alphaworks.ibm.com/tech/xml4c</a></code>
-
-<p>
-<a name="REF-SAX"><strong>[SAX]</strong></a> &nbsp;
-Megginson Technologies.
-"SAX 1.0: The Simple API for XML". Web page.
-<code><a href="http://www.megginson.com/SAX">http://www.megginson.com/SAX</a></code>
-
-<p>
-<a name="REF-Jikes"><strong>[Jikes]</strong></a> &nbsp;
-IBM Jikes Java Compiler.
-<code><a href="http://www.alphaworks.ibm.com/tech/Jikes">http://www.alphaworks.ibm.com/tech/Jikes</a></code>
-
+<a name="REF-CCEL"><strong>[CCEL]</strong></a> &nbsp;
+Carolyn K. Duby, Scott Meyers, Steven P. Reiss.
+"CCEL: A Metalanguage for C++".
+<em>Proceedings of the USENIX 1992 C++ Conference</em>.
+August 1992. Portland, Oregon.
 
 <p>
 <a name="REF-CSS2"><strong>[CSS2]</strong></a> &nbsp;
@@ -1775,64 +1755,10 @@ and L. Wood, eds.
 <code><a href="http://www.w3.org/TR/REC-DOM-Level-1">http://www.w3.org/TR/REC-DOM-Level-1</a></code>
 
 <p>
-<a name="REF-XSLT"><strong>[XSLT]</strong></a> &nbsp;
-James Clark, ed.
-<em>XSL Transformations</em>.  W3C Recommendation.
-<code><a href="http://www.w3.org/TR/xslt">http://www.w3.org/TR/xslt</a></code>
-
-<p>
-<a name="REF-strong"><strong>[XSL]</strong></a> &nbsp;
-Stephen Deach, ed.
-<em>Extensible Stylesheet Language (XSL) Specification</em>. W3C Working Draft 21 Apr 1999.
-<code><a href="http://www.w3.org/TR/WD-xsl">http://www.w3.org/TR/WD-xsl</a></code>
-
-<p>
-<a name="REF-XPath"><strong>[XPath]</strong></a> &nbsp;
-James Clark and Steve DeRose, eds.
-<em>XML Path Langauge (XPath) Version 1.0</em>. W3C Recommendation.
-<code><a href="http://www.w3.org/TR/xpath">http://www.w3.org/TR/xpath</a></code>
-
-<p>
-<a name="REF-XMLSchema1"><strong>[XMLSchema1]</strong></a> &nbsp;
-Henry S. Thompson, David Beech, Murray Maloney, Noah Mendelsohn, eds.
-<em>XML Scheme Part 1: Structures</em>. W3c Working Draft 5 Nov 1999.
-<code><a href="http://www.w3.org/TR/xmlschema-1">http://www.w3.org/TR/xmlschema-1</a></code>
-
-<p>
-<a name="REF-XMLSchema1"><strong>[XMLSchema1]</strong></a> &nbsp;
-Paul V. Biron, Ashok Malhotra, eds.
-<em>XML Scheme Part 2: Datatypes</em>. W3c Working Draft 5 Nov 1999.
-<code><a href="http://www.w3.org/TR/xmlschema-2">http://www.w3.org/TR/xmlschema-2</a></code>
-
-<p>
-<a name="REF-Smalltalk"><strong>[Smalltalk]</strong></a> &nbsp;
-Adele Goldberg and David Robson.
-<em>Smalltalk-80: The Language</em>.
-Addison-Wesley, 1989.
-
-<p>
-<a name="REF-Prolog"><strong>[Prolog]</strong></a> &nbsp;
-W. F. Clocksin and C. S. Mellish.
-<em>Programming in Prolog</em>.
-Springer-Verlang, 1994.
-
-<p>
-<a name="REF-C++"><strong>[C++]</strong></a> &nbsp;
-Bjarne Stoustrup.
-<em>The C++ Programming Language</em>, 3rd ed.
-Addison-Wesley, 1997.
-
-<p>
-<a name="REF-Modula-2"><strong>[Modula-2]</strong></a> &nbsp;
-British Standards Institution.
-<em>Modula-2 Draft International Standard</em>, ISO-94.
-June 1994.
-
-<p>
-<a name="REF-XML"><strong>[XML]</strong></a> &nbsp;
-Tim Bray, Jean Paoli, and C. M. Sperberg-McQueen, eds.
-<em>Extensible Markup Language (XML) 1.0</em>
-<code><a href="http://www.w3.org/TR/REC-xml">http://www.w3.org/TR/REC-xml</a></code>
+<a name="REF-DSSSL"><strong>[DSSSL]</strong></a> &nbsp;
+<em>Document Style Semantics and Specification Language (DSSSL)</em>.
+ISO/IEC 10179:1996.
+<code><a href="http://www.jclark.com/dsssl">http://www.jclark.com/dsssl</a></code>
 
 <p>
 <a name="REF-EmpAnCpp"><strong>[EmpAnCpp]</strong></a> &nbsp;
@@ -1842,30 +1768,51 @@ University of Washington TR UW-CSE-97-04-06.
 <code><a href="http://www.cs.washington.edu/homes/mernst/pubs/empirical-tr970406-abstract.html">http://www.cs.washington.edu/homes/mernst/pubs/empirical-tr970406-abstract.html</a></code>
 
 <p>
-<a name="REF-PCP3"><strong>[PCP3]</strong></a> &nbsp;
-Greg Badros and David Notkin.
-"A Framework for Preprocessor-aware C Source Code Analyses".
-To appear: Software--Practice and Experience.
-<code><a href="http://www.cs.washington.edu/homes/gjb/papers/cpp-aware-c-analyses.pdf">http://www.cs.washington.edu/homes/gjb/papers/cpp-aware-c-analyses.pdf</a></code>
+<a name="REF-Java"><strong>[Java]</strong></a> &nbsp; 
+Ken Arnold and James Gosling.
+<em>The Java Programming Language</em>, 2nd ed.
+Addison Wesley Longman, 1997.
 
 <p>
-<a name="REF-ASTLog"><strong>[ASTLog]</strong></a> &nbsp;
-Roger Crew.
-"ASTLOG: A Language for Examining Abstract Syntax Trees".
-<em>Proceedings of the USENIX Conference on Domain-Specific Languages</em>
-October 1997. Santa Barbara, California.
+<a name="REF-JavaNutshell"><strong>[JavaNutshell]</strong></a> &nbsp;
+David Flanagan.
+<em>Java in a Nutshell</em>, 2nd ed.
+O'Reilly and Associates, 1996.
 
 <p>
-<a name="REF-Cassowary"><strong>[Cassowary]</strong></a> &nbsp;
-Greg Badros and Alan Borning.
-"The Cassowary Linear Arithmetic Constraint Solving Algorithm: Interface and Implementation".
-University of Washington TR UW-CSE-98-06-04.
+<a name="REF-JavaSpec"><strong>[JavaSpec]</strong></a> &nbsp; 
+James Gosling, Bill Joy, and Guy Steele. 
+<em>The Java Language Specification</em>.
+Addison-Wesley, 1996.
 
 <p>
-<a name="REF-XMLQL"><strong>[XMLQL-EnE]</strong></a> &nbsp;
-Mary Fernandez, J&eacute;r&ocirc;me Sim&eacute;on, and Philip Wadler.
-"XML Query Language: Experiences and Exemplars"
-<code><a href="http://www-db.research.bell-labs.com/usr/simeon/xquery.html">http://www-db.research.bell-labs.com/usr/simeon/xquery.html</a></code>
+<a name="REF-Jikes"><strong>[Jikes]</strong></a> &nbsp;
+IBM Jikes Java Compiler.
+<code><a href="http://www.alphaworks.ibm.com/tech/Jikes">http://www.alphaworks.ibm.com/tech/Jikes</a></code>
+
+<p>
+<a name="REF-LaTeXWeb"><strong>[LaTeXWeb]</strong></a> &nbsp;
+Michael Goosens and Sebastian Rahtz.
+<em>The LaTeX Web Companion</em>.
+Addison Wesley Longman, 1999.
+
+<p>
+<a name="REF-LexYacc"><strong>[LexYacc]</strong></a> &nbsp;
+Levine, John R.
+<em>Lex & Yacc</em>, 2nd ed.
+O'Reilly and Associates, 1992.
+
+<p>
+<a name="REF-ltxml"><strong>[ltxml]</strong></a> &nbsp;
+Language Technology Group, University of Edinburgh.
+LT XML version 1.1.
+<code><a href="http://www.ltg.ed.ac.uk/software/xml">http://www.ltg.ed.ac.uk/software/xml</a></code>
+
+<p>
+<a name="REF-Modula-2"><strong>[Modula-2]</strong></a> &nbsp;
+British Standards Institution.
+<em>Modula-2 Draft International Standard</em>, ISO-94.
+June 1994.
 
 <p>
 <a name="REF-Montana"><strong>[Montana]</strong></a> &nbsp;
@@ -1875,48 +1822,11 @@ Danny Soroker, Michael Karasick, John Barton, and David Streeter.
 June 1997.
 
 <p>
-<a name="REF-CCEL"><strong>[CCEL]</strong></a> &nbsp;
-Carolyn K. Duby, Scott Meyers, Steven P. Reiss.
-"CCEL: A Metalanguage for C++".
-<em>Proceedings of the USENIX 1992 C++ Conference</em>.
-August 1992. Portland, Oregon.
-
-<p>
-<a name="REF-LexYacc"><strong>[LexYacc]</strong></a> &nbsp;
-Levine, John R.
-<em>Lex & Yacc</em>, 2nd ed.
-O'Reilly and Associates, 1992.
-
-<p>
-<a name="REF-SGML"><strong>[SGML]</strong></a> &nbsp;
-<em>Standard Generalized Markup Language (SGML)</em>.
-ISO 8879:1986.
-<code><a href="http://www.iso.ch/cate/d16387.html">http://www.iso.ch/cate/d16387.html</a></code>
-
-<p>
-<a name="REF-DSSSL"><strong>[DSSSL]</strong></a> &nbsp;
-<em>Document Style Semantics and Specification Language (DSSSL)</em>.
-ISO/IEC 10179:1996.
-<code><a href="http://www.jclark.com/dsssl">http://www.jclark.com/dsssl</a></code>
-
-<p>
-<a name="REF-LaTeXWeb"><strong>[LaTeXWeb]</strong></a> &nbsp;
-Michael Goosens and Sebastian Rahtz.
-<em>The LaTeX Web Companion</em>.
-Addison Wesley Longman, 1999.
-
-<p>
-<a name="REF-XML"><strong>[XML-Handbook]</strong></a> &nbsp;
-Charles F. Goldfarb and Paul Prescod.
-<em>The XML Handbook</em>
-Prentice Hall PTR, 1998.
-
-
-<p>
-<a name="REF-ltxml"><strong>[ltxml]</strong></a> &nbsp;
-Language Technology Group, University of Edinburgh.
-LT XML version 1.1.
-<code><a href="http://www.ltg.ed.ac.uk/software/xml">http://www.ltg.ed.ac.uk/software/xml</a></code>
+<a name="REF-PCP3"><strong>[PCP3]</strong></a> &nbsp;
+Greg Badros and David Notkin.
+"A Framework for Preprocessor-aware C Source Code Analyses".
+To appear: Software--Practice and Experience.
+<code><a href="http://www.cs.washington.edu/homes/gjb/papers/cpp-aware-c-analyses.pdf">http://www.cs.washington.edu/homes/gjb/papers/cpp-aware-c-analyses.pdf</a></code>
 
 <p>
 <a name="REF-perlSGML"><strong>[perlSGML]</strong></a> &nbsp;
@@ -1936,13 +1846,24 @@ Larry Wall and Clark Cooper.
 Perl <code>XML::Parser</code> module.
 <code><a href="http://wwwx.netheaven.com/~coopercc/xmlparser/intro.html">http://wwwx.netheaven.com/~coopercc/xmlparser/intro.html</a></code>
 
+<p>
+<a name="REF-Prolog"><strong>[Prolog]</strong></a> &nbsp;
+W. F. Clocksin and C. S. Mellish.
+<em>Programming in Prolog</em>.
+Springer-Verlang, 1994.
+
 
 <p>
-<a name="REF-TAWK"><strong>[TAWK]</strong></a> &nbsp;
-William G. Griswold and Darren C. Atkinson.
-"Fast, Flexible Syntactic Pattern Matching and Processing".
-<em>Proceedings of the IEEE 1996 Workshop on Program Comprehension</em>.
-March 1996.
+<a name="REF-SAX"><strong>[SAX]</strong></a> &nbsp;
+Megginson Technologies.
+"SAX 1.0: The Simple API for XML". Web page.
+<code><a href="http://www.megginson.com/SAX">http://www.megginson.com/SAX</a></code>
+
+<p>
+<a name="REF-SGML"><strong>[SGML]</strong></a> &nbsp;
+<em>Standard Generalized Markup Language (SGML)</em>.
+ISO 8879:1986.
+<code><a href="http://www.iso.ch/cate/d16387.html">http://www.iso.ch/cate/d16387.html</a></code>
 
 <p>
 <a name="REF-Simonyi96"><strong>[Simonyi96]</strong></a> &nbsp;
@@ -1951,6 +1872,92 @@ Charles Simonyi.
 <emph>International Federation for Information Processing WG 2.1 meeting</emph>.
 June 1996.
 
+<p>
+<a name="REF-Smalltalk"><strong>[Smalltalk]</strong></a> &nbsp;
+Adele Goldberg and David Robson.
+<em>Smalltalk-80: The Language</em>.
+Addison-Wesley, 1989.
+
+
+<p>
+<a name="REF-TAWK"><strong>[TAWK]</strong></a> &nbsp;
+William G. Griswold and Darren C. Atkinson.
+"Fast, Flexible Syntactic Pattern Matching and Processing".
+<em>Proceedings of the IEEE 1996 Workshop on Program Comprehension</em>.
+March 1996.
+
+
+<p>
+<a name="REF-UMLNutshell"><strong>[UMLNutshell]</strong></a> &nbsp;
+Sinan Si Alhir.
+<em>UML in a Nutshell</em>.
+O'Reilly and Associates, 1998.
+
+<p>
+<a name="REF-XMI"><strong>[XMI]</strong></a> &nbsp;
+IBM AlphaWorks.
+XML Metadata Interchange (XMI) Toolkit.
+<code><a href="http://www.alphaworks.ibm.com/tech/xmitoolkit">http://www.alphaworks.ibm.com/tech/xmitoolkit</a></code>
+
+<p>
+<a name="REF-XML"><strong>[XML]</strong></a> &nbsp;
+Tim Bray, Jean Paoli, and C. M. Sperberg-McQueen, eds.
+<em>Extensible Markup Language (XML) 1.0</em>
+<code><a href="http://www.w3.org/TR/REC-xml">http://www.w3.org/TR/REC-xml</a></code>
+
+<p>
+<a name="REF-XML4C++"><strong>[XML4C++]</strong></a> &nbsp;
+IBM AlphaWorks.
+XML for C++.
+<code><a href="http://www.alphaworks.ibm.com/tech/xml4c">http://www.alphaworks.ibm.com/tech/xml4c</a></code>
+
+<p>
+<a name="REF-XMLDiffMerge"><strong>[XMLDiffMerge]</strong></a> &nbsp;
+IBM AlphaWorks.
+XML Diff and Merge Tool.
+<code><a href="http://www.alphaworks.ibm.com/tech/xmldiffmerge">http://www.alphaworks.ibm.com/tech/xmldiffmerge</a></code>
+
+<p>
+<a name="REF-XML-Handbook"><strong>[XML-Handbook]</strong></a> &nbsp;
+Charles F. Goldfarb and Paul Prescod.
+<em>The XML Handbook</em>
+Prentice Hall PTR, 1998.
+
+<p>
+<a name="REF-XMLQL"><strong>[XMLQL-EnE]</strong></a> &nbsp;
+Mary Fernandez, J&eacute;r&ocirc;me Sim&eacute;on, and Philip Wadler.
+"XML Query Language: Experiences and Exemplars"
+<code><a href="http://www-db.research.bell-labs.com/usr/simeon/xquery.html">http://www-db.research.bell-labs.com/usr/simeon/xquery.html</a></code>
+
+<p>
+<a name="REF-XMLSchema1"><strong>[XMLSchema1]</strong></a> &nbsp;
+Henry S. Thompson, David Beech, Murray Maloney, Noah Mendelsohn, eds.
+<em>XML Scheme Part 1: Structures</em>. W3c Working Draft 5 Nov 1999.
+<code><a href="http://www.w3.org/TR/xmlschema-1">http://www.w3.org/TR/xmlschema-1</a></code>
+
+<p>
+<a name="REF-XMLSchema2"><strong>[XMLSchema2]</strong></a> &nbsp;
+Paul V. Biron, Ashok Malhotra, eds.
+<em>XML Scheme Part 2: Datatypes</em>. W3c Working Draft 5 Nov 1999.
+<code><a href="http://www.w3.org/TR/xmlschema-2">http://www.w3.org/TR/xmlschema-2</a></code>
+
+<p>
+<a name="REF-XPath"><strong>[XPath]</strong></a> &nbsp;
+James Clark and Steve DeRose, eds.
+<em>XML Path Langauge (XPath) Version 1.0</em>. W3C Recommendation.
+<code><a href="http://www.w3.org/TR/xpath">http://www.w3.org/TR/xpath</a></code>
+
+<p>
+<a name="REF-XSL"><strong>[XSL]</strong></a> &nbsp;
+Stephen Deach, ed.
+<em>Extensible Stylesheet Language (XSL) Specification</em>. W3C Working Draft 21 Apr 1999.
+<code><a href="http://www.w3.org/TR/WD-xsl">http://www.w3.org/TR/WD-xsl</a></code>
+
+<p>
+<a name="REF-XSLT"><strong>[XSLT]</strong></a> &nbsp;
+James Clark, ed.
+<em>XSL Transformations</em>.  W3C Recommendation.
+<code><a href="http://www.w3.org/TR/xslt">http://www.w3.org/TR/xslt</a></code>
 
 <!--
 <p>
