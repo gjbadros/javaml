@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE java-source-program SYSTEM "java-ml.dtd">
 <!-- $Id$ -->
 <!-- From p. 129 in Java in a Nutshell 2nd. 
 
@@ -15,72 +17,6 @@ public class FirstApplet extends Applet {
 
 -->
 
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE java-source-program [
-   <!ENTITY % visibility-attribute "visibility (public|private|protected) #IMPLIED">
-   <!ENTITY % kind-attribute "kind (integer|real|double) #IMPLIED">
-   <!ENTITY % mod-final "final (final) #IMPLIED">
-   <!ENTITY % mod-static "static (static) #IMPLIED">
-   <!ENTITY % mod-volatile "volatile (volatile) #IMPLIED">
-   <!ENTITY % mod-transient "transient (transient) #IMPLIED">
-   <!ENTITY % mod-native "native (native) #IMPLIED">
-   <!ENTITY % mod-abstract "abstract (abstract) #IMPLIED">
-   <!ENTITY % mod-synchronized "synchronized (synchronized) #IMPLIED">
-   <!ELEMENT java-source-program (import|class)* >
-   <!ATTLIST java-source-program
-       version CDATA #IMPLIED>
-   <!ELEMENT import EMPTY>
-   <!ATTLIST import
-       module CDATA #REQUIRED>
-   <!ELEMENT class ((implement)*, (comment|method|field)*) >
-   <!ATTLIST class
-       name CDATA #REQUIRED
-       %visibility-attribute 
-       superclass CDATA "Object">
-   <!ELEMENT field EMPTY>
-   <!ATTLIST field
-       type CDATA #REQUIRED
-       name CDATA #REQUIRED
-       %visibility-attribute
-       %mod-final
-       %mod-static
-       %mod-volatile
-       %mod-transient>
-   <!ELEMENT method (comment,formal-arguments,statements)>
-   <!ATTLIST method 
-       name CDATA #REQUIRED
-       id ID #REQUIRED
-       %visibility-attribute
-       %mod-abstract
-       %mod-final
-       %mod-static
-       %mod-synchronized
-       %mod-volatile
-       %mod-transient
-       %mod-native
-       return-type CDATA #REQUIRED>
-   <!ELEMENT comment (#PCDATA)>
-   <!ELEMENT formal-arguments (formal-argument)*>
-   <!ELEMENT formal-argument EMPTY>
-   <!ATTLIST formal-argument
-       type CDATA #REQUIRED
-       name CDATA #REQUIRED
-       id ID #REQUIRED>
-   <!ELEMENT send (target,arguments)>
-   <!ELEMENT target (#PCDATA)>
-   <!ELEMENT return (expression)>
-   <!ELEMENT statements (send|var-decl|condition|loop|return)*>
-   <!ELEMENT expression (#PCDATA)>
-   <!ELEMENT arguments (literal-string|literal-number)*>
-   <!ELEMENT literal-string EMPTY>
-   <!ATTLIST literal-string
-       value CDATA #REQUIRED>
-   <!ELEMENT literal-number EMPTY>
-   <!ATTLIST literal-number
-       value CDATA #REQUIRED
-       %kind-attribute
-       base CDATA "10">
-]>
 <java-source-program version="1.2">
 <import module="java.applet.*">
 <import module="java.awt.*">
