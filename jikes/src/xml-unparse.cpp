@@ -739,23 +739,23 @@ void AstSuperCall::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstSuperCall:#" << this-> id << "*/";
     if (wcscmp(lex_stream.NameString(super_token), L"super") == 0)
-	{
-    if (base_opt)
-    {
-      base_opt -> XMLUnparse(os, lex_stream);
-      os << lex_stream.NameString(dot_token_opt);
-    }
-    os << lex_stream.NameString(super_token);
-    os << lex_stream.NameString(left_parenthesis_token);
-    for (int j = 0; j < NumArguments(); j++)
       {
-	if (j>0) os << ", ";
-	this -> Argument(j) -> XMLUnparse(os, lex_stream);
+        if (base_opt)
+          {
+            base_opt -> XMLUnparse(os, lex_stream);
+            os << lex_stream.NameString(dot_token_opt);
+          }
+        os << lex_stream.NameString(super_token);
+        os << lex_stream.NameString(left_parenthesis_token);
+        for (int j = 0; j < NumArguments(); j++)
+          {
+            if (j>0) os << ", ";
+            this -> Argument(j) -> XMLUnparse(os, lex_stream);
+          }
+        os << lex_stream.NameString(right_parenthesis_token);
+        os << lex_stream.NameString(semicolon_token);
+        os << "\n";
       }
-    os << lex_stream.NameString(right_parenthesis_token);
-    os << lex_stream.NameString(semicolon_token);
-    os << "\n";
-	}
     if (Ast::debug_unparse) os << "/*:AstSuperCall#" << this-> id << "*/";
 }
 
@@ -1408,10 +1408,10 @@ void AstArrayAccess::XMLUnparse(Ostream& os, LexStream& lex_stream)
     if (Ast::debug_unparse) os << "/*AstArrayAccess:#" << this-> id << "*/";
     xml_open(os,"array-ref");
     xml_open(os,"base");
-    base -> XMLUnparse(os, lex_stream);
+    xml_unparse_maybe_var_ref(os,lex_stream,base);
     xml_close(os,"base",false);
     xml_open(os,"offset");
-    expression -> XMLUnparse(os, lex_stream);
+    xml_unparse_maybe_var_ref(os,lex_stream,expression);
     xml_close(os,"offset");
     xml_close(os,"array-ref");
     if (Ast::debug_unparse) os << "/*:AstArrayAccess#" << this-> id << "*/";
