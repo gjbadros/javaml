@@ -1,0 +1,61 @@
+Executive summary:
+
+JavaML -- the Java Markup Language -- is an XML-based alternative
+complementary representation of Java source code.  E.g., I convert this:
+
+import java.applet.*;
+import java.awt.*;
+
+public class FirstApplet 
+                   extends Applet {
+  public void paint(Graphics g) {
+    g.drawString("FirstApplet", 25, 50);
+  }
+}
+
+into this:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE java-source-program SYSTEM "java-ml.dtd">
+
+<java-source-program name="FirstApplet.java">
+  <import module="java.applet.*"/>
+  <import module="java.awt.*"/>
+  <class name="FirstApplet" visibility="public">
+    <superclass class="Applet"/>
+    <method name="paint" visibility="public" id="meth-15">
+      <type name="void" primitive="true"/>
+      <formal-arguments>
+         <formal-argument name="g" id="frmarg-13">
+             <type name="Graphics"/></formal-argument>
+      </formal-arguments>
+      <block>
+        <send message="drawString">
+          <target><var-ref name="g" idref="frmarg-13"/></target>
+            <arguments>
+              <literal-string value="FirstApplet"/>
+              <literal-number kind="integer" value="25"/>
+              <literal-number kind="integer" value="50"/>
+            </arguments>
+        </send>
+      </block>
+    </method>
+  </class>
+</java-source-program>
+
+
+And can then do nifty software-engineering analyses and transformations
+on the JavaML representation very easily.  See my JavaML page at:
+
+http://www.cs.washington.edu/homes/gjb/JavaML
+
+my JavaML affiliates poster at:
+
+http://www.cs.washington.edu/homes/gjb/images/javaml-poster.gif
+
+and draft versions of my accepted WWW9 paper at:
+
+http://www.cs.washington.edu/homes/gjb/JavaML/#papers
+
+for more details.
+
