@@ -1,4 +1,4 @@
 #!/bin/sh -
 tag="code-fragment"
 awk "NR == 2 { print; print \"<$tag>\"; next } { print } END { print \"</$tag>\" }" "$@" | \
-  javaml-to-plain-source
+  `dirname $0`/javaml-to-plain-source
