@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE java-source-program SYSTEM "java-ml.dtd">
+
+<java-source-program name="FirstApplet.java">
+  <import module="java.applet.*"/>
+  <import module="java.awt.*"/>
+  <class name="FirstApplet" visibility="public" superclass="Applet">
+    <method name="paint" visibility="public" id="meth-15">
+      <type name="void" primitive="true"/>
+      <formal-arguments>
+	<formal-argument name="g" id="frmarg-13"><type name="Graphics"/></formal-argument>
+      </formal-arguments>
+      <statements>
+	<statements>
+	  <send message="drawString">
+	    <target><var-ref name="g" idref="frmarg-13"/></target>
+	    <arguments>
+              <literal-string length="13">Hello World</literal-string>
+              <literal-number kind="integer" value="25"/>
+              <literal-number kind="integer" value="50"/>
+            </arguments>
+	  </send>
+	</statements>
+      </statements>
+    </method>
+  </class>
+</java-source-program>

@@ -1,0 +1,20 @@
+<java-source-program>
+<import-declaration>import java.applet.*;</import-declaration>
+<import-declaration>import java.awt.*;</import-declaration>
+
+<class-declaration>
+<modifiers>public</modifiers> class 
+   <class-name>FirstApplet</class-name> 
+     extends <superclass>Applet</superclass> {
+ <method-definition>
+  <modifiers>public</modifiers> <return-type>void</return-type> 
+    <method-name>paint</method-name>
+      (<formal-arguments><type>Graphics</type> 
+             <name>g</name></formal-arguments>) 
+    <statements>{
+    g.drawString("Hello World", 25, 50);
+  } </statements>
+ </method-definition>
+}
+</class-declaration>
+</java-source-program>
