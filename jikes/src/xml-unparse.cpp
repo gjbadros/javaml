@@ -57,6 +57,27 @@ void xml_suffix(Ostream &xo)
   xo << "</java-source-program>\n";
 }
 
+// GJB:FIXME:: should \" turn into "
+// should \n, \t, etc. be expanded?
+void
+OutputLiteralString(Ostream &xo, const char *sz)
+{
+  ++sz; // skip leading quote
+  while (*(sz+1)) { // test one beyond so we skip last quote
+    switch (*sz) {
+    case '&':
+      xo << "&amp;"; break;
+    case '<':
+      xo << "&lt;"; break;
+    case '>':
+      xo << "&gt;"; break;
+    default:
+      xo << *sz; break;
+    }
+    ++sz;
+  }
+}
+
 #ifdef XML_MANGLE_FOR_IDS
 static char *szIdSeparator = ".";
 
@@ -1435,18 +1456,11 @@ void AstStringLiteral::XMLUnparse(Ostream& os, LexStream& lex_stream)
       nm << lex_stream.NameString(string_literal_token), lex_stream.NameStringLength(string_literal_token);
     }
     xnm << ends;
-#if 0
-    // this shows w/ double quotes-- bad! --11/12/99 gjb
     xml_output(os,"literal-string",
-               "value",xnm.str(),
                "length",SzNewFromLong(lex_stream.NameStringLength(string_literal_token)),
-               XML_CLOSE);
-#else
-    os << "<literal-string" 
-       << " value=" << xnm.str() 
-       << " length=\"" << SzNewFromLong(lex_stream.NameStringLength(string_literal_token))
-       << "\"/>";
-#endif
+               NULL);
+    OutputLiteralString(os,xnm.str());
+    xml_close(os,"literal-string");
     if (Ast::debug_unparse) os << "/*:AstStringLiteral#" << this-> id << "*/";
 }
 
