@@ -1,0 +1,24 @@
+Mon Jan 31 13:17:56 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* README-JAVAML: Added.
+
+	* java-ml.dtd: Added. The document type definition (DTD) for
+ 	JavaML; useful with SGML-aware editors (e.g., psgml mode for
+ 	Emacs) and for validating parsers (e.g., JADE:
+ 	http://www.jclark.com/jade)
+
+ 	* xml-unparse.cpp: Added to unparse into JavaML representation.
+  	See http://www.cs.washington.edu/homes/gjb/papers/javaml/javaml.html
+
+	* Makefile.in: Added xml-unparse.o to list of files, and added its 
+	build rule.
+
+	* ast.h: Updated all AST node classes to have XMLUnparse() method
+	(analogous to existing Unparse() method)
+
+	* control.cpp: Added handing of debug_xml_unparse_ast option
+
+	* jikes.cpp: Updated usage message to include usage for +ux, +udx, 
+	the new XML unparsing options.
+
+	* option.cpp, option.h: Handle the +ux, +udx options
