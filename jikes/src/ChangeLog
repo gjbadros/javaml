@@ -1,3 +1,17 @@
+Fri Feb 18 20:54:11 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Include comments as text nodes in the output!
+	Improve comment about FieldDeclaration location unparsing.
+
+	* stream.h, stream.cpp: Added FirstCommentSince() to be less picky 
+	about which comment to return, so I can get at the comment nodes.
+	Make FirstComment() work in terms of FirstCommentSince().
+
+	* jikes.cpp: Mention in the help text that +c also chooses not to
+ 	discard comments in JavaML output.
+
+	* control.cpp: Call SetUpComments() if +c is given before xml unparsing.
+
 Fri Feb 18 16:57:43 2000  Greg J. Badros  <gjb@cs.washington.edu>
 
 	* xml-unparse.cpp: Added xml_output_with_location() and output the
