@@ -1,0 +1,66 @@
+INSTRUCTIONS TO AUTHORS
+PAPER PROCEEDINGS WWW9 CONFERENCE
+
+1. Please submit a Postscript or PDF file of the entire paper (including
+figures, etc.) together with the source files used to produce the
+Postscript/PDF file. If your paper is written in LaTeX or MSWord, please
+submit these files too. Please note that all figures should be supplied
+as separate files to get the best results in final print, i.e. do not
+supply embedded figures. Figures should preferably be supplied at a
+resolution of 600 dpi or higher.
+
+2. Please insert the names and (full) addresses of all authors on top of
+the paper.
+
+3. An abstract is obligatory; please insert it directly after the author
+addresses.
+
+4. The Proceedings will contain a Subject Index based on the keywords
+given by the authors. Please insert them (max. 5), preceded by the word
+"Keywords", just below the abstract.
+
+5. Please provide (short) biographies and passport-sized photographs of
+all co-authors. The biographies should be inserted at the end of the
+text file after the References section under the heading "Vitae", in the
+same the order as on the opening page. If the electronic versions of the
+photographs are not available, hard copy photographs should be forwarded
+to J. Kastelein, Elsevier Science B.V., P.O. Box 2759, 1000 CT
+Amsterdam, Netherlands. In case the biographies and/or photographs fail
+at the date of submission of the final version, your paper will be
+published without.
+
+6. In the paper Proceedings all figures will be reproduced in
+greyscale. So if some figures in your paper contain colors, please keep
+this in mind. Selection of other colors might improve contrast.
+
+7. Sections, subsections etc. should be numbered.
+
+8. Figures/tables should to be numbered and have a caption. They should
+be cited in the text at least once.
+
+9. All references cited in the text should be listed in the References
+section. All references listed in the References section should be cited
+at least once in the text. Citing in de abstract should be avoided. The
+references should be numbered and listed in alphabetical order, as in
+the following examples: books [1], articles in journals [2], papers in a
+contributed volume [3,4], unpublished papers [5]:
+
+* [1] E. Borger, Computability, Complexity, Logic, North-Holland, Amsterdam, 1989. 
+
+* [2] D.E. Knuth, Theory and practice, Theoret. Comput. Sci.90 (1991) 1-15.
+
+* [3] A.K. Lenstra, H.W. Lenstra, Jr., Algorithms in number theory, in:
+  J. van Leeuwen, (Ed.), Handbook of Computer Science, vol. A, Elsevier,
+  Amsterdam, 1990, pp. 673-715.
+
+* [4] M. Li, Lower bounds by Kolmogorov complexity, in: Proc. ICALP '85,
+  Lecture Notes in Computer Science, vol. 194, Springer, Berlin, 1985
+  pp. 383-393.
+
+* [5] A. Rajasekar, Semantics for logic programs, Ph.D. Thesis,
+  Department of Computer Science, University of Maryland, 1989.
+
+10. Files (text, figures, photographs) should have names of max. 8
+characters and one extension. This will ease the further processing of
+your paper and is less error prone.
+
