@@ -53,7 +53,7 @@
 <xsl:param name="clr-finally">blue</xsl:param>
 <xsl:param name="clr-instanceof">blue</xsl:param>
 
-<xsl:variable name="cchIndent" select="0"/>
+<xsl:variable name="cchIndent" select="0" saxon:assignable="yes"/>
 
 <xsl:output method="html"/>
 
@@ -643,7 +643,7 @@
 </xsl:template>
 
 <xsl:template name="indent">
-  <xsl:variable name="i" select="0"/>
+  <xsl:variable name="i" select="0" saxon:assignable="yes"/>
   <saxon:while test="$i &lt; $cchIndent">
      <saxon:entity-ref name="nbsp"/>
      <saxon:entity-ref name="nbsp"/>
