@@ -1,4 +1,4 @@
-<!-- java-ml.dtd 0.96 -->
+<!-- java-ml.dtd 0.97 -->
 <!-- Copyright (C) 2000, Greg J. Badros <gjb@cs.washington.edu> -->
 <!-- A DTD for JavaML, an XML representation of Java Source Code -->
 <!-- http://www.cs.washington.edu/homes/gjb/papers/javaml/javaml.html -->
@@ -48,7 +48,7 @@
 <!ELEMENT superclass EMPTY>
 <!ATTLIST superclass
     name CDATA #REQUIRED>
-<!ELEMENT interface (extend*, (method|field)*) >
+<!ELEMENT interface (extend*, (class|method|field)*) >
 <!ATTLIST interface
     name CDATA #REQUIRED
     %interface-visibility-attribute;
@@ -151,7 +151,7 @@
 <!ATTLIST var-ref
     name CDATA #REQUIRED
     idref IDREF #IMPLIED>
-<!ELEMENT field-access (%expr-elems;)>
+<!ELEMENT field-access (type|%expr-elems;)>
 <!ATTLIST field-access
     field CDATA #REQUIRED>
 <!ELEMENT var-set EMPTY>
