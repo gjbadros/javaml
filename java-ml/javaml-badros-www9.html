@@ -48,25 +48,40 @@ JavaML: A Markup Language for Java Source Code
 University of Washington</h6>
 
 <h3>Abstract</h3>
-<p> Typical ...
-</p>
+
+      The typical plain-text representation of source code is convenient
+      for programmers but requires parsing to uncover the deep structure
+      of the program.  While sophisticated software tools parse source
+      code to gain access to the program's structure, many lightweight
+      programming aids such as <tt>grep</tt> rely instead on only the
+      lexical structure of source code.  I describe a new XML
+      application that provides an isomorphic alternative representation
+      of Java source code. This XML-based representation, called JavaML,
+      is more natural for tools and permits easy specification of
+      numerous software-engineering analysis by leveraging the plethora
+      of XML tools and techniques.  A robust converter built inside the
+      Jikes Java compiler framework translates from plain-text Java
+      source code to JavaML.  I argue that the plain-text representation
+      should be viewed as only artifact of the interactive
+      program-editing process, and that JavaML is a better primary
+      representation format for Java programs.
 
 <h3>Keywords</h3>
-<p>Java, source-code, XML, AST, parsing, analsysis, software-engineering, AST</p>
+Java, source-code, XML, AST, parsing, analysis, software-engineering, AST, Jikes
 
 <h3>Introduction</h3>
-<p> Many
-</p>
+
+<h3>JavaML</h3>
 
 <h3>Conclusion</h3>
-<p> I
-</p>
 
-<h3>Acknowledgments</h3>
-<p>I thank Zack Ives, Craig Kaplan, Stefan Bjarni Sigurdsson for their helpful discussion.
-I also thank Michael Ernst for advice on use of the Jikes compiler framework.</p>
+<h3>Acknowledgments</h3> 
 
-<h3>Appendix</h3>
+I thank Zack Ives, Craig Kaplan, Stefan Bjarni Sigurdsson for their
+helpful discussion.  I also thank Michael Ernst for advice on use of the
+Jikes compiler framework.
+
+<h3>Appendix 1 - JavaML DTD</h3>
 
 <h3>References</h3>
 
