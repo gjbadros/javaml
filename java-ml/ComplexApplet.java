@@ -29,6 +29,7 @@ public abstract class ComplexApplet extends Applet {
   public abstract int foo(Graphics g);
 
   public Object tgt() {
+    //    Object k = new ComplexApplet(2);
     for (int i = 0; i < 10; ++i);
     for (int i = 0; i < 10; ++i) {
       System.out.println(i);
