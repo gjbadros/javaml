@@ -419,7 +419,7 @@
 <xsl:template match="cast-expr">
   <xsl:text>(</xsl:text>
   <xsl:apply-templates select="type"/>
-  <xsl:text>)</xsl:text>
+  <xsl:text>) </xsl:text>
   <xsl:apply-templates select="*[position() > 1]"/>
 </xsl:template>
 
