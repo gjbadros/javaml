@@ -147,7 +147,7 @@ xml_unparse_throws(Ostream &xo, LexStream &lex_stream, T *pnode)
       char *szExceptionName = SzFromUnparse(lex_stream,pnode->Throw(k));
       xml_output(xo,"throws",
                  "exception",szExceptionName,
-                 NULL);
+                 XML_CLOSE);
       xml_nl(xo);
     }
   }
@@ -155,7 +155,14 @@ xml_unparse_throws(Ostream &xo, LexStream &lex_stream, T *pnode)
 
 /* extra parameters are
    attribute/value pairs (always as char *'s).
-   use final NULL/XML_CLOSE to signify end */
+   use final NULL/XML_CLOSE to signify end 
+   Note that you need to use my `nsgmls-xml' script to
+   run nsgmls properly to recognize the <br/> XML-empty tags:
+
+nsgmls-xml does this:
+  nsgmls -c/usr/doc/jade-1.2.1/pubtext/xml.soc -wxml "$@"
+
+*/
 void
 xml_output(Ostream &xo, char *szTag, ...)
 {
@@ -200,7 +207,16 @@ xml_name_string(LexStream &ls, LexStream::TokenIndex i)
 {
   ostrstream xnm;
   Ostream nm(&xnm);
-  nm << ls.NameString(i);
+  char *sz = wstring2string(ls.NameString(i));
+  if (strcmp(sz,"<") == 0) {
+    // GJB:FIXME:: this is an ugly hack;
+    // does XML really disallow this? --11/13/99 gjb
+    nm << "lt";
+  } else if (strcmp(sz,"&&") == 0) {
+    nm << "logand";
+  } else {
+    nm << ls.NameString(i);
+  }
   xnm << ends;
   return xnm.str();
 }
@@ -217,7 +233,7 @@ void xml_unparse_maybe_var_ref(Ostream &xo, LexStream &ls, Ast *pnode)
   } else if (pnode->IsName()) {
     xml_output(xo,"var-ref",
                "name",SzFromUnparse(ls,pnode),
-               NULL);
+               XML_CLOSE);
   } else {
     pnode -> XMLUnparse(xo, ls);
   }
@@ -236,7 +252,7 @@ void xml_unparse_maybe_var_set(Ostream &xo, LexStream &ls, Ast *pnode)
   } else if (pnode->IsName()) {
     xml_output(xo,"var-set",
                "name",SzFromUnparse(ls,pnode),
-               NULL);
+               XML_CLOSE);
   } else {
     pnode -> XMLUnparse(xo, ls);
   }
@@ -311,7 +327,7 @@ void AstBlock::XMLUnparse(Ostream& os, LexStream& lex_stream)
     {
       xml_output(os, "label",
                  "name",lex_stream.NameString(this->Label(i)),
-                 NULL);
+                 XML_CLOSE);
     }
 
     /* GJB:FIXME:: we get extra nestings of statements
@@ -358,7 +374,7 @@ void AstSimpleName::XMLUnparse(Ostream& os, LexStream& lex_stream)
 #if 0
     xml_output(os,"var-ref",
                "name",xml_name_string(lex_stream,identifier_token),
-               NULL);
+               XML_CLOSE);
 #else
     os << lex_stream.NameString(identifier_token);
 #endif
@@ -370,7 +386,7 @@ void AstPackageDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
     if (Ast::debug_unparse) os << "/*AstPackageDeclaration:#" << this-> id << "*/";
     xml_output(os,"package-decl",
                "name",SzFromUnparse(lex_stream,name),
-               NULL);
+               XML_CLOSE);
     xml_nl(os);
     if (Ast::debug_unparse) os << "/*:AstPackageDeclaration#" << this-> id << "*/";
 }
@@ -387,7 +403,7 @@ void AstImportDeclaration::XMLUnparse(Ostream& os, LexStream& lex_stream)
     xnm << ends;
     xml_output(os,"import",
                "module", xnm.str(),
-               NULL);
+               XML_CLOSE);
     xml_nl(os);
     if (Ast::debug_unparse) os << "/*:AstImportDeclaration#" << this-> id << "*/";
 }
@@ -1200,7 +1216,7 @@ void AstBreakStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
     xml_output(os,"break",
                "targetname",
                identifier_token_opt? xml_name_string(lex_stream,identifier_token_opt):NULL,
-               NULL);
+               XML_CLOSE);
     if (Ast::debug_unparse) os << "/*:AstBreakStatement#" << this-> id << "*/";
 }
 
@@ -1210,7 +1226,7 @@ void AstContinueStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
     xml_output(os,"continue",
                "targetname",
                identifier_token_opt? xml_name_string(lex_stream,identifier_token_opt):NULL,
-               NULL);
+               XML_CLOSE);
     if (Ast::debug_unparse) os << "/*:AstContinueStatement#" << this-> id << "*/";
 }
 
@@ -1295,7 +1311,7 @@ void AstIntegerLiteral::XMLUnparse(Ostream& os, LexStream& lex_stream)
     xml_output(os,"literal-number",
                "kind","integer",
                "value",xml_name_string(lex_stream,integer_literal_token),
-               NULL);
+               XML_CLOSE);
     if (Ast::debug_unparse) os << "/*:AstIntegerLiteral#" << this-> id << "*/";
 }
 
@@ -1305,7 +1321,7 @@ void AstLongLiteral::XMLUnparse(Ostream& os, LexStream& lex_stream)
     xml_output(os,"literal-number",
                "kind","long",
                "value",xml_name_string(lex_stream,long_literal_token),
-               NULL);
+               XML_CLOSE);
     if (Ast::debug_unparse) os << "/*:AstLongLiteral#" << this-> id << "*/";
 }
 
@@ -1315,7 +1331,7 @@ void AstFloatingPointLiteral::XMLUnparse(Ostream& os, LexStream& lex_stream)
     xml_output(os,"literal-number",
                "kind","float",
                "value",xml_name_string(lex_stream,floating_point_literal_token),
-               NULL);
+               XML_CLOSE);
     if (Ast::debug_unparse) os << "/*:AstFloatingPointLiteral#" << this-> id << "*/";
 }
 
@@ -1325,21 +1341,21 @@ void AstDoubleLiteral::XMLUnparse(Ostream& os, LexStream& lex_stream)
     xml_output(os,"literal-number",
                "kind","double",
                "value",xml_name_string(lex_stream,double_literal_token),
-               NULL);
+               XML_CLOSE);
     if (Ast::debug_unparse) os << "/*:AstDoubleLiteral#" << this-> id << "*/";
 }
 
 void AstTrueLiteral::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstTrueLiteral:#" << this-> id << "*/";
-    xml_open(os,"literal-true");
+    xml_output(os,"literal-true",XML_CLOSE);
     if (Ast::debug_unparse) os << "/*:AstTrueLiteral#" << this-> id << "*/";
 }
 
 void AstFalseLiteral::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstFalseLiteral:#" << this-> id << "*/";
-    xml_open(os,"literal-false");
+    xml_output(os,"literal-false",XML_CLOSE);
     if (Ast::debug_unparse) os << "/*:AstFalseLiteral#" << this-> id << "*/";
 }
 
@@ -1357,12 +1373,12 @@ void AstStringLiteral::XMLUnparse(Ostream& os, LexStream& lex_stream)
     xml_output(os,"literal-string",
                "value",xnm.str(),
                "length",SzNewFromLong(lex_stream.NameStringLength(string_literal_token)),
-               NULL);
+               XML_CLOSE);
 #else
     os << "<literal-string" 
        << " value=" << xnm.str() 
        << " length=\"" << SzNewFromLong(lex_stream.NameStringLength(string_literal_token))
-       << "\">";
+       << "\"/>";
 #endif
     if (Ast::debug_unparse) os << "/*:AstStringLiteral#" << this-> id << "*/";
 }
@@ -1382,21 +1398,21 @@ void AstCharacterLiteral::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstNullLiteral::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstNullLiteral:#" << this-> id << "*/";
-    xml_open(os,"literal-null");
+    xml_output(os,"literal-null",XML_CLOSE);
     if (Ast::debug_unparse) os << "/*:AstNullLiteral#" << this-> id << "*/";
 }
 
 void AstThisExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstThisExpression:#" << this-> id << "*/";
-    xml_open(os,"this");
+    xml_output(os,"this",XML_CLOSE);
     if (Ast::debug_unparse) os << "/*:AstThisExpression#" << this-> id << "*/";
 }
 
 void AstSuperExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstSuperExpression:#" << this-> id << "*/";
-    xml_open(os,"super");
+    xml_output(os,"super",XML_CLOSE);
     if (Ast::debug_unparse) os << "/*:AstSuperExpression#" << this-> id << "*/";
 }
 
