@@ -29,10 +29,32 @@ ALSO CANNOT DO ANYTHING THAT REQUIRES A TRANSFORMATION, OBVIOUSLY
 * ensure that all variables of type String start with str (hungarian)
 -> sggrep -q '.*/local-variable[name!~"^str"]' -s './type[name=String]' xml-unparsed/ComplexApplet.java.xml 
 * etags
-* list functions that do not call a function
 * list functions that send message "drawString" (contrast w/ above)
+-> sggrep -q '.*/method' -s '.*/send[message=drawString]' xml-unparsed/ComplexApplet.java.xml | sgmltrans -r method-names.sgmltrans
+---or---
+-> sgrpg '.*/method' '.*/send[message=drawString]' '' '%s %s' visibility name < xml-unparsed/ComplexApplet.java.xml
+* list functions that do not call a function
+-> sggrep -v -q '.*/method' -s '.*/send[message=drawString]' xml-unparsed/ComplexApplet.java.xml | sgmltrans -r method-names.sgmltrans 
 * add debug code at entry/exit to function
 * better diff utility; canonical ast differ for cheating check
+
+
+Compare versions of dtd w/ perlSGML's dtddiff.
+e.g., make true-case an optional child of an if element
+
+    ----------------------------------------------------------------------
+                           Content Rule Differences
+    ----------------------------------------------------------------------
+         ------------------------------------------------------------
+                                     <IF>
+
+  << old content rule <<
+  (test,true-case?,false-case?)
+
+  >> new content rule >>
+  (test,true-case,false-case?)
+
+
 
 
 
