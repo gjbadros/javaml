@@ -1,3 +1,20 @@
+Sun Feb  6 13:30:58 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp: Use "block" instead of "statements".  Added
+	output of array-initializer tag.  Fix memory leak in
+	AstStringLiteral.
+
+Sun Feb  6 10:56:08 2000  Greg J. Badros  <gjb@cs.washington.edu>
+
+	* xml-unparse.cpp (xml_name_string): convert < and & on a
+	character-by-character basis to be more robust.
+	(AstArrayInitializer) Use xml_unparse_maybe_var_ref so that
+	elements in an array initializer are appropriately marked-up as
+	variable references.  (AstCharacterLiteral) Use xml_name_string so 
+	'<' gets output as '&lt;'.  (AstBinaryExpression) Handle
+	instanceof expressions separately since they're second argument is 
+	a type, not an %expr-elem;
+
 Sat Feb  5 19:46:44 2000  Greg J. Badros  <gjb@cs.washington.edu>
 
 	**** All changes to xml-unparse.cpp

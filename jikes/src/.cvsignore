@@ -1,5 +1,7 @@
-config.status
-config.cache
-jikes
-Makefile
 *.o
+Makefile
+config.cache
+config.log
+config.status
+gencode.class
+jikes
