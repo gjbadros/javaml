@@ -1,0 +1,364 @@
+#!/usr/bin/perl -w
+# $Id$
+# java-ml-to-source
+# (C) 1999 Greg J. Badros
+# Sample implementation of a converter
+# from JavaML back to plain Java source code
+# Mostly a means for me to learn about DOM and this
+# Perl DOM package.
+# Handles ComplexApplet.java.xml w/ only unreachable statement warnings.
+
+use XML::DOM;
+
+my $filename = shift @ARGV;
+
+my $parser = new XML::DOM::Parser;
+my $doc = $parser->parsefile ($filename);
+
+my $root = $doc->getDocumentElement();
+
+RemoveTextNodes($root);
+ProcessNode($root,\*STDOUT);
+
+sub RemoveTextNodes {
+  my ($n) = @_;
+#  print STDERR $n->getNodeName(), "\n";
+  my $children = $n->getChildNodes();
+  my $name = $n->getNodeName();
+  for (my $i = 0; $i < $children->getLength(); ) {
+    my $child = $children->item($i);
+    if (defined($child) && $child->getNodeName() eq "#text" && 
+	$name ne "literal-string" && $name ne "comment") {
+      $n->removeChild($child);
+    } else {
+      RemoveTextNodes($child);
+      ++$i;
+    }
+  }
+}
+
+sub ProcessNode {
+  my ($n,$o) = @_;
+  die if !defined($o);
+
+  my $name = $n->getNodeName();
+  my $children = $n->getChildNodes();
+
+#  print STDERR "processing $name...\n";
+  if (0) {
+    # empty
+  } elsif ("java-source-program" eq $name) {
+    RecurseProcessAll($children,$o);
+  } elsif ("class" eq $name) {
+    my $class_name = $n->getAttribute("name");
+    print $o 
+      $n->getAttribute("visibility")," ",
+      ClassModifiersOf($n), " class $class_name {\n";
+    RecurseProcessAll($children,$o);
+    print $o "}\n";
+  } elsif ("method" eq $name || "constructor" eq $name) {
+    print $o
+      $n->getAttribute("visibility")," ",
+      MethodModifiersOf($n), " ", 
+      TypeOf($n), " ", $n->getAttribute("name");
+    # constructors do not have a type as first child
+    my $i = ("constructor" eq $name)? 0 : 1;
+    my $formal_arguments = $children->item($i++);
+    ProcessFormalArguments($formal_arguments,$o);
+    for (;$i < $children->getLength() && $children->item($i)->getNodeName eq "throws"; ++$i) {
+      print $o 
+	"\nthrows ", $children->item($i)->getAttribute("exception");
+    }
+    my $fNeedSemicolon = 1;
+    for (;$i < $children->getLength(); ++$i) {
+#      print STDERR "processing ", $children->item($i)->getNodeName();
+      $fNeedSemicolon = 0;
+      ProcessNode($children->item($i),$o);
+    }
+    if ($fNeedSemicolon) {
+      print $o ";\n";
+    }
+  } elsif ("import" eq $name) {
+    print $o
+      "import ", $n->getAttribute("module"), ";\n";
+  } elsif ("package-decl" eq $name) {
+    print $o
+      "package ", $n->getAttribute("name"), ";\n";
+  } elsif ("statements" eq $name) {
+    print $o "{\n";
+    my $length = $children->getLength();
+    for (my $i = 0; $i < $length; ++$i) {
+      my $node = $children->item($i);
+      ProcessNode($node,$o);
+      print ";\n";
+    }
+    print $o "}\n";
+  } elsif ("local-variable" eq $name) {
+    my $type = TypeOf($n);
+    print $o
+      "$type " . $n->getAttribute("name");
+    my $initval = $n->getChildNodes()->item(1);
+    if ($initval) {
+      print $o " = ";
+      ProcessNode($initval,$o);
+    }
+  } elsif ("field" eq $name) {
+    print $o
+      $n->getAttribute("visibility"), " ",
+      FieldModifiersOf($n), " ";
+    my $type = TypeOf($n);
+    print $o
+      "$type " . $n->getAttribute("name");
+    my $initval = $n->getChildNodes()->item(1);
+    if ($initval) {
+      print $o " = ";
+      ProcessNode($initval,$o);
+    }
+    print $o ";\n";
+  } elsif ("send" eq $name) {
+    my $i = 0;
+    my $target = $n->getChildNodes()->item($i);
+    if (defined($target) && $target->getNodeName eq "target") {
+      ProcessNode($target,$o);
+      print $o ".";
+      ++$i;
+    }
+    print $o $n->getAttribute("message"), "(";
+    ProcessSendArguments($n->getChildNodes()->item($i),$o);
+    print $o ")";
+  } elsif ("target" eq $name) {
+    RecurseProcessAll($children,$o);
+  } elsif ("new" eq $name) {
+    print $o "new ", TypeOf($n), "(";
+    ProcessSendArguments($n->getChildNodes->item(1),$o);
+    print $o ")";
+  } elsif ("throw" eq $name) {
+    print $o "throw ";
+    RecurseProcessAll($children,$o);
+  } elsif ("loop" eq $name) {
+    my $kind = $n->getAttribute("kind");
+    my $children = $n->getChildNodes();
+    my $length = $children->getLength();
+    my $i = 0;
+    if ("for" eq $kind) {
+      print $o "for (";
+      my $init;
+      while ($init = $children->item($i)) {
+	if ($init->getNodeName() eq "init") {
+	  ProcessNode($init->getChildNodes()->item(0),$o);
+	  print $o ";";
+	  ++$i;
+	} else {
+	  last;
+	}
+      }
+    } else { # while loop
+      print $o "while (";
+    }
+    my $test = $children->item($i);
+    ProcessNode($test,$o);
+    print $o ";";
+    ++$i;
+    my $update;
+    if ("for" eq $kind) {
+      my $not_first = 0;
+      while ($update = $children->item($i)) {
+	if ($update->getNodeName() eq "update") {
+	  if ($not_first) {
+	    print $o ";";
+	    $not_first = 1;
+	  }	  
+	  ProcessNode($update->getChildNodes()->item(0),$o);
+	  ++$i;
+	} else {
+	  last;
+	}
+      }
+    }
+    print $o ")";
+    my $statements = $children->item($i);
+    if (defined($statements)) {
+      ProcessNode($statements,$o);
+    }
+  } elsif ("if" eq $name) {
+    my $children = $n->getChildNodes;
+    my $test = $children->item(0);
+    my $true_case = $children->item(1);
+    my $false_case = $children->item(2);
+    print $o "if (";
+    ProcessNode($test,$o);
+    print $o ")";
+    ProcessNode($true_case,$o);
+    if (defined($false_case)) {
+      ProcessNode($false_case,$o);
+    }
+  } elsif ("test" eq $name) {
+    RecurseProcessAll($children,$o);
+  } elsif ("true-case" eq $name) {
+    RecurseProcessAll($children,$o);
+  } elsif ("false-case" eq $name) {
+    RecurseProcessAll($children,$o);
+  } elsif ("field-access" eq $name) {
+    ProcessNode($n->getChildNodes->item(0),$o);
+    print $o ".", $n->getAttribute("field");
+  } elsif ("binary-expr" eq $name) {
+    my $children = $n->getChildNodes;
+    my $left = $children->item(0);
+    my $right = $children->item(1);
+    ProcessNode($left,$o);
+    my $op = $n->getAttribute("op");
+    if ($op eq "lt") {
+      $op = "<";
+    } elsif ($op eq "logand") {
+      $op = "&&";
+    }
+    print $o $op;
+    ProcessNode($right,$o);
+  } elsif ("unary-expr" eq $name) {
+    my $children = $n->getChildNodes;
+    my $operand = $children->item(0);
+    my $op = $n->getAttribute("op");
+    my $post = $n->getAttribute("post");
+    if ($post ne "true") {
+      print $o $op;
+    }
+    ProcessNode($operand,$o);
+    if ($post eq "true") {
+      print $o $op;
+    }
+  } elsif ("return" eq $name) {
+    print $o "return ";
+    RecurseProcessAll($children,$o);
+  } elsif ("var-ref" eq $name) {
+    print $o $n->getAttribute("name");
+  } elsif ("var-set" eq $name) {
+    print $o $n->getAttribute("name");
+  } elsif ("array-ref" eq $name) {
+    my $base = $n->getElementsByTagName("base")->item(0);
+    my $offset = $n->getElementsByTagName("offset")->item(0);
+    ProcessNode($base,$o);
+    print $o "[";
+    ProcessNode($offset,$o);
+    print $o "]";
+  } elsif ("base" eq $name) {
+    RecurseProcessAll($children, $o);
+  } elsif ("offset" eq $name) {
+    RecurseProcessAll($children, $o);
+  } elsif ("assignment-expr" eq $name) {
+    my $lhs = $children->item(0);
+    ProcessNode($lhs->getChildNodes->item(0),$o);
+    print $o " = ";
+    ProcessNode($children->item(1),$o);
+  } elsif ("literal-number" eq $name) {
+    print $o $n->getAttribute("value");
+  } elsif ("literal-string" eq $name) {
+    my $text = $n->getChildNodes()->item(0);
+    print $o '"';
+    print $text->getData;
+    print $o '"';
+  } elsif ("literal-true" eq $name) {
+    print $o "true";
+  } elsif ("literal-false" eq $name) {
+    print $o "false";
+  } elsif ("literal-null" eq $name) {
+    print $o "null";
+  } elsif ("#text" eq $name) {
+    print $o $n->getData;
+  } else {
+    print STDERR "*** Did not handle ", $name, "\n";
+  }
+}
+
+sub RecurseProcessAll {
+  my ($nodes,$o) = @_;
+
+  my $length = $nodes->getLength();
+  for (my $i = 0; $i < $length; ++$i) {
+    my $node = $nodes->item($i);
+    ProcessNode($node,$o);
+  }
+}
+
+sub ClassModifiersOf {
+  my ($n) = @_;
+  my @modifiers = ();
+  for my $i ( qw(abstract final synchronized) ) {
+    if ($n->getAttribute($i) eq "true") {
+      push @modifiers, $i;
+    }
+  }
+  return join(" ",@modifiers);
+}
+
+sub MethodModifiersOf {
+  my ($n) = @_;
+  my @modifiers = ();
+  for my $i ( qw(abstract final static synchronized volatile transient native) ) {
+    if ($n->getAttribute($i) eq "true") {
+      push @modifiers, $i;
+    }
+  }
+  return join(" ",@modifiers);
+}
+
+sub FieldModifiersOf {
+  my ($n) = @_;
+  my @modifiers = ();
+  for my $i ( qw(final static volatile transient) ) {
+    if ($n->getAttribute($i) eq "true") {
+      push @modifiers, $i;
+    }
+  }
+  return join(" ",@modifiers);
+}
+
+sub TypeOf {
+  my ($n) = @_;
+  my $type = $n->getChildNodes()->item(0);
+  return ($type->getAttribute("name") .
+	  "[]" x ($type->getAttribute("dimensions") || 0));
+}
+
+
+# here, the type is the zeroth element.. hmmmm 
+sub TypeOfVar {
+  my ($n) = @_;
+  my $type;
+  my $children = $n->getChildNodes;
+  my $length = $children->getLength();
+  for (my $i = 0; $i < $length; ++$i) {
+    if ($children->item($i)->getNodeName() eq "type") {
+      my $type = $children->item($i);
+      return ($type->getAttribute("name") .
+	      "[]" x ($type->getAttribute("dimensions") || 0));
+    }
+  }
+}
+
+
+sub ProcessFormalArguments {
+  my ($n, $o) = @_;
+  my @arguments = ();
+  my $children = $n->getChildNodes();
+  my $length = $children->getLength();
+  for (my $i = 0; $i < $length; ++$i) {
+    my $arg = $children->item($i);
+    next if $arg->getNodeName() eq "#text";
+    push @arguments, 
+    TypeOf($arg) . " " . $arg->getAttribute("name");
+  }
+  print $o "(",
+    join(",",@arguments), ")";
+}
+
+sub ProcessSendArguments {
+  my ($n, $o) = @_;
+  my $children = $n->getChildNodes();
+  my $length = $children->getLength();
+  for (my $i = 0; $i < $length; ++$i) {
+    if ($children->item($i)->getNodeName() ne "#text") {
+      print ", " if ($i > 0);
+      ProcessNode($children->item($i),$o);
+    }
+  }
+}
