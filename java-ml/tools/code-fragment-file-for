@@ -1,0 +1,4 @@
+#!/bin/sh -
+FNAME=cf$$.xml
+awk 'NR == 2 { print; print "<code-fragment>"; next } { print } END { print "</code-fragment>" }' $1 >$FNAME
+echo $FNAME

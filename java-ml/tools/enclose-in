@@ -1,0 +1,3 @@
+#!/bin/sh -
+tag=$1; shift
+awk "NR == 2 { print; print \"<$tag>\"; next } { print } END { print \"</$tag>\" }" "$@"
