@@ -207,7 +207,14 @@ xml_name_string(LexStream &ls, LexStream::TokenIndex i)
 
 void xml_unparse_maybe_var_ref(Ostream &xo, LexStream &ls, Ast *pnode)
 {
-  if (pnode->IsName()) {
+  AstFieldAccess *pfaNode = dynamic_cast<AstFieldAccess *>(pnode);
+  if (pfaNode) {
+    xml_output(xo,"field-access",
+               "field",xml_name_string(ls,pfaNode->identifier_token),
+               NULL);
+    xml_unparse_maybe_var_ref(xo,ls,pfaNode->base);
+    xml_close(xo,"field-access");
+  } else if (pnode->IsName()) {
     xml_output(xo,"var-ref",
                "name",SzFromUnparse(ls,pnode),
                NULL);
@@ -517,7 +524,7 @@ void AstVariableDeclarator::XMLUnparse(Ostream& os, LexStream& lex_stream)
     // name is handled in AstFieldDeclaration, AstFormalParameter, AstLocalVariableDeclarationStatement
     //    variable_declarator_name -> XMLUnparse(os, lex_stream); 
     if (variable_initializer_opt)
-      variable_initializer_opt -> XMLUnparse(os, lex_stream);
+      xml_unparse_maybe_var_ref(os,lex_stream,variable_initializer_opt);
     if (Ast::debug_unparse) os << "/*:AstVariableDeclarator#" << this-> id << "*/";
 }
 
@@ -943,8 +950,6 @@ void AstLocalVariableDeclarationStatement::XMLUnparse(Ostream& os, LexStream& le
 {
     if (Ast::debug_unparse) os << "/*AstLocalVariableDeclarationStatement:#" << this-> id << "*/";
 
-
-
     bool fFinal = false;
     bool fStatic = false;
     bool fVolatile = false;
@@ -1154,26 +1159,20 @@ void AstForStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstBreakStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstBreakStatement:#" << this-> id << "*/";
-    os << lex_stream.NameString(break_token);
-    if (identifier_token_opt)
-      {
-	os << " ";
-	os << lex_stream.NameString(identifier_token_opt);
-      }
-    os << ";\n";
+    xml_output(os,"break",
+               "targetname",
+               identifier_token_opt? xml_name_string(lex_stream,identifier_token_opt):NULL,
+               NULL);
     if (Ast::debug_unparse) os << "/*:AstBreakStatement#" << this-> id << "*/";
 }
 
 void AstContinueStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstContinueStatement:#" << this-> id << "*/";
-    os << lex_stream.NameString(continue_token);
-    if (identifier_token_opt)
-      {
-	os << " ";
-	os << lex_stream.NameString(identifier_token_opt);
-      }
-    os << ";\n";
+    xml_output(os,"continue",
+               "targetname",
+               identifier_token_opt? xml_name_string(lex_stream,identifier_token_opt):NULL,
+               NULL);
     if (Ast::debug_unparse) os << "/*:AstContinueStatement#" << this-> id << "*/";
 }
 
@@ -1221,33 +1220,34 @@ void AstSynchronizedStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstCatchClause::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstCatchClause:#" << this-> id << "*/";
-    os << lex_stream.NameString(catch_token);
-    os << " (";
+    xml_open(os,"catch");
     formal_parameter -> XMLUnparse(os, lex_stream);
-    os << ")\n";
     block -> XMLUnparse(os, lex_stream);
+    xml_close(os,"catch");
     if (Ast::debug_unparse) os << "/*:AstCatchClause#" << this-> id << "*/";
 }
 
 void AstFinallyClause::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstFinallyClause:#" << this-> id << "*/";
-    os << lex_stream.NameString(finally_token);
-    os << "\n";
+    xml_open(os,"finally");
     block -> XMLUnparse(os, lex_stream);
+    xml_close(os,"finally");
     if (Ast::debug_unparse) os << "/*:AstFinallyClause#" << this-> id << "*/";
 }
 
 void AstTryStatement::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstTryStatement:#" << this-> id << "*/";
-    os << lex_stream.NameString(try_token);
-    os << "\n";
+    xml_open(os,"try");
     block -> XMLUnparse(os, lex_stream);
-    for (int k = 0; k < this -> NumCatchClauses(); k++)
-	this -> CatchClause(k) -> XMLUnparse(os, lex_stream);
-    if (finally_clause_opt)
-	finally_clause_opt -> XMLUnparse(os, lex_stream);
+    for (int k = 0; k < this -> NumCatchClauses(); k++) {
+      this -> CatchClause(k) -> XMLUnparse(os, lex_stream);
+    }
+    if (finally_clause_opt) {
+      finally_clause_opt -> XMLUnparse(os, lex_stream);
+    }
+    xml_close(os,"try");
     if (Ast::debug_unparse) os << "/*:AstTryStatement#" << this-> id << "*/";
 }
 
@@ -1366,7 +1366,7 @@ void AstParenthesizedExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstParenthesizedExpression:#" << this-> id << "*/";
     xml_open(os,"paren");
-    expression -> XMLUnparse(os, lex_stream);
+    xml_unparse_maybe_var_ref(os,lex_stream,expression);
     xml_close(os,"paren",false);
     if (Ast::debug_unparse) os << "/*:AstParenthesizedExpression#" << this-> id << "*/";
 }
@@ -1381,11 +1381,12 @@ void AstTypeExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 void AstClassInstanceCreationExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstClassInstanceCreationExpression:#" << this-> id << "*/";
-    xml_output(os,"new",
-               "class", SzFromUnparse(lex_stream,class_type),
-               NULL);
+    xml_open(os,"new");
+    xml_open(os,"class-type");
+    class_type -> XMLUnparse(os, lex_stream);
     if (dot_token_opt /* base_opt - see ast.h for explanation */)
 	base_opt -> XMLUnparse(os, lex_stream);
+    xml_close(os,"class-type");
     xml_open(os,"arguments");
     for (int j = 0; j < NumArguments(); j++)
       {
@@ -1401,24 +1402,29 @@ void AstClassInstanceCreationExpression::XMLUnparse(Ostream& os, LexStream& lex_
 void AstDimExpr::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstDimExpr:#" << this-> id << "*/";
-    os << "[";
-    expression -> XMLUnparse(os, lex_stream);
-    os << "]";
+    xml_open(os,"dim-expr");
+    xml_unparse_maybe_var_ref(os,lex_stream,expression);
+    xml_close(os,"dim-expr");
     if (Ast::debug_unparse) os << "/*:AstDimExpr#" << this-> id << "*/";
 }
 
 void AstArrayCreationExpression::XMLUnparse(Ostream& os, LexStream& lex_stream)
 {
     if (Ast::debug_unparse) os << "/*AstArrayCreationExpression:#" << this-> id << "*/";
-    os << lex_stream.NameString(new_token);
-    os << " ";
+    char *szNumDimensions = SzNewFromLong(NumBrackets() + NumDimExprs());
+    xml_output(os,"new-array",
+               "dimensions",szNumDimensions,
+               NULL);
+    delete szNumDimensions;
+    xml_open(os,"array-type");
     array_type -> XMLUnparse(os, lex_stream);
-    for (int i = 0; i < NumDimExprs(); i++)
-	DimExpr(i) -> XMLUnparse(os, lex_stream);
-    for (int k = 0; k < NumBrackets(); k++)
-	 os << "[]";
+    xml_close(os,"array-type");
+    for (int i = 0; i < NumDimExprs(); i++) {
+      DimExpr(i) -> XMLUnparse(os, lex_stream);
+    }
     if (array_initializer_opt)
       array_initializer_opt -> XMLUnparse(os, lex_stream);
+    xml_close(os,"new-array");
     if (Ast::debug_unparse) os << "/*:AstArrayCreationExpression#" << this-> id << "*/";
 }
 
