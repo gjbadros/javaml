@@ -161,7 +161,7 @@ imagine wanting to rename a local variable from \smtexttt{result} to
 the word will be changed, even if they refer to characters inside
 comments, literal strings, or an unrelated instance field.
 
-An alternate route taken by some developers is to rely
+An alternate route taken by some developers is to rely instead on
 a fixed set of tools provided within an integrated development
 environment (IDE) that has access to the structure of their source
 program via an integrated language-specific parser.  This approach
@@ -397,7 +397,7 @@ unique identifiers to elements via an \smtexttt{id} attribute.  These
 elements can then be referred to by \smtexttt{idref} attributes of other
 elements.  A well-formed XML document must have every \smtexttt{idref}
 value match an \smtexttt{id} given in the document.  The
-\smtexttt{id}\smtexttt{idref} links describe edges that enable XML to
+\smtexttt{id}--\smtexttt{idref} links describe edges that enable XML to
 represent generalized directed graphs, not just trees.
 
 XML, in part due to its SGML heritage, is very well supported by tools
@@ -715,7 +715,7 @@ JavaML.  At present, the DTD permits certain ``important'' elements
 \smtexttt{block}, \smtexttt{loop}) to specify a \smtexttt{comment}
 attribute.  Determining which comments to attach to which elements is
 challenging; the current implementation simply queues up comments and
-includes all comments read since the last ``important'' element in the
+includes all that appear since the last ``important'' element in the
 \smtexttt{comment} attribute of the current such element.
 
 An alternate possibility for comments is to just insert them in the
@@ -1041,17 +1041,20 @@ C++.  For example, we can rename all methods named \smtexttt{isBall} to
 <!-- mostly do an identity transform -->
 <xsl:template match="*|@*|text()">
  <xsl:copy>
-  <xsl:apply-templates select="*|@*|text()"/>
+  <xsl:apply-templates 
+       select="*|@*|text()"/>
  </xsl:copy>
 </xsl:template>
 
-<xsl:template match="method[@name=$oldname]">
+<xsl:template
+     match="method[@name=$oldname]">
  <method name="{$newname}">
   <xsl:apply-templates/>
  </method>
 </xsl:template>
 
-<xsl:template match="send[@message=$oldname]">
+<xsl:template
+     match="send[@message=$oldname]">
  <send message="{$newname}">
   <xsl:apply-templates/>
  </send>
@@ -1248,7 +1251,7 @@ more possibilities are feasible.
 
 The current converter that translates back from JavaML to the classical
 source representation is based on XSLT.  Adding a
-Jikes front-end that would permit the compiler to read JavaML directly.
+Jikes front-end would permit the compiler to read JavaML directly.
 Such an implementation would use an XML parser (e.g.,
 XML4C++~\cite{XML4C++}) to construct the XML DOM from the JavaML source,
 then simply recursively build the Jikes internal AST using the DOM API.
