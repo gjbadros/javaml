@@ -24,13 +24,15 @@
 <!ELEMENT import EMPTY>
 <!ATTLIST import
     module CDATA #REQUIRED>
-<!ELEMENT class (superclass?, implement*, (constructor|method|field)*) >
+<!ELEMENT class (superclass?, implement*, (class|interface|constructor|method|field)*) >
 <!ATTLIST class
     name CDATA #REQUIRED
     %visibility-attribute;
+    %mod-static;
     %mod-abstract;
     %mod-final;
     %mod-synchronized;>
+<!ELEMENT anonymous-class (superclass?, implement*, (constructor|method|field)*) >
 <!ELEMENT superclass EMPTY>
 <!ATTLIST superclass
     class CDATA #REQUIRED>
@@ -91,7 +93,7 @@
 <!ELEMENT throws EMPTY>
 <!ATTLIST throws
     exception CDATA #REQUIRED>
-<!ELEMENT new (type,arguments)>
+<!ELEMENT new (type,arguments,anonymous-class?)>
 <!ELEMENT type EMPTY>
 <!ATTLIST type
     primitive CDATA #IMPLIED
@@ -105,7 +107,7 @@
 <!ATTLIST local-variable
     name CDATA #REQUIRED
     id ID #REQUIRED
-    continuation CDATA #IMPLIED
+    continued CDATA #IMPLIED
     %mod-final;>
 <!ELEMENT arguments (%expr-elems;)*>
 <!ELEMENT literal-string (#PCDATA)>
