@@ -1,0 +1,65 @@
+# $Id$ -*- perl -*-
+# Usage: perl JavaMLXForm < foo.java.xml
+#
+# For use with the perlSGML SGML::Parser tool
+# This converts methods of name bar to Bar
+# it fixes both method elements and send tags.
+# It does not care about the static type of the
+# target, though it could
+# --11/15/99 gjb
+
+package JavaMLXForm;
+use SGML::Parser;
+use SGML::Util;
+@ISA = qw( SGML::Parser );
+
+sub cdata { 
+  my ($this,$cdata) = @_;
+  print "$cdata";
+}
+sub comment_decl { 
+  my ($this,$comments) = @_;
+  print join("\n", @$comments);
+}
+sub processing_inst { 
+  my ($this,$data) = @_;
+  print "<?$data>";
+}
+sub start_tag { 
+  my ($this,$gi,$attr_spec) = @_;
+  my $empty = '';
+  if ($attr_spec =~ s%/$%%) {
+    $empty = '/';
+  }
+  my %attrs = SGMLparse_attr_spec($attr_spec);
+  if ($gi eq "method") {
+    if ($attrs{name} eq "bar") {
+      $attrs{name} = "Bar";
+    }
+  } elsif ($gi eq "send") {
+    if ($attrs{message} eq "bar") {
+      $attrs{name} = "Bar";
+    }
+  }
+  $attr_spec = SGMLattr_to_sgml(\%attrs);
+  print "<$gi";
+  if ($attr_spec ne "") {
+    print " $attr_spec";
+  }
+  print "$empty>";
+}
+sub end_tag { 
+  my ($this,$gi) = @_;
+  print "</$gi>";
+}
+
+#sub char_ref { }
+#sub entity_ref { }
+#sub ignored_data { }
+#sub marked_sect_close { }
+#sub marked_sect_open { }
+#sub parm_entity_ref { }
+#sub error { }
+
+$javaml_parser = new JavaMLXForm;
+$javaml_parser->parse_data(\*STDIN);
