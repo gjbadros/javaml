@@ -9,7 +9,7 @@
 <!ENTITY % mod-abstract "abstract CDATA #IMPLIED">
 <!ENTITY % mod-synchronized "synchronized CDATA #IMPLIED">
 
-<!ENTITY % expression-types "send|new|var-ref|array-ref|paren|assignment-expr|conditional-expr|binary-expr|unary-expr|cast-expr|literal-number|literal-string|literal-true|literal-false|literal-null|this|super">
+<!ENTITY % expression-types "send|new|new-array|var-ref|field-access|array-ref|paren|assignment-expr|conditional-expr|binary-expr|unary-expr|cast-expr|literal-number|literal-string|literal-true|literal-false|literal-null|this|super">
 
 <!ELEMENT java-source-program (package-decl?,import*,class+) >
 <!ATTLIST java-source-program
@@ -69,18 +69,24 @@
 <!ELEMENT send (target,arguments)>
 <!ELEMENT target ANY>
 <!ELEMENT return ANY>
-<!ELEMENT statements (statements|local-variable|throw|if|loop|return|%expression-types)*>
+<!ELEMENT statements (statements|local-variable|try|throw|if|loop|return|continue|break|%expression-types)*>
 <!ELEMENT throw ANY>
 <!ELEMENT throws EMPTY>
 <!ATTLIST throws
     exception CDATA #REQUIRED>
-<!ELEMENT new (arguments)>
-<!ATTLIST new
-    class CDATA #REQUIRED>
+<!ELEMENT new (class-type,arguments)>
+<!ELEMENT class-type (#PCDATA)>
+<!ELEMENT new-array (array-type,dim-expr*,(%expression-types)?)>
+<!ATTLIST new-array
+    dimensions CDATA #REQUIRED>
+<!ELEMENT dim-expr ANY>
+<!ELEMENT array-type (#PCDATA)>
 <!ELEMENT local-variable (%expression-types)?>
 <!ATTLIST local-variable
     type CDATA #REQUIRED
-    name CDATA #REQUIRED>
+    name CDATA #REQUIRED
+    %mod-final
+    id ID #IMPLIED>
 <!ELEMENT arguments (%expression-types)*>
 <!ELEMENT literal-string EMPTY>
 <!ATTLIST literal-string
@@ -94,6 +100,9 @@
 <!ELEMENT var-ref EMPTY>
 <!ATTLIST var-ref
     name CDATA #REQUIRED>
+<!ELEMENT field-access (%expression-types)>
+<!ATTLIST field-access
+    field CDATA #REQUIRED>
 <!ELEMENT package-decl EMPTY>
 <!ATTLIST package-decl
     name CDATA #REQUIRED>
@@ -129,3 +138,13 @@
 <!ELEMENT init ANY>
 <!ELEMENT update ANY>
 <!ELEMENT do-loop (statements?,test?)>
+<!ELEMENT try (statements,catch*,finally?)>
+<!ELEMENT catch (formal-argument,statements?)>
+<!ELEMENT finally (statements)>
+<!ELEMENT continue EMPTY>
+<!ATTLIST continue
+    targetname CDATA #IMPLIED>
+<!ELEMENT break EMPTY>
+<!ATTLIST break
+    targetname CDATA #IMPLIED>
+<!ELEMENT conditional-expr ((%expression-types),(%expression-types),(%expression-types))>

@@ -11,6 +11,7 @@ Possible Analyses:
 * search for unused variables
 * etags
 * list functions that do not call a function
+* enforce hungarian naming convention
 
 XML DTD Stuff:
 
@@ -53,6 +54,45 @@ http://www.oasis-open.org/cover/duplTokens.html
    </statements>
 </for-loop
 
+
+
+
+//////// Try
+
+    try {
+      fAddedOkDirectly = tryAddingDirectly(expr);
+      if (!fAddedOkDirectly) {
+        // could not add directly
+        addWithArtificialVariable(expr);
+      }
+    } catch (ExCLRequiredFailure err) {
+      throw err;
+    }
+
+<try>
+  <statements>
+    ...
+  </statements>
+  <catch>
+    <formal-argument  type="ExCLRequiredFailure" name="err">
+    <statements>
+      ...
+    </statements>
+  </catch>
+  <catch>
+    <formal-argument type="Exception" name="exc">
+    <statements>
+      ...
+    </statements>
+  </catch>
+  <finally>
+     <statements>
+       ...
+     </statements>
+  </finally>
+</try>  
+
+
 
 Thoughts for paper:
 
@@ -70,3 +110,12 @@ Issue:
   for-loop element vs. loop:
   -> do we care about preserving the looping format initially chosen in source
   -> or should we canonicalize to <loop> element
+
+Issue:
+  -> field w/ attribute static, or instance-field and class-field?
+  -> same for method element
+  -> Bigger issue: these sorts of higher level conceptual changes good or bad?
+     [[ need to look at use to better understand these issues ]]
+
+Issue:
+  -> mangling for id/idrefs
