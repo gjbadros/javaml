@@ -61,6 +61,10 @@
 <xsl:template match="*|@*|text()"/>
 
 <xsl:template match="java-source-program">
+  <xsl:apply-templates/>
+</xsl:template>
+
+<xsl:template match="java-class-file">
   <html>
     <head>
       <title><xsl:value-of select="@name"/></title>

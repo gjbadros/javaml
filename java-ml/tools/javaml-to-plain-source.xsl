@@ -20,6 +20,18 @@
 <xsl:template match="*|@*|text()"/>
 
 <xsl:template match="java-source-program">
+  <xsl:for-each select="*">
+    <xsl:text>// FILE: </xsl:text>
+    <xsl:value-of select="@name"/>
+    <xsl:text>&#xA;</xsl:text>
+    <xsl:apply-templates select="."/>
+    <xsl:if test="not(position()=last())">
+      <xsl:text>//----------------&#xA;</xsl:text>
+    </xsl:if>
+  </xsl:for-each>
+</xsl:template>
+
+<xsl:template match="java-class-file">
   <xsl:apply-templates/>
 </xsl:template>
 
