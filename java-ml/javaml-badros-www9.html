@@ -97,12 +97,12 @@ as the medium for encoding software structure and
 computation.  Over the years, techniques have been developed that
 largely mechanize the front-end of compilers which perform the lexical
 analysis and parsing necessary to uncover the structure of programming
-language constructs represented as plain text.  Tools such as Lex/Flex
+language constructs represented as plain text.  Tools such as <code>Lex/Flex</code>
 and Yacc/Bison <cite>[<a href="#REF-LexYacc">LexYacc</a>]</cite> automate these uninteresting tasks
 by using well-founded concepts of regular expressions and
 grammars. Regular expressions describe how individual characters combine
 to form tokens, and the grammar enumerates how higher-level constructs
-are composed of tokens and more primitive constructs.  Together, these
+are composed recursively of other constructs and primitive tokens.  Together, these
 procedures convert from a sequence of characters into a data structure
 called an <em>abstract syntax tree</em> (AST) that more directly
 reflects the structure of the source program.
@@ -110,7 +110,7 @@ reflects the structure of the source program.
 <p>
 
 The textual representation of source code has several nice properties.
-It can be concise and is similar to natural languages thus often making
+It can be concise and is similar to natural languages, often making
 it easy to read.  Text is a universal data format thus making source
 code easy to exchange and manipulate using a wide variety of tools
 including text editors, version control systems, and command pipeline
@@ -123,7 +123,7 @@ Nevertheless, the <em>classical source representation</em> has numerous
 problems.  The syntax of popular contemporary
 languages such as C++ and Perl push the limits of parsing capabilities
 (witness the <code>typename</code> keyword in C++ that is necessary to
-resolve an ambiguity in template-based code).  Constructing a front end
+resolve an ambiguity in template-based code).  Constructing a front-end
 for such languages is difficult despite the support from 
 tools.  Perhaps more disconcerting is that evolving the syntax of the
 language often requires manipulating a fragile grammar.  This limitation
@@ -133,7 +133,7 @@ complicates handling an evolving language.
 
 Another problem with the classical representation is that parsing is not very
 robust.  A small change in the source code can have a dramatic effect on
-the resulting AST and thus the semantics of the computation.  For
+the resulting AST and, thus, the semantics of the computation.  For
 example, a single extraneous semicolon can change a looping block into
 an ordinary one and result in an infinite loop:
 
@@ -167,7 +167,7 @@ lexical tasks.
 
 There are several reasons why tool developers often avoid embedding a parser in
 tools.  As mentioned previously, building a complete front-end is
-challenging for syntactically-complex languages.  Though re-using
+challenging for syntactically-complex languages.  Although re-using
 existing infrastructure (e.g., the grammar definition) simplifies
 implementation, working with the resulting AST is not always intuitive.  An
 AST typically reflects quirky artifacts of the grammar rather than
@@ -180,7 +180,7 @@ a simple analysis that can do "good enough" with lexical information.
 Other complications arise if a transformation of the source code is
 desired: a change in the AST must ultimately be reflected in the classical
 source representation
-since that is the primary long-term representation.  Recreating a text
+because that is the primary long-term representation.  Recreating a text
 representation from an AST is most
 straightforwardly done using an unparsing approach that can create
 undesired lexical side effects (e.g., changes in indentation or
@@ -189,7 +189,7 @@ relies upon (e.g., a version control system that is unable to
 disambiguate between a meaningful change and a gratuitous one effected
 unintentionally).  Finally, using a parser in a tool necessarily targets
 that tool to a specific language, thus reducing its applicability and
-generality.  Worse, since there is no standard structured external
+generality.  Worse, because there is no standard structured external
 representation of a source program, supporting inter-operability of
 independent tools even targeting the same programming language is
 very difficult.
@@ -200,7 +200,7 @@ The end result of these complications is that developers often use
 simple, lexically-oriented tools such as <code>grep</code> or search and
 replace within an editor.  This approach sacrifices accuracy:
 imagine wanting to rename a local variable from <code>result</code> to
-<code>answer</code>.  With simple search and replace, all occurrences of
+<code>answer</code>.  With simple search-and-replace, all occurrences of
 the word will be changed, even if they refer to characters inside
 comments, literal strings, or an unrelated instance field.
 
@@ -216,7 +216,7 @@ transformation on source code are often hard to automate or perform in
 batch using existing interactive environments.  Some more advanced
 IDEs, such as IBM VisualAge for C++ <cite>[<a href="#REF-Montana">Montana</a>]</cite>, expose an
 application programming interface to the representation of the program.
-Though an improvement, this technique still suffers from an inability
+Although an improvement, this technique still suffers from an inability
 to separate simple tools from a complex environment and additionally
 creates a dependency on proprietary technology that may be undesirable.
 
@@ -277,7 +277,7 @@ features of the two technologies it builds a bridge between: Java and XML.
 
  <h4><a name="java">2.1 - Java</a></h4>
 
-    Though the XML-based representation of programming language
+    Although the XML-based representation of programming language
     constructs is language independent and could be applied to many
     conventional languages, Java is an excellent candidate for 
     experimenting with these ideas and techniques.
@@ -336,7 +336,7 @@ XML is a standardized eXtensible Markup Language <cite>[<a href="#REF-XML">XML</
 that is a subset of
 SGML, the standard Generalized Markup Language <cite>[<a href="#REF-SGML">SGML</a>]</cite>.  The World Wide Web
 Consortium (W3C) designed XML to be lightweight and simple, while
-retaining compatibility with SGML.  Though HTML (HyperText Markup
+retaining compatibility with SGML.  Although HTML (HyperText Markup
 Language) is currently the standard language, the W3C is positioning XML
 to be its replacement.  While HTML permits authors to use only a
 pre-determined fixed set of tags in marking up their document, XML
@@ -445,7 +445,7 @@ could have multiple <code>to</code> elements contained by the
 
 </ul>
 
-Though the above distinctions sometimes mandate using one technique or
+Although the above distinctions sometimes mandate using one technique or
 the other, the decision is often initially a matter of taste.  However,
 later experiences using the resulting documents may suggest
 revisiting the decision in order to facilitate or simplify
@@ -457,7 +457,7 @@ Another useful data modeling feature of XML is the ability to attach
 unique identifiers to elements via an <code>ID</code> attribute.  These
 elements can then be later referred to by <code>IDREF</code> attributes
 of other elements.  A well-formed XML document must have every
-<code>IDREF</code> name an <code>ID</code> given in the document.
+<code>IDREF</code> name be an <code>ID</code> given in the document.
 
 
 <p>
@@ -480,9 +480,9 @@ The Java Markup Language provides a complete self-describing
 representation of Java source code.  Unlike the conventional
 character-based representation of programs, JavaML reflects the
 structure of the software artifact directly in the nesting of elements
-in the XML-based syntax.  Since XML is a text-based representation, many
-of the advantages of the classical source representation remain. Since
-JavaML is an XML application, JavaML is incredibly easy to parse, and
+in the XML-based syntax.  Because XML is a text-based representation, many
+of the advantages of the classical source representation remain. Because
+JavaML is an XML application, JavaML is easy to parse, and
 all existing tools for working with XML can be applied to Java source
 code in its JavaML representation.  JavaML tools can leverage the
 existing infrastructure and exploit the canonical representation to
@@ -491,7 +491,7 @@ improve inter-operability among tool sets.
 
 <h4><a name="approaches">3.1 - Possible approaches</a></h4>
 
-Though the basic approach of using an XML application to model source
+Although the basic approach of using an XML application to model source
 code is fairly straightforward, there is a large design space for
 possible markup languages.  The most obvious possibility is to simply use
 XML as a textual dump format of a typical abstract syntax tree derived
@@ -511,7 +511,7 @@ public class FirstApplet extends Applet {
 </code>
 
 Performing the obvious (but very unsatisfying) translation from the AST
-of the above might result in the below <em>for just the first line of code</em>:
+of the above might result in the below XML <em>for just the first line of code</em>:
 
 <code>
 <pre>
@@ -542,7 +542,7 @@ of the above might result in the below <em>for just the first line of code</em>:
 </pre>
 </code>
 
-Certainly this is far from ideal.  It is unacceptably verbose, exposes
+Certainly this translation is far from ideal:  it is unacceptably verbose, exposes
 numerous uninteresting details of the underlying grammar that was used to do the
 initial parse from the classical source representation and would be difficult to work with because
 of the excessive number of nodes.
@@ -578,17 +578,18 @@ convert the <code>FirstApplet.java</code> implementation to:
 </pre>
 </code>
 
-This is a huge step towards a more useful markup language.
+This format is a huge step towards a more useful markup language.
 We have definitely added value to the source code
 and it is trivial to convert back to the classical representation: we simply
-remove all tags and leave the content of the elements behind (this is
+remove all tags and leave the content of the elements behind (this
+removal of markup is
 exactly what the <code>stripsgml</code> <cite>[<a href="#REF-perlSGML">perlSGML</a>]</cite> utility
-does).  Though this representation seems useful for many tasks, it still
+does).  Although this representation seems useful for many tasks, it still
 has some problems.  First, many of the details of the code are included
 in the textual content of elements.  If we want to determine what
 packages are being imported, our XML query would need to lexically
-analyze the content of the import-declaration elements.  This is
-inconvenient and is not taking advantage of the capabilities that XML
+analyze the content of the import-declaration elements.  Such analysis is
+inconvenient and does not take advantage of the capabilities that XML
 provides.  Perhaps more significantly, the above XML representation
 retains artifacts from the classical source code that another representation might permit
 us to abstract away from and free ourselves of those syntactic burdens
@@ -608,7 +609,9 @@ and readability of the resulting markup language.
 
 <p>
 
-For the example <code>FirstApplet.java</code> listed above, we represent 
+JavaML is defined by the document type definition (DTD) in
+<a href="javaml.dtd">Appendix 1</a>, but is best illustrated by example. 
+For the <code>FirstApplet.java</code> source code listed above, we represent 
 the program in JavaML as:
 
 <code>
@@ -631,7 +634,7 @@ the program in JavaML as:
   16  	  &lt;send message="drawString"&gt;
   17  	    &lt;target&gt;&lt;var-ref name="g" idref="frmarg-13"/&gt;&lt;/target&gt;
   18  	    &lt;arguments&gt;
-  19                &lt;literal-string length="13"&gt;Hello World&lt;/literal-string&gt;
+  19                &lt;literal-string length="11"&gt;Hello World&lt;/literal-string&gt;
   20                &lt;literal-number kind="integer" value="25"/&gt;
   21                &lt;literal-number kind="integer" value="50"/&gt;
   22              &lt;/arguments&gt;
@@ -644,22 +647,21 @@ the program in JavaML as:
 </pre>
 </code>
 
-In the above, concepts such as methods, superclasses, message sends, and
+In the above document, concepts such as methods, superclasses, message sends, and
 literal numbers are all directly represented in the elements and
 attributes of the representation.  The representation reflects the 
 structure of the programming language in the nesting of the elements.  
 For example, the literal
 string "Hello World" is a part of the message send, thus the
 <code>literal-string</code> element is nested inside the
-<code>send</code> element.  See <a href="javaml.dtd">Appendix 1</a> for
-the complete document type definition of JavaML, and Appendices <a
+<code>send</code> element.  See Appendices <a
 href="#set.java">2a</a> and <a href="#set.java.xml">2b</a> for an
 example of a more complex converted program.
 
 <h4><a name="design-decisions">3.3 - Design decisions</a></h4>
 
 JavaML provides more than just the structure of the source program,
-though.  In the above, notice the use of the formal-argument
+though.  In the preceding example, notice the use of the formal-argument
 <code>g</code> in line 17 as the target of the message send.  The
 <code>idref</code> attribute of that <code>var-ref</code> tag points
 back at the referenced <code>formal-argument</code> element (through its
@@ -680,7 +682,7 @@ structure of the value can never be more complex than a simple text string.
 Attributes are used for modifiers such as <code>synchronized</code> and
 <code>final</code> and for visibility settings such as
 <code>public</code> or <code>private</code>.  Attributes are not used
-for properties such as types because they have richer structure: a type
+for properties such as types because types have some structure: a type
 can consist of a base name and a number of dimensions, and could also
 reference the definition of the class that implements the type, if
 desired.  If, say, a return type were just the value of an attribute on
@@ -691,8 +693,8 @@ type of that two-dimensional array was the primitive type
 
 <p>
 
-In JavaML, important characteristics of elements are stressed over less
-important features, but those less important distinctions are preserved.
+JavaML generalizes related concepts to simplify some analyses
+but also preserves distinctions that may be needed for other tasks.
 For example, <code>45</code> and <code>1.9</code> are represented as:
 <code>&lt;literal-number kind="integer" value="45"&gt;</code> and
 <code>&lt;literal-number kind="float" value="1.9"&gt;</code>,
@@ -700,8 +702,10 @@ respectively.  An alternate possible markup is:
 <code>&lt;literal-integer value="45"&gt;</code> and
 <code>&lt;literal-float value="1.9"&gt;</code> but using separate
 element classes eliminates the tight relationship that both values are
-numbers and can complicate using the representation.  By instead
-disambiguating these literals based on a kind attribute, we can still
+numbers and can complicate using the representation.  Instead, we use
+a single element tag and 
+disambiguate these literals based on a <code>kind</code> attribute. Thus,
+we can still
 tell the difference between a floating point literal and an integer
 literal, but in the common case we gain the same flexibility of numeric
 types that the Java language has.
@@ -718,7 +722,7 @@ instructions.  Thus, instead of using two classes of elements,
 <code>loop</code> element that has a <code>kind</code> attribute with
 value either <code>for</code> or <code>while</code>.  When a
 <code>while</code> loop is converted, it will have no initializer and
-update children, yet a <code>for</code> loop could potentially contain multiple
+update children, yet a <code>for</code> loop could potentially contain many
 of each.  In contrast <code>do-loop</code> elements are used for
 <code>do</code> loops which have their test performed at the end of the
 loop, instead of at the start.
@@ -731,7 +735,7 @@ loop, instead of at the start.
 
 As yet another example, we represent both instance and class (i.e.,
 static) fields as <code>field</code> elements with a <code>static</code>
-attribute used to disambiguate.  Though there are more substantial
+attribute used to disambiguate.  Although there are more substantial
 differences between these two concepts than between <code>while</code>
 and <code>for</code> loops, it still seems beneficial to use a single
 kind of element for both concepts.
@@ -740,30 +744,18 @@ kind of element for both concepts.
 
 Local variable declarations provide a syntactic shorthand that raises an
 interesting question about their underlying representation.  The code
-segment:
-
-<code>
-<pre>
-  int x, y;
-</pre>
-</code>
-
+segment <code>int x, y;</code>
 defines two variables both of type <code>int</code>, but with perhaps a
 subtle additional intention: that the two variables have the same type.
-For contrast, consider:
-
-<code>
-<pre>
-  int weight, i;
-</pre>
-</code>
-
+For contrast, consider <code>int weight, i;</code>.
 Here, there probably is <em>not</em> the implicit desire that the two
 variables have the same type, but instead the shorthand syntax is being
-used simply for brevity.  Since it is hard to automate distinguishing
+used simply for brevity.  Because it is hard to automate distinguishing
 these cases, JavaML simply preserves this syntactic feature by using a
 <code>continued="true"</code> attribute on variable declarations that
 exploit this shorthand.
+
+<p>
 
 The careful reader will observe that the JavaML representation is 
 about three times longer than the classical source code.  That expansion is a fundamental
@@ -781,7 +773,7 @@ classical source representation to JavaML.  Within the IBM Jikes Java
 compiler framework <cite>[<a href="#REF-Jikes">Jikes</a>]</cite>, I added an
 <code>XMLUnparse</code> method to each of the AST nodes. This change,
 along with some small additional code for managing the options to
-request the XML output, results in an incredibly robust and fast 
+request the XML output, results in a robust and fast 
 JavaML converter.  In total, I added about 1600 non-comment-non-blank
 lines of C++ code to the Jikes framework to support the option.  The
 source code is available upon request (and will be made publicly
@@ -794,7 +786,8 @@ well as the whole of the 4300 line Cassowary Constraint Solving Toolkit
 <cite>[<a href="#REF-Cassowary">Cassowary</a>]</cite>.  The processing of all those files takes only
 about six seconds on the author's RedHat6-based Pentium III-450 machine.
 Each of the files converted was then validated with respect to the
-JavaML DTD using James Clark's Jade package's <code>nsgmls</code> tool.
+JavaML DTD using James Clark's Jade package's <code>nsgmls</code> tool
+<cite>[<a href="#REF-Jade">Jade</a>]</code>.
 
 <p>
 
@@ -803,14 +796,14 @@ source representation given
 the JavaML representation. That application uses the XML and DOM packages
 and contains about 360 lines of Perl.
 See <a href="#future-work">section 6</a> for
-more about back-converting possibilities.
+more details about back-converting possibilities.
 
 <p><span class="index"><a href="#top">[top]</a></span>
 
 <h3><a name="leveraging-xml">4 - Leveraging XML</a></h3>
 
 JavaML uses XML as an alternate, structured representation of a Java
-source program.  Though the abstraction away from syntactic details of
+source program.  Although the abstraction away from syntactic details of
 Java is convenient, the more important benefit is that JavaML enables
 the use of the rich infrastructure developed to support SGML and XML.
 Instead of building analysis and transformation tools from scratch to
@@ -818,7 +811,7 @@ work on a proprietary binary structured format for a program, existing
 SGML and XML tools can be used, combined, and extended.  XML tools
 encompass a broad range of features that include querying and
 transformation, document differencing and merging
-<cite>[XMLDiffMerge]</cite>, and simple APIs for working with the
+<cite>[<a href="#REF-XMLDiffMerge">XMLDiffMerge</a>]</cite>, and simple APIs for working with the
 document directly.  In this paper, I will (for space reasons) limit
 discussion to uses of only three tool groups:
 
@@ -838,7 +831,7 @@ DOM level 1 <cite>[<a href="#REF-DOM">DOM</a>]</cite> interface to an XML tree.
 These are just a very small subset of the tools that prove useful when
 working with JavaML.  In the following examples, we will query the
 <code>Set.java.xml</code> document that appears in <a
-href="#set.java.xml">Appendix 2b</a>.  Though these examples are small
+href="#set.java.xml">Appendix 2b</a>.  Although these examples are small
 by real-world standards, XML and SGML tools target documents ranging up
 through lengthy books so the implementations are designed to
 scale well.
@@ -856,50 +849,50 @@ in a Java program:
 % sgcount Set.java.xml
 </strong>
 <small>
-new                    5   0
-method                 9   9
-lvalue                 4   0
-if                     1   0
-var-set                4   0
-literal-true           2   0
-assignment-expr        4   0
-loop                   1   0
-formal-argument        7   7
-package-decl           1   0
-local-variable         2   2
-literal-null           2   0
-target                 18  0
-cast-expr              1   0
-constructor            4   4
-arguments              23  0
-import                 1   0
-send                   18  0
-return                 8   0
-test                   2   0
-formal-arguments       13  0
-class                  1   0
-java-source-program    1   0
-true-case              1   0
-type                   25  0
-conditional-expr       2   0
-var-ref                25  0
-literal-false          2   0
-statements             25  0
-literal-string         3   0
-binary-expr            3   0
-field                  1   0
-*Total*               219  22
+new                    5  
+method                 9  
+lvalue                 4  
+if                     1  
+var-set                4  
+literal-true           2  
+assignment-expr        4  
+loop                   1  
+formal-argument        7  
+package-decl           1  
+local-variable         2  
+literal-null           2  
+target                 18 
+cast-expr              1  
+constructor            4  
+arguments              23 
+import                 1  
+send                   18 
+return                 8  
+test                   2  
+formal-arguments       13 
+class                  1  
+java-source-program    1  
+true-case              1  
+type                   25 
+conditional-expr       2  
+var-ref                25 
+literal-false          2  
+statements             25 
+literal-string         3  
+binary-expr            3  
+field                  1  
+*Total*               219 
 </small>
 </pre>
 
-In the above, each row lists an element class and the number of times
-that that element appeared in the document (the third column can be
-ignored).  Thus, we can easily see that there are 9 <code>method</code>
-elements, thus there are 9 method definitions.  Similarly, we can see
-that there is 1 class definition, 25 variable references, 18 message
-sends, and 3 string literals.  This summary is far more indicative of 
-the content of a program than a typical lexical measure such as the
-number of lines of code.
+In the above output, each row lists an element class and the number of
+times that that element appeared in the document.  Thus, we can easily
+see that there are 9 <code>method</code> elements, thus there are 9
+method definitions.  Similarly, we can see that there is 1 class
+definition, 25 variable references, 18 message sends, and 3 string
+literals.  This summary is far more indicative of the content of a
+program than a typical lexical measure such as the number of lines of
+code.
 
 <p>
 
@@ -913,9 +906,9 @@ representation of the program:
 </strong>
 &lt;?xml version='1.0' encoding='UTF-8'?&gt;
 &lt;!DOCTYPE java-source-program SYSTEM "java-ml.dtd" &gt;
-&lt;literal-string length='4'&gt;{ &lt;/literal-string&gt;
-&lt;literal-string length='4'&gt;, &lt;/literal-string&gt;
-&lt;literal-string length='6'&gt; }\n&lt;/literal-string&gt;
+&lt;literal-string length='2'&gt;{ &lt;/literal-string&gt;
+&lt;literal-string length='2'&gt;, &lt;/literal-string&gt;
+&lt;literal-string length='4'&gt; }\n&lt;/literal-string&gt;
 </pre>
 
 Notice that the output of <code>sggrep</code> is also a (not necessarily
@@ -956,7 +949,7 @@ message <code>clone</code> we can do so easily and reliably:
 
 Another class of common analyses is the semantic checks done by the
 compiler prior to translation.  For example, in Java code, only abstract
-classes can have abstract methods.  When compiling, a semantic error
+classes may have abstract methods.  When compiling, a semantic error
 will be flagged if this rule is violated.  We can query a JavaML document
 for not-abstract classes that contain a method that is abstract:
 
@@ -966,15 +959,15 @@ for not-abstract classes that contain a method that is abstract:
 </strong>
 </pre>
 
-and the output will be empty since this semantic restriction is not
+and the output will be empty because this semantic restriction is not
 violated in our target document (i.e., the analyzed program).
 
 <p>
 
 A common error for novice Java programmers is to accidentally use the
 assignment operator, <code>=</code>, instead of using the equality test
-operator, <code>==</code>.  Though the Java type checker will catch
-these most of these errors at compile time, it will miss the problem if
+operator, <code>==</code>.  Although the Java type checker will catch
+most of these errors at compile time, it will miss the problem if
 the assigned-to variable is a <code>boolean</code>. If we wish to find these
 questionable constructs, <code>sggrep</code> makes this analysis
 trivial thanks to the JavaML representation:
@@ -1058,7 +1051,7 @@ also straightforward.
 GJB:FIXME:: need another transformation example, ideally using XSLT if I
 can find a working implementation of that.
 
-* changing sense of a default parameter (via overriding, since no
+* changing sense of a default parameter (via overriding, because no
 defaults in Java)
 
 * renaming a method
@@ -1079,7 +1072,7 @@ defaults in Java)
 
 A key benefit of JavaML is its ability to leverage the growing
 infrastructure of SGML and XML related tools and techniques as described
-in <a href="#leveraging-xml">the previous section</a>.  Various others
+in <a href="#leveraging-xml">the previous section</a>.  Various researchers
 have similarly approached the problem of 
 improving software engineering and development
 tools with varying degrees of success.
@@ -1131,7 +1124,7 @@ build their software.  JavaML is especially exciting as a representation
 for this approach.  We can view new abstractions as incremental
 extensions to DTDs.  In order for the new document type, call it Java++ML, to
 still be compilable by a stock Java compiler, the developer must simply
-write a transformation from Java++ML to JavaML.  Since DTDs are
+write a transformation from Java++ML to JavaML.  Because DTDs are
 exceptionally easy to extend, this approach is tenable and likely a
 fruitful avenue for future work.  There are several utilities for
 documenting and comparing DTDs (e.g., <code>dtd2html</code> and
@@ -1145,10 +1138,10 @@ technique.
 
 The one unfortunate shortcoming of the current implementation of the
 classical source representation to JavaML converter
-is that it loses source-level comments.  Though these
+is that it loses source-level comments.  Although these
 are an essential part of any software artifact, conventional parsing
 technology throws the comments away early in the lexical analysis phase.
-Since the comments are never a part of the internal representation of
+Because the comments are never a part of the internal representation of
 the program inside the Jikes compiler framework, they cannot be unparsed
 into JavaML.  Even after modifying the compiler's internal 
 representation to support
@@ -1175,7 +1168,7 @@ instead of a DTD after the Schema working drafts are finalized.
 
 <p>
 
-Though this paper has presented a markup language for Java,
+Although this paper has presented a markup language for Java,
 the same basic approach can be
 applied to other programming languages, or even to translate among
 languages.  To the extent that the representation abstracts away syntax,
@@ -1208,7 +1201,7 @@ function to build the Jikes internal AST from using the DOM API.  Then,
 using Jikes's pre-existing conventional unparser, the compiler can write
 out the classical representation for the source code.  The key benefit of this technique is
 that it then permits the compiler to work directly on the JavaML
-representation of the source code via the new front end.
+representation of the source code via the new front-end.
 
 <p>
 
@@ -1224,7 +1217,7 @@ href="#leveraging-xml">Section 4</a>).
 
 <p>
 
-Since the concise textual representation of source code is nicely suited
+Because the concise textual representation of source code is nicely suited
 to expert programmers, it's unlikely that they will be interested in
 discarding their favourite text editor anytime soon.  It will be useful
 to investigate better ways to convert interactively and incrementally
@@ -1242,14 +1235,14 @@ commercial importance of XML technology.
 JavaML is an alternate representation of Java source programs that is
 based on XML.  Unlike the classical textual source representation, the
 JavaML representation makes it easy for software tools to reason about
-programming-level constructs in a Java program.  This results from the
+programming-level constructs in a Java program.  This benefit results from the
 ability of JavaML to more directly represent the structure of the program.
 
 <p>
 
 Given JavaML, the wealth of pre-existing XML and SGML tools can perform
 numerous interesting and useful analyses and transformations of Java
-source programs.  But the best is yet to come.  XML tools are improving
+source programs.  XML tools are improving
 continually to support the growing infrastructure of XML-based
 documents.  Ultimately, JavaML could replace the classical source
 representation of Java programs as the storage format for programs,
@@ -1632,7 +1625,7 @@ class Set {
 	  &lt;local-variable name="bstr" id="locvar-216"&gt;
                &lt;type name="StringBuffer"/&gt;
                &lt;new&gt;&lt;type name="StringBuffer"/&gt;
-                 &lt;arguments&gt;&lt;literal-string length="4"&gt;{ &lt;/literal-string&gt;&lt;/arguments&gt;&lt;/new&gt;
+                 &lt;arguments&gt;&lt;literal-string length="2"&gt;{ &lt;/literal-string&gt;&lt;/arguments&gt;&lt;/new&gt;
 	  &lt;/local-variable&gt;
 	  &lt;local-variable name="e" id="locvar-223"&gt;&lt;type name="Enumeration"/&gt;&lt;send message="keys"&gt;
 	      &lt;target&gt;&lt;var-ref name="hash"/&gt;&lt;/target&gt;
@@ -1668,7 +1661,7 @@ class Set {
 	      &lt;/test&gt;&lt;statements&gt;
 		&lt;send message="append"&gt;
 		  &lt;target&gt;&lt;var-ref name="bstr"/&gt;&lt;/target&gt;
-		  &lt;arguments&gt;&lt;binary-expr op="+"&gt;&lt;literal-string length="4"&gt;, &lt;/literal-string&gt;&lt;send message="nextElement"&gt;
+		  &lt;arguments&gt;&lt;binary-expr op="+"&gt;&lt;literal-string length="2"&gt;, &lt;/literal-string&gt;&lt;send message="nextElement"&gt;
 			&lt;target&gt;&lt;var-ref name="e"/&gt;&lt;/target&gt;
 			&lt;arguments/&gt;
 		      &lt;/send&gt;
@@ -1679,7 +1672,7 @@ class Set {
 	  &lt;/statements&gt;
 	  &lt;send message="append"&gt;
 	    &lt;target&gt;&lt;var-ref name="bstr" idref="locvar-216"/&gt;&lt;/target&gt;
-	    &lt;arguments&gt;&lt;literal-string length="6"&gt; }\n&lt;/literal-string&gt;&lt;/arguments&gt;
+	    &lt;arguments&gt;&lt;literal-string length="4"&gt; }\n&lt;/literal-string&gt;&lt;/arguments&gt;
 	  &lt;/send&gt;
 	  &lt;return&gt;&lt;send message="toString"&gt;
 	      &lt;target&gt;&lt;var-ref name="bstr" idref="locvar-216"/&gt;&lt;/target&gt;
@@ -1762,6 +1755,12 @@ Michael Ernst, Greg Badros, and David Notkin.
 "An Empirical Study of C Preprocessor Use".
 University of Washington TR UW-CSE-97-04-06.
 <code><a href="http://www.cs.washington.edu/homes/mernst/pubs/empirical-tr970406-abstract.html">http://www.cs.washington.edu/homes/mernst/pubs/empirical-tr970406-abstract.html</a></code>
+
+<p>
+<a name="REF-Jade"><strong>[Jade]</strong></a> &nbsp;
+James Clark.
+James' DSSSL Engine.
+<code>http://www.jclark.com/jade</code>
 
 <p>
 <a name="REF-Java"><strong>[Java]</strong></a> &nbsp; 
